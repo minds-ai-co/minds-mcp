@@ -8,6 +8,7 @@ testing, message testing, and segment comparison.
 **Endpoint:** `https://getminds.ai/mcp` (streamable HTTP)
 **Docs:** https://getminds.ai/mcp
 **Quick-start guide:** https://minds-ai-co.github.io/minds-mcp/
+**Technical reference:** https://minds-mcp.readthedocs.io/en/latest/
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
 
 > This repository is documentation for a hosted MCP server. There is no code to
