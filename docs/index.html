@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Connect Minds to ChatGPT, Claude, Cursor, and other MCP clients for evidence-grounded synthetic market research.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://minds-ai-co.github.io/minds-mcp/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Minds MCP · Market research, callable">
+  <meta property="og:description" content="Build grounded synthetic audiences, run studies, and export evidence from any MCP-compatible assistant.">
+  <meta property="og:url" content="https://minds-ai-co.github.io/minds-mcp/">
+  <title>Minds MCP · Market research, callable</title>
+  <link rel="icon" href="assets/images/minds-logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/selecta-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/selecta-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/site.css">
+  <script defer src="assets/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="page-shell">
+    <header class="site-header" aria-label="Primary">
+      <a class="brand" href="https://getminds.ai/" aria-label="Minds home">
+        <img src="assets/images/minds-logo.svg" alt="Minds">
+      </a>
+      <p class="header-title">Minds · Model Context Protocol</p>
+      <nav class="header-nav" aria-label="Page">
+        <a href="#connect">Connect</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#tools">Tools</a>
+        <a href="https://github.com/minds-ai-co/minds-mcp">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Remote MCP server · <span class="status-dot" aria-hidden="true"></span> Live</p>
+          <h1 id="hero-title">Market research,<br>callable.</h1>
+          <p class="hero-lede">
+            Build evidence-grounded synthetic audiences, test decisions, and inspect
+            disagreement from the AI assistant where your work already happens.
+          </p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="https://getminds.ai/mcp/setup">Connect Minds</a>
+            <a class="button button--secondary" href="https://getminds.ai/mcp">Read the documentation</a>
+          </div>
+        </div>
+
+        <aside class="endpoint-panel reveal" aria-label="MCP endpoint">
+          <div class="panel-heading">
+            <span>Remote endpoint</span>
+            <span class="protocol-label">Streamable HTTP</span>
+          </div>
+          <div class="endpoint-row">
+            <code id="endpoint">https://getminds.ai/mcp</code>
+            <button class="copy-button" type="button" data-copy-target="endpoint">
+              <span class="copy-button__default">Copy</span>
+              <span class="copy-button__success" aria-live="polite">Copied</span>
+            </button>
+          </div>
+          <dl class="protocol-spec">
+            <div>
+              <dt>Registry name</dt>
+              <dd><code>ai.getminds/minds</code></dd>
+            </div>
+            <div>
+              <dt>Authentication</dt>
+              <dd>OAuth 2.1 or API key</dd>
+            </div>
+            <div>
+              <dt>Studies</dt>
+              <dd>Durable, server-side runs</dd>
+            </div>
+            <div>
+              <dt>Exports</dt>
+              <dd>PDF · CSV · XLSX · JSON</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="protocol-rail" aria-label="Compatible clients">
+        <span>Works with</span>
+        <ul>
+          <li>ChatGPT</li>
+          <li>Claude</li>
+          <li>Cursor</li>
+          <li>VS Code</li>
+          <li>Windsurf</li>
+          <li>Codex</li>
+        </ul>
+      </section>
+
+      <section id="workflow" class="signal-field" aria-labelledby="workflow-title">
+        <div class="signal-field__intro reveal">
+          <p class="eyebrow">The research sequence</p>
+          <h2 id="workflow-title">From brief<br>to evidence.</h2>
+          <p>
+            Minds grounds a population before the first question is asked, then keeps
+            the study available for follow-up instead of collapsing it into one answer.
+          </p>
+        </div>
+        <ol class="workflow-list">
+          <li class="reveal">
+            <span class="step-number">01</span>
+            <div>
+              <h3>Define the audience</h3>
+              <p>Describe a market, buyer group, stakeholder set, or research population in plain language.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="step-number">02</span>
+            <div>
+              <h3>Ground the population</h3>
+              <p>External statistics and research shape the audience before synthetic respondents are created.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="step-number">03</span>
+            <div>
+              <h3>Run the study</h3>
+              <p>Test concepts, messages, products, positioning, or hypotheses across the complete panel.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="step-number">04</span>
+            <div>
+              <h3>Inspect and export</h3>
+              <p>Compare segments, follow disagreement, and move structured results into the next decision.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section id="connect" class="section section--connect" aria-labelledby="connect-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Connect</p>
+          <h2 id="connect-title">One endpoint.<br>Your assistant.</h2>
+          <p>
+            Use OAuth when your client supports it. For clients that accept custom
+            headers, generate an API key in Minds under Settings → API Keys.
+          </p>
+        </div>
+
+        <div class="connect-content reveal">
+          <div class="terminal" aria-label="Claude Code setup command">
+            <div class="terminal__bar">
+              <span>Claude Code</span>
+              <button class="copy-button copy-button--dark" type="button" data-copy-target="claude-command">
+                <span class="copy-button__default">Copy command</span>
+                <span class="copy-button__success" aria-live="polite">Copied</span>
+              </button>
+            </div>
+            <pre><code id="claude-command">claude mcp add --transport http mindsai https://getminds.ai/mcp \
+  --header "Authorization: Bearer minds_YOUR_API_KEY"</code></pre>
+          </div>
+
+          <div class="client-notes">
+            <details open>
+              <summary>ChatGPT</summary>
+              <p>Open Settings → Connected Apps, add the remote endpoint, and authorize with OAuth.</p>
+            </details>
+            <details>
+              <summary>Claude and Claude Desktop</summary>
+              <p>Open Customize → Connectors, add the remote endpoint, and complete OAuth authorization.</p>
+            </details>
+            <details>
+              <summary>Cursor, VS Code, and Windsurf</summary>
+              <p>Add <code>https://getminds.ai/mcp</code> as a remote MCP server in the client’s MCP settings.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="tools" class="section section--tools" aria-labelledby="tools-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Research tools</p>
+          <h2 id="tools-title">A complete study,<br>not a single prompt.</h2>
+          <p>
+            The server describes its current schemas to every connected client.
+            These are the core operations an assistant can orchestrate.
+          </p>
+        </div>
+
+        <div class="tool-index reveal" role="list">
+          <article role="listitem">
+            <code>create_group_from_brief</code>
+            <p>Build a grounded synthetic audience from a population brief.</p>
+          </article>
+          <article role="listitem">
+            <code>ask_group</code>
+            <p>Interview, survey, or poll one saved audience.</p>
+          </article>
+          <article role="listitem">
+            <code>create_panel</code>
+            <p>Create a panel or study around a research goal.</p>
+          </article>
+          <article role="listitem">
+            <code>ask_panel</code>
+            <p>Ask one focused question across the complete panel.</p>
+          </article>
+          <article role="listitem">
+            <code>plan_panel_study</code>
+            <p>Turn a research goal into a structured multi-question plan.</p>
+          </article>
+          <article role="listitem">
+            <code>run_panel_study</code>
+            <p>Execute an approved plan as a durable server-side study.</p>
+          </article>
+          <article role="listitem">
+            <code>get_panel_study</code>
+            <p>Inspect progress, outputs, and method artifacts.</p>
+          </article>
+          <article role="listitem">
+            <code>export_panel</code>
+            <p>Export findings in common research and data formats.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="decision-strip" aria-labelledby="decision-title">
+        <div class="decision-strip__copy reveal">
+          <p class="eyebrow">Scope</p>
+          <h2 id="decision-title">Sharpen the question<br>before fieldwork.</h2>
+        </div>
+        <p class="decision-strip__body reveal">
+          Minds does not replace representative human research. It improves the
+          first pass: expose objections, compare reactions, and decide which
+          assumptions deserve validation with real respondents.
+        </p>
+        <a class="text-link reveal" href="https://getminds.ai/mcp/setup">
+          Open the complete setup guide <span aria-hidden="true">↗</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Minds · Synthetic market research</p>
+      <div class="footer-links">
+        <a href="https://getminds.ai/">getminds.ai</a>
+        <a href="https://getminds.ai/api">API documentation</a>
+        <a href="https://github.com/minds-ai-co/minds-mcp">Source and metadata</a>
+      </div>
+      <p>Remote MCP server</p>
+    </footer>
+  </div>
+</body>
+</html>
