@@ -1,5 +1,7 @@
 # Minds MCP Server
 
+[![smithery badge](https://smithery.ai/badge/alexander-a4p3/minds)](https://smithery.ai/servers/alexander-a4p3/minds)
+
 Run AI market research from your assistant: synthetic customer panels for concept
 testing, message testing, and segment comparison.
 
