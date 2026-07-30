@@ -42,6 +42,7 @@ continue after the chat session that started it.
 ## Start here
 
 - [Connect a client](connect.md) for ChatGPT, Claude, Cursor, VS Code, and other clients.
+- [Check client compatibility](https://minds-mcp-compatibility.pages.dev/) for a compact transport and authentication matrix.
 - [Run a study](workflow.md) for a durable end-to-end workflow.
 - [Browse the tools](tools.md) exposed by the remote server.
 - [Understand the scope](scope.md) before using results in a decision.

@@ -9,6 +9,7 @@ testing, message testing, and segment comparison.
 **Docs:** https://getminds.ai/mcp
 **Quick-start guide:** https://minds-ai-co.github.io/minds-mcp/
 **Technical reference:** https://minds-mcp.readthedocs.io/en/latest/
+**Client compatibility:** https://minds-mcp-compatibility.pages.dev/
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
 
 > This repository is documentation for a hosted MCP server. There is no code to
@@ -108,4 +109,5 @@ state rather than assuming.
 - Product: https://getminds.ai
 - MCP docs: https://getminds.ai/mcp
 - API docs: https://getminds.ai/api
+- Client compatibility: https://minds-mcp-compatibility.pages.dev/
 - Support: https://getminds.ai
