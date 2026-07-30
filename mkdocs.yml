@@ -1,0 +1,30 @@
+site_name: Minds MCP
+site_description: Technical integration reference for the Minds remote MCP server
+site_url: https://minds-mcp.readthedocs.io/
+repo_url: https://github.com/minds-ai-co/minds-mcp
+repo_name: minds-ai-co/minds-mcp
+docs_dir: reference
+strict: true
+
+theme:
+  name: readthedocs
+  logo: assets/minds-logo.svg
+  highlightjs: true
+  hljs_languages:
+    - bash
+    - json
+
+nav:
+  - Overview: index.md
+  - Connect a client: connect.md
+  - Run a study: workflow.md
+  - Tool reference: tools.md
+  - Scope and methods: scope.md
+
+extra_css:
+  - assets/minds.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
