@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://minds-ai-co.github.io/minds-mcp/sitemap.xml
