@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "minds",
+  "version": "2.0.0",
+  "description": "Run AI market research: synthetic customer panels for concept testing, message testing, segments.",
+  "author": {
+    "name": "Minds",
+    "url": "https://getminds.ai"
+  },
+  "homepage": "https://getminds.ai/mcp",
+  "repository": "https://github.com/minds-ai-co/minds-mcp",
+  "license": "MIT",
+  "keywords": [
+    "market-research",
+    "synthetic-panel",
+    "consumer-insights",
+    "ai-personas",
+    "concept-testing",
+    "message-testing",
+    "ad-pretesting",
+    "segmentation",
+    "survey",
+    "focus-group",
+    "qualitative-research",
+    "customer-insight",
+    "ux-research"
+  ]
+}
