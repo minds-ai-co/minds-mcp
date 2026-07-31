@@ -4,6 +4,8 @@ site_url: https://minds-mcp.readthedocs.io/
 repo_url: https://github.com/minds-ai-co/minds-mcp
 repo_name: minds-ai-co/minds-mcp
 docs_dir: reference
+exclude_docs: |
+  SUMMARY.md
 strict: true
 
 theme:
@@ -17,6 +19,7 @@ theme:
 nav:
   - Overview: index.md
   - Connect a client: connect.md
+  - Practical cookbook: cookbook.md
   - Run a study: workflow.md
   - Tool reference: tools.md
   - Scope and methods: scope.md
