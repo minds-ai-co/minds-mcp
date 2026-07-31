@@ -1,9 +1,8 @@
 const PAGE_URL = "https://minds-mcp-compatibility.pages.dev/";
 const MCP_URL = "https://getminds.ai/mcp";
-const TRACKED_MCP_URL =
-  "https://getminds.ai/mcp?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=cloudflare-compatibility";
 const SETUP_URL =
   "https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=cloudflare-compatibility";
+const DOI_URL = "https://doi.org/10.5281/zenodo.21711429";
 
 const clients = [
   {
@@ -104,7 +103,7 @@ const page = `<!doctype html>
     @media(max-width:850px){header{grid-template-columns:1fr auto}.header-label{display:none}nav a:not(:last-child){display:none}.hero,.section-head,.signal{grid-template-columns:1fr}.hero{padding-top:76px}.configs{grid-template-columns:1fr}footer{grid-template-columns:1fr;padding:30px 0}.footer-links{justify-content:flex-start}footer p:last-child{text-align:left}}
     @media(prefers-reduced-motion:no-preference){.button{transition:transform 160ms ease}}
   </style>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Minds MCP","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"${TRACKED_MCP_URL}","codeRepository":"https://github.com/minds-ai-co/minds-mcp","softwareVersion":"2.0.0"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Minds MCP","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"${SETUP_URL}","codeRepository":"https://github.com/minds-ai-co/minds-mcp","softwareVersion":"2.0.0"}</script>
 </head>
 <body>
   <div class="shell">
@@ -128,7 +127,7 @@ const page = `<!doctype html>
           <div class="check-head"><span>Endpoint check</span><span id="checked">Running…</span></div>
           <div class="check-body">
             <p class="check-status" id="status">Checking reachability</p>
-            <a class="endpoint" href="${TRACKED_MCP_URL}">${MCP_URL}</a>
+            <code class="endpoint">${MCP_URL}</code>
             <dl class="facts">
               <div><dt>Registry</dt><dd>ai.getminds/minds</dd></div>
               <div><dt>Transport</dt><dd>Streamable HTTP</dd></div>
@@ -180,15 +179,16 @@ const page = `<!doctype html>
       <section>
         <div class="signal">
           <div><p class="eyebrow">What the connection unlocks</p><h2>From brief<br>to evidence.</h2></div>
-          <p>Build grounded synthetic audiences, run durable panel studies, compare segments, and export structured findings. <a href="${TRACKED_MCP_URL}">Explore Minds MCP →</a></p>
+          <p>Build grounded synthetic audiences, run durable panel studies, compare segments, and export structured findings. <a href="${SETUP_URL}">Explore Minds MCP →</a></p>
         </div>
       </section>
     </main>
     <footer>
       <p>Minds · Synthetic market research</p>
       <div class="footer-links">
-        <a href="${TRACKED_MCP_URL}">MCP documentation</a>
+        <a href="${SETUP_URL}">MCP documentation</a>
         <a href="https://minds-mcp.readthedocs.io/en/latest/">Integration reference</a>
+        <a href="${DOI_URL}">Archived reference DOI</a>
         <a href="https://github.com/minds-ai-co/minds-mcp/releases/tag/v2.0.0">Release v2.0.0</a>
       </div>
       <p>Independent compatibility surface</p>
