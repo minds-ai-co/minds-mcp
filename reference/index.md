@@ -47,6 +47,7 @@ continue after the chat session that started it.
 - [Check client compatibility](https://minds-mcp-compatibility.pages.dev/) for a compact transport and authentication matrix.
 - [Generate a client configuration](https://minds-mcp-setup-generator.netlify.app/) for Claude Code, Cursor, VS Code, or a generic MCP client.
 - [Explore the live public API contract](https://minds-api-explorer.vercel.app/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-api-explorer) across panels, groups, sparks, research, and durable runs.
+- [Choose an API or MCP integration path](https://minds-api-mcp-integration-lab-bba685.gitlab.io/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-integration-lab) with the live route recommender and production OpenAPI index.
 - [Run a study](workflow.md) for a durable end-to-end workflow.
 - [Browse the tools](tools.md) exposed by the remote server.
 - [Understand the scope](scope.md) before using results in a decision.
