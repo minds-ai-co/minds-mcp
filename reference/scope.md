@@ -44,4 +44,4 @@ Treat synthetic research as decision support:
 4. identify assumptions that require real-world validation;
 5. retain exports alongside the downstream decision.
 
-[Learn about Minds](https://getminds.ai/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=rtd-scope){ .minds-cta }
+[Learn about Minds](https://getminds.ai/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-scope){ .minds-cta }

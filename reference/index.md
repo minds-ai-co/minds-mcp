@@ -14,7 +14,7 @@ assistant.
 | Study execution | Durable, server-side runs |
 | Exports | PDF, CSV, XLSX, JSON, and Markdown |
 
-[Connect Minds to an MCP client](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=rtd-overview){ .minds-cta }
+[Connect Minds to an MCP client](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-overview){ .minds-cta }
 
 ## What it is for
 
@@ -42,13 +42,14 @@ continue after the chat session that started it.
 ## Start here
 
 - [Connect a client](connect.md) for ChatGPT, Claude, Cursor, VS Code, and other clients.
+- [Use the practical cookbook](cookbook.md) for complete positioning, concept, and message-study recipes.
 - [Check client compatibility](https://minds-mcp-compatibility.pages.dev/) for a compact transport and authentication matrix.
 - [Run a study](workflow.md) for a durable end-to-end workflow.
 - [Browse the tools](tools.md) exposed by the remote server.
 - [Understand the scope](scope.md) before using results in a decision.
 
 The maintained product documentation is available at
-[getminds.ai/mcp/setup](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=rtd-overview-docs).
+[getminds.ai/mcp/setup](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-overview-guide).
 
 ## Citation and archived release
 

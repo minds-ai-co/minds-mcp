@@ -1,0 +1,5 @@
+root: ./reference/
+
+structure:
+  readme: index.md
+  summary: SUMMARY.md

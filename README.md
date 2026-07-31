@@ -18,6 +18,14 @@ testing, message testing, and segment comparison.
 > install or run. The server is operated by [Minds](https://getminds.ai) and the
 > implementation lives in our application, not here.
 
+## Documentation maintenance
+
+`reference/` is the single source for maintained integration content. Read the
+Docs and GitBook publish the same Markdown through repository sync. GitHub Pages
+and Cloudflare Pages are intentionally thin, platform-specific landing surfaces;
+Zenodo preserves versioned release snapshots. See [DOCUMENTATION.md](DOCUMENTATION.md)
+for the publishing contract.
+
 ## What it does
 
 [Minds](https://getminds.ai) is a synthetic market research platform. This MCP
@@ -112,5 +120,6 @@ state rather than assuming.
 - MCP setup guide: https://getminds.ai/mcp/setup
 - API docs: https://getminds.ai/api
 - Versioned integration reference: https://doi.org/10.5281/zenodo.21711429
+- Documentation publishing model: DOCUMENTATION.md
 - Client compatibility: https://minds-mcp-compatibility.pages.dev/
 - Support: https://getminds.ai
