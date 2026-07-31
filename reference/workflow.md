@@ -50,4 +50,4 @@ Use `export_panel` to produce PDF, CSV, XLSX, or JSON output. Choose a format
 based on the next consumer: PDF for a decision brief, spreadsheets for analysis,
 and JSON for another system.
 
-[Open Minds MCP documentation](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-workflow){ .minds-cta }
+[Open Minds MCP documentation](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-workflow)

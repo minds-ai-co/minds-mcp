@@ -45,4 +45,4 @@ tool definition before constructing a call.
 | OAuth protected-resource metadata | `https://getminds.ai/.well-known/oauth-protected-resource` |
 | MCP endpoint | `https://getminds.ai/mcp` |
 
-[Review the live API documentation](https://getminds.ai/api?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-tools){ .minds-cta }
+[Review the live API documentation](https://getminds.ai/api?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-tools)
