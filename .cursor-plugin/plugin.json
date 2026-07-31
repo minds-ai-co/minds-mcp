@@ -1,0 +1,32 @@
+{
+  "name": "minds",
+  "displayName": "Minds Market Research",
+  "version": "2.0.0",
+  "description": "Run synthetic customer panels for concept testing, message testing, audience research, and segment comparison.",
+  "author": {
+    "name": "Minds",
+    "email": "developers@getminds.ai"
+  },
+  "publisher": "Minds AI Labs Inc.",
+  "homepage": "https://getminds.ai/mcp/setup",
+  "repository": "https://github.com/minds-ai-co/minds-mcp",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "keywords": [
+    "market-research",
+    "consumer-insights",
+    "synthetic-panels",
+    "concept-testing",
+    "message-testing",
+    "audience-research",
+    "mcp"
+  ],
+  "category": "productivity",
+  "tags": [
+    "market-research",
+    "customer-insights",
+    "synthetic-panels",
+    "mcp"
+  ],
+  "mcpServers": "./cursor.mcp.json"
+}

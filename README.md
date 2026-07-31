@@ -77,6 +77,10 @@ claude mcp add --transport http mindsai https://getminds.ai/mcp \
 ### Cursor
 
 Settings, then MCP, then add `https://getminds.ai/mcp` and authorize via OAuth.
+The repository also contains a Marketplace-ready Cursor plugin manifest at
+`.cursor-plugin/plugin.json`; its MCP configuration is intentionally kept in
+`cursor.mcp.json` so the shared Agent Plugins configuration can retain the
+portable `streamable-http` transport name.
 
 ### VS Code (Copilot), Windsurf, Langdock, Open WebUI
 
