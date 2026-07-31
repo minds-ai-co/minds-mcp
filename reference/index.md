@@ -45,6 +45,7 @@ continue after the chat session that started it.
 - [Use the practical cookbook](cookbook.md) for complete positioning, concept, and message-study recipes.
 - [Browse this maintained reference on GitBook](https://minds-1.gitbook.io/minds-mcp/).
 - [Check client compatibility](https://minds-mcp-compatibility.pages.dev/) for a compact transport and authentication matrix.
+- [Generate a client configuration](https://minds-mcp-setup-generator.netlify.app/) for Claude Code, Cursor, VS Code, or a generic MCP client.
 - [Run a study](workflow.md) for a durable end-to-end workflow.
 - [Browse the tools](tools.md) exposed by the remote server.
 - [Understand the scope](scope.md) before using results in a decision.

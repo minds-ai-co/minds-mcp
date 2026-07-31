@@ -12,6 +12,7 @@ testing, message testing, and segment comparison.
 **Technical reference:** https://minds-mcp.readthedocs.io/en/latest/
 **GitBook:** https://minds-1.gitbook.io/minds-mcp/
 **Client compatibility:** https://minds-mcp-compatibility.pages.dev/
+**Setup generator:** https://minds-mcp-setup-generator.netlify.app/
 **Archived release:** https://doi.org/10.5281/zenodo.21711429
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
 
@@ -22,10 +23,10 @@ testing, message testing, and segment comparison.
 ## Documentation maintenance
 
 `reference/` is the single source for maintained integration content. Read the
-Docs and GitBook publish the same Markdown through repository sync. GitHub Pages
-and Cloudflare Pages are intentionally thin, platform-specific landing surfaces;
-Zenodo preserves versioned release snapshots. See [DOCUMENTATION.md](DOCUMENTATION.md)
-for the publishing contract.
+Docs and GitBook publish the same Markdown through repository sync. GitHub Pages,
+Cloudflare Pages, and the Netlify setup generator are intentionally thin,
+platform-specific surfaces; Zenodo preserves versioned release snapshots. See
+[DOCUMENTATION.md](DOCUMENTATION.md) for the publishing contract.
 
 ## What it does
 
@@ -124,4 +125,5 @@ state rather than assuming.
 - Documentation publishing model: DOCUMENTATION.md
 - GitBook reference: https://minds-1.gitbook.io/minds-mcp/
 - Client compatibility: https://minds-mcp-compatibility.pages.dev/
+- MCP setup generator: https://minds-mcp-setup-generator.netlify.app/
 - Support: https://getminds.ai

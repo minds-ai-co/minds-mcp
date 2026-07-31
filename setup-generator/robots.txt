@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://minds-mcp-setup-generator.netlify.app/sitemap.xml

@@ -120,7 +120,7 @@ const page = `<!doctype html>
           <p class="lede">A practical field guide for connecting Minds to MCP-capable assistants, with a live reachability check against the canonical remote endpoint.</p>
           <div class="actions">
             <a class="button primary" href="${SETUP_URL}">Connect Minds</a>
-            <a class="button" href="https://minds-1.gitbook.io/minds-mcp/">GitBook reference</a>
+            <a class="button" href="https://minds-mcp-setup-generator.netlify.app/">Generate a client config</a>
           </div>
         </div>
         <aside class="check" aria-label="Live endpoint check">
@@ -188,6 +188,7 @@ const page = `<!doctype html>
       <div class="footer-links">
         <a href="${SETUP_URL}">MCP documentation</a>
         <a href="https://minds-1.gitbook.io/minds-mcp/">GitBook reference</a>
+        <a href="https://minds-mcp-setup-generator.netlify.app/">Setup generator</a>
         <a href="https://minds-mcp.readthedocs.io/en/latest/">Integration reference</a>
         <a href="${DOI_URL}">Archived reference DOI</a>
         <a href="https://github.com/minds-ai-co/minds-mcp/releases/tag/v2.0.0">Release v2.0.0</a>
