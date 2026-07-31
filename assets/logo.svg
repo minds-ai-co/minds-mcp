@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#111111" stroke-width="1">
+  <title>Minds</title>
+  <g shape-rendering="geometricPrecision">
+    <circle cx="13" cy="7.5" r="5.5" vector-effect="non-scaling-stroke"/>
+    <circle cx="25" cy="19" r="5.5" vector-effect="non-scaling-stroke"/>
+    <circle cx="7.5" cy="25" r="5.5" vector-effect="non-scaling-stroke"/>
+  </g>
+</svg>

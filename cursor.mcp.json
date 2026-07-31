@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "minds": {
+      "type": "http",
+      "url": "https://getminds.ai/mcp"
+    }
+  }
+}
