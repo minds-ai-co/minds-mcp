@@ -13,6 +13,7 @@ testing, message testing, and segment comparison.
 **GitBook:** https://minds-1.gitbook.io/minds-mcp/
 **Client compatibility:** https://minds-mcp-compatibility.pages.dev/
 **Setup generator:** https://minds-mcp-setup-generator.netlify.app/
+**Public API explorer:** https://minds-api-explorer.vercel.app/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-api-explorer
 **Archived release:** https://doi.org/10.5281/zenodo.21711429
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
 
@@ -130,4 +131,5 @@ state rather than assuming.
 - GitBook reference: https://minds-1.gitbook.io/minds-mcp/
 - Client compatibility: https://minds-mcp-compatibility.pages.dev/
 - MCP setup generator: https://minds-mcp-setup-generator.netlify.app/
+- Public API explorer: https://minds-api-explorer.vercel.app/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-links-api-explorer
 - Support: https://getminds.ai
