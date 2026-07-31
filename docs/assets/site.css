@@ -593,6 +593,14 @@ h3 {
   font-size: 15px;
 }
 
+.decision-strip__citation {
+  grid-column: 2;
+  max-width: 570px;
+  margin: -28px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 .site-footer {
   min-height: 110px;
   display: grid;
@@ -671,6 +679,11 @@ h3 {
 
   .text-link {
     grid-column: 1;
+  }
+
+  .decision-strip__citation {
+    grid-column: 1;
+    margin-top: -28px;
   }
 
   .site-footer {

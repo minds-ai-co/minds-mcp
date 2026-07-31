@@ -1,15 +1,17 @@
 # Minds MCP Server
 
 [![smithery badge](https://smithery.ai/badge/alexander-a4p3/minds)](https://smithery.ai/servers/alexander-a4p3/minds)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21711429.svg)](https://doi.org/10.5281/zenodo.21711429)
 
 Run AI market research from your assistant: synthetic customer panels for concept
 testing, message testing, and segment comparison.
 
 **Endpoint:** `https://getminds.ai/mcp` (streamable HTTP)
-**Docs:** https://getminds.ai/mcp
+**Docs:** https://getminds.ai/mcp/setup
 **Quick-start guide:** https://minds-ai-co.github.io/minds-mcp/
 **Technical reference:** https://minds-mcp.readthedocs.io/en/latest/
 **Client compatibility:** https://minds-mcp-compatibility.pages.dev/
+**Archived release:** https://doi.org/10.5281/zenodo.21711429
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
 
 > This repository is documentation for a hosted MCP server. There is no code to
@@ -107,7 +109,8 @@ state rather than assuming.
 ## Links
 
 - Product: https://getminds.ai
-- MCP docs: https://getminds.ai/mcp
+- MCP setup guide: https://getminds.ai/mcp/setup
 - API docs: https://getminds.ai/api
+- Versioned integration reference: https://doi.org/10.5281/zenodo.21711429
 - Client compatibility: https://minds-mcp-compatibility.pages.dev/
 - Support: https://getminds.ai

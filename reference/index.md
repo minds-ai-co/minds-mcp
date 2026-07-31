@@ -48,4 +48,11 @@ continue after the chat session that started it.
 - [Understand the scope](scope.md) before using results in a decision.
 
 The maintained product documentation is available at
-[getminds.ai/mcp](https://getminds.ai/mcp?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=rtd-overview-docs).
+[getminds.ai/mcp/setup](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=rtd-overview-docs).
+
+## Citation and archived release
+
+The versioned integration reference is preserved as an open software record:
+
+Minds Developer Team (2026). *Minds MCP Integration Reference* (Version 2.0.0).
+[https://doi.org/10.5281/zenodo.21711429](https://doi.org/10.5281/zenodo.21711429)
