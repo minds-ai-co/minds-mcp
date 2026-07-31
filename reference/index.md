@@ -43,6 +43,7 @@ continue after the chat session that started it.
 
 - [Connect a client](connect.md) for ChatGPT, Claude, Cursor, VS Code, and other clients.
 - [Use the practical cookbook](cookbook.md) for complete positioning, concept, and message-study recipes.
+- [Browse this maintained reference on GitBook](https://minds-1.gitbook.io/minds-mcp/).
 - [Check client compatibility](https://minds-mcp-compatibility.pages.dev/) for a compact transport and authentication matrix.
 - [Run a study](workflow.md) for a durable end-to-end workflow.
 - [Browse the tools](tools.md) exposed by the remote server.
