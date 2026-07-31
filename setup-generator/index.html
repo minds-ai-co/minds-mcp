@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generate a safe, copy-ready configuration for connecting Minds to Claude Code, Cursor, VS Code, or another MCP client.">
+  <meta name="theme-color" content="#f4f4f0">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://minds-mcp-setup-generator.netlify.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Minds MCP setup generator">
+  <meta property="og:description" content="Choose your client and copy a working Minds remote MCP configuration.">
+  <meta property="og:url" content="https://minds-mcp-setup-generator.netlify.app/">
+  <title>Minds MCP setup generator</title>
+  <link rel="icon" href="assets/minds-logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/selecta-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/selecta-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Minds MCP Setup Generator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://minds-mcp-setup-generator.netlify.app/","isPartOf":{"@type":"SoftwareApplication","name":"Minds","url":"https://getminds.ai/"}}</script>
+</head>
+<body>
+  <a class="skip-link" href="#generator">Skip to generator</a>
+
+  <header class="site-header">
+    <a class="brand" href="https://getminds.ai/?utm_source=content&amp;utm_medium=content&amp;utm_campaign=content-seo-mcp-reference&amp;utm_content=mcp-setup-generator" aria-label="Minds home">
+      <img src="assets/minds-logo.svg" alt="Minds">
+    </a>
+    <p>MCP setup generator</p>
+    <nav aria-label="Resources">
+      <a href="https://minds-1.gitbook.io/minds-mcp/">Reference</a>
+      <a href="https://github.com/minds-ai-co/minds-mcp">Source</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Remote MCP · Streamable HTTP</p>
+        <h1 id="page-title">Choose a client.<br>Leave with the config.</h1>
+        <p class="lede">Generate the exact command or JSON shape for connecting your assistant to Minds. No credentials are entered or transmitted here.</p>
+        <dl class="endpoint-spec">
+          <div><dt>Endpoint</dt><dd><code>https://getminds.ai/mcp</code></dd></div>
+          <div><dt>Registry</dt><dd><code>ai.getminds/minds</code></dd></div>
+        </dl>
+      </div>
+
+      <div class="workbench" id="generator">
+        <div class="workbench-head">
+          <div>
+            <p class="utility-label">Configuration workbench</p>
+            <h2>Build your connection</h2>
+          </div>
+          <span class="local-badge">Runs locally</span>
+        </div>
+
+        <fieldset class="control-group">
+          <legend>1 · Client</legend>
+          <div class="segmented" id="client-options" aria-label="MCP client"></div>
+        </fieldset>
+
+        <fieldset class="control-group">
+          <legend>2 · Authentication</legend>
+          <div class="segmented" id="auth-options" aria-label="Authentication method">
+            <button type="button" data-auth="oauth" aria-pressed="true">OAuth <span>Preferred</span></button>
+            <button type="button" data-auth="api-key" aria-pressed="false">API key <span>Placeholder</span></button>
+          </div>
+        </fieldset>
+
+        <div class="output-block">
+          <div class="output-head">
+            <div>
+              <span id="output-type">Command</span>
+              <strong id="output-file">Terminal</strong>
+            </div>
+            <button class="copy-button" type="button" id="copy-config">
+              <span class="copy-default">Copy config</span>
+              <span class="copy-success" aria-live="polite">Copied</span>
+            </button>
+          </div>
+          <pre tabindex="0"><code id="config-output"></code></pre>
+        </div>
+
+        <div class="next-step" aria-live="polite">
+          <span>Then</span>
+          <p id="next-step-copy"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="after-connect" aria-labelledby="after-title">
+      <div>
+        <p class="eyebrow">Connection check</p>
+        <h2 id="after-title">Ask your client to list the Minds tools.</h2>
+      </div>
+      <div class="check-copy">
+        <p>A successful connection exposes audience, panel, study, export, and research-method operations. Minds describes current tool schemas at runtime, so the setup stays thin and maintainable.</p>
+        <a class="primary-link" href="https://getminds.ai/mcp/setup?utm_source=content&amp;utm_medium=content&amp;utm_campaign=content-seo-mcp-reference&amp;utm_content=mcp-setup-generator">Open the maintained setup guide <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Minds · Synthetic market research</p>
+    <div>
+      <a href="https://minds-1.gitbook.io/minds-mcp/">GitBook</a>
+      <a href="https://minds-mcp.readthedocs.io/en/latest/">Read the Docs</a>
+      <a href="https://doi.org/10.5281/zenodo.21711429">Archived release</a>
+    </div>
+    <p>Credentials never leave this page</p>
+  </footer>
+</body>
+</html>

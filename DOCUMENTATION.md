@@ -8,6 +8,9 @@ MCP integration documentation.
 - Read the Docs builds `reference/` with MkDocs.
 - [GitBook](https://minds-1.gitbook.io/minds-mcp/) synchronizes `reference/`
   from this repository with Git Sync.
+- The [MCP setup generator](https://minds-mcp-setup-generator.netlify.app/) is a
+  thin interactive utility. It links back to the maintained setup guide instead
+  of duplicating the reference content.
 - Future documentation hosts must import or build from `reference/`; do not create
   a second manually maintained copy.
 
