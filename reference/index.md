@@ -14,7 +14,7 @@ assistant.
 | Study execution | Durable, server-side runs |
 | Exports | PDF, CSV, XLSX, JSON, and Markdown |
 
-[Connect Minds to an MCP client](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-overview){ .minds-cta }
+[Connect Minds to an MCP client](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-overview)
 
 ## What it is for
 
