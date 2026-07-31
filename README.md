@@ -10,6 +10,7 @@ testing, message testing, and segment comparison.
 **Docs:** https://getminds.ai/mcp/setup
 **Quick-start guide:** https://minds-ai-co.github.io/minds-mcp/
 **Technical reference:** https://minds-mcp.readthedocs.io/en/latest/
+**GitBook:** https://minds-1.gitbook.io/minds-mcp/
 **Client compatibility:** https://minds-mcp-compatibility.pages.dev/
 **Archived release:** https://doi.org/10.5281/zenodo.21711429
 **Auth:** OAuth 2.1 with PKCE, or a Minds API key
@@ -121,5 +122,6 @@ state rather than assuming.
 - API docs: https://getminds.ai/api
 - Versioned integration reference: https://doi.org/10.5281/zenodo.21711429
 - Documentation publishing model: DOCUMENTATION.md
+- GitBook reference: https://minds-1.gitbook.io/minds-mcp/
 - Client compatibility: https://minds-mcp-compatibility.pages.dev/
 - Support: https://getminds.ai

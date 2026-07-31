@@ -6,7 +6,8 @@ MCP integration documentation.
 ## Maintained documentation
 
 - Read the Docs builds `reference/` with MkDocs.
-- GitBook synchronizes `reference/` from this repository with Git Sync.
+- [GitBook](https://minds-1.gitbook.io/minds-mcp/) synchronizes `reference/`
+  from this repository with Git Sync.
 - Future documentation hosts must import or build from `reference/`; do not create
   a second manually maintained copy.
 
