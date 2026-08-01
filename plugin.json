@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "minds",
-  "version": "2.0.0",
-  "description": "Run AI market research: synthetic customer panels for concept testing, message testing, segments.",
+  "version": "2.0.1",
+  "description": "Run evidence-grounded synthetic market research, concept tests, message tests, and segment comparisons.",
   "author": {
     "name": "Minds",
     "url": "https://getminds.ai"

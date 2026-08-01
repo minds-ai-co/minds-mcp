@@ -19,7 +19,8 @@ back to the hosted setup guide.
 
 | Surface | Repository artifact | Distribution mechanism |
 | --- | --- | --- |
-| Gemini CLI Extensions | `gemini-extension.json`, `GEMINI.md` | Public GitHub repository with the `gemini-cli-extension` topic |
+| Google Antigravity Plugins | `plugin.json`, `mcp_config.json` | Install the public GitHub repository with `agy plugins install`; OAuth is discovered from the endpoint |
+| Gemini CLI Extensions (enterprise/API-key legacy) | `gemini-extension.json`, `GEMINI.md` | Retained for supported Google Cloud enterprise and API-key users |
 | ChatGPT and Codex Plugins | `.codex-plugin/plugin.json`, `.mcp.json` | OpenAI plugin submission portal using the hosted MCP endpoint |
 | GitHub MCP Registry and VS Code | Official MCP Registry package plus this repository | GitHub curation request after official registry publication |
 | Docker MCP Catalog | Separate contribution under `docker/mcp-registry` | Docker registry pull request |

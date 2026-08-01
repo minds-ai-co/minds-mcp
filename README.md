@@ -84,14 +84,19 @@ The repository also contains a Marketplace-ready Cursor plugin manifest at
 `cursor.mcp.json` so the shared Agent Plugins configuration can retain the
 portable `streamable-http` transport name.
 
-### Gemini CLI
+### Google Antigravity
 
 ```bash
-gemini extensions install https://github.com/minds-ai-co/minds-mcp
+agy plugins install https://github.com/minds-ai-co/minds-mcp
 ```
 
-The root `gemini-extension.json` connects Gemini CLI to the hosted server and
-uses OAuth discovery from the endpoint.
+The root `plugin.json` and `mcp_config.json` make this repository an Antigravity
+plugin. Antigravity discovers OAuth from the hosted endpoint and prompts you to
+authenticate. You can also add Minds directly in the Antigravity MCP manager
+with the server URL `https://getminds.ai/mcp`.
+
+Gemini CLI remains supported for Google Cloud enterprise and API-key users. Its
+legacy extension manifest stays available as `gemini-extension.json`.
 
 ### ChatGPT and Codex Plugins
 
@@ -152,3 +157,5 @@ state rather than assuming.
 - API + MCP integration lab: https://minds-api-mcp-integration-lab-bba685.gitlab.io/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-links-integration-lab
 - Support: https://getminds.ai
 - Developer portal distribution model: DISTRIBUTION.md
+- Google Antigravity plugin manifest: plugin.json
+- Google Antigravity MCP configuration: mcp_config.json
