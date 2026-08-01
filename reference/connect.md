@@ -41,6 +41,23 @@ claude mcp add --transport http mindsai https://getminds.ai/mcp \
 2. Add `https://getminds.ai/mcp`.
 3. Complete OAuth authorization when prompted.
 
+## Gemini CLI
+
+Install the public extension from GitHub:
+
+```bash
+gemini extensions install https://github.com/minds-ai-co/minds-mcp
+```
+
+Gemini CLI discovers OAuth automatically from the remote MCP endpoint. Restart
+Gemini CLI after installation, then confirm that `minds` appears under `/mcp`.
+
+## ChatGPT and Codex Plugins
+
+Minds is packaged as a shared ChatGPT and Codex plugin in this repository. Until
+the public directory review is complete, add `https://getminds.ai/mcp` as a
+developer-mode MCP connection and complete OAuth authorization.
+
 ## VS Code, Windsurf, Langdock, and Open WebUI
 
 Add `https://getminds.ai/mcp` as a remote MCP server. The exact configuration
