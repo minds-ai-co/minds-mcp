@@ -41,16 +41,33 @@ claude mcp add --transport http mindsai https://getminds.ai/mcp \
 2. Add `https://getminds.ai/mcp`.
 3. Complete OAuth authorization when prompted.
 
-## Gemini CLI
+## Google Antigravity
 
-Install the public extension from GitHub:
+Install the public plugin from GitHub:
 
 ```bash
-gemini extensions install https://github.com/minds-ai-co/minds-mcp
+agy plugins install https://github.com/minds-ai-co/minds-mcp
 ```
 
-Gemini CLI discovers OAuth automatically from the remote MCP endpoint. Restart
-Gemini CLI after installation, then confirm that `minds` appears under `/mcp`.
+Antigravity discovers OAuth automatically from the remote MCP endpoint. Complete
+authentication in **Settings → Customizations**, then confirm that `minds`
+appears under `/mcp`.
+
+For a manual connection, add the following to `~/.gemini/config/mcp_config.json`
+or the current workspace's `.agents/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "minds": {
+      "serverUrl": "https://getminds.ai/mcp"
+    }
+  }
+}
+```
+
+Gemini CLI remains supported for Google Cloud enterprise and API-key users. Its
+legacy extension is still available from the same repository.
 
 ## ChatGPT and Codex Plugins
 
