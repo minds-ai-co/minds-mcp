@@ -1,0 +1,46 @@
+{
+  "name": "minds",
+  "version": "2.0.1",
+  "description": "Run evidence-grounded synthetic market research with Minds MCP.",
+  "author": {
+    "name": "Minds AI Labs Inc.",
+    "email": "developers@getminds.ai",
+    "url": "https://getminds.ai"
+  },
+  "homepage": "https://getminds.ai/mcp/setup",
+  "repository": "https://github.com/minds-ai-co/minds-mcp",
+  "license": "MIT",
+  "keywords": [
+    "market-research",
+    "consumer-insights",
+    "synthetic-panels",
+    "concept-testing",
+    "message-testing",
+    "mcp"
+  ],
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Minds Market Research",
+    "shortDescription": "Test concepts and messages with synthetic customer panels",
+    "longDescription": "Build evidence-grounded audiences, run synthetic panel studies, compare segments, inspect disagreement, and export research results from ChatGPT or Codex.",
+    "developerName": "Minds AI Labs Inc.",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://getminds.ai",
+    "privacyPolicyURL": "https://getminds.ai/legal/dataprivacy",
+    "termsOfServiceURL": "https://getminds.ai/legal/terms",
+    "defaultPrompt": [
+      "Test this concept with my target audience",
+      "Compare how two customer segments react to this message",
+      "Plan and run a synthetic market research study"
+    ],
+    "brandColor": "#FFDD00",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": []
+  }
+}

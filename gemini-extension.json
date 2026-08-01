@@ -1,0 +1,12 @@
+{
+  "name": "minds-mcp",
+  "version": "2.0.1",
+  "description": "Run evidence-grounded synthetic market research, concept tests, message tests, and segment comparisons from Gemini CLI.",
+  "mcpServers": {
+    "minds": {
+      "httpUrl": "https://getminds.ai/mcp",
+      "timeout": 60000
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}

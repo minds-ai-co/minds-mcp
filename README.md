@@ -84,6 +84,22 @@ The repository also contains a Marketplace-ready Cursor plugin manifest at
 `cursor.mcp.json` so the shared Agent Plugins configuration can retain the
 portable `streamable-http` transport name.
 
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/minds-ai-co/minds-mcp
+```
+
+The root `gemini-extension.json` connects Gemini CLI to the hosted server and
+uses OAuth discovery from the endpoint.
+
+### ChatGPT and Codex Plugins
+
+The repository includes the shared plugin package at
+`.codex-plugin/plugin.json` and its remote server configuration in `.mcp.json`.
+The public directory listing uses the same hosted endpoint and maintained
+reference content.
+
 ### VS Code (Copilot), Windsurf, Langdock, Open WebUI
 
 Add `https://getminds.ai/mcp` as a remote MCP server. Full per-client instructions,
@@ -135,3 +151,4 @@ state rather than assuming.
 - Public API explorer: https://minds-api-explorer.vercel.app/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-links-api-explorer
 - API + MCP integration lab: https://minds-api-mcp-integration-lab-bba685.gitlab.io/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-links-integration-lab
 - Support: https://getminds.ai
+- Developer portal distribution model: DISTRIBUTION.md
