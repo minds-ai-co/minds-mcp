@@ -31,6 +31,13 @@ tool definition before constructing a call.
 | `get_panel_study` | Check durable progress, outputs, and method calculations. |
 | `list_research_methods` | List supported methods and their current execution status. |
 
+## Study drafts
+
+| Tool | Purpose |
+| --- | --- |
+| `list_study_drafts` | List reusable draft study plans saved in the connected Minds workspace. |
+| `save_study_draft` | Save a study plan as a reusable draft before execution. |
+
 ## Export
 
 | Tool | Purpose |

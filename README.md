@@ -132,6 +132,8 @@ Generate one in the Minds app under Settings, then API Keys. Keys start with
 | `get_panel_study` | Check durable progress, artifacts, and method calculations for a running study. |
 | `list_research_methods` | List supported research methods and which of them can actually execute. |
 | `get_panel_summary` | Return a whole-study summary with semantic blocks and heatmaps. |
+| `list_study_drafts` | List reusable study-plan drafts in the connected workspace. |
+| `save_study_draft` | Save a study plan as a reusable draft before execution. |
 
 Research methods: MaxDiff runs through a deterministic adapter. Conjoint is
 planned and cannot execute yet. Call `list_research_methods` for the current
