@@ -4,6 +4,12 @@ The remote server is the source of truth for current schemas. This page describe
 the role of each core operation; always let the connected client inspect the live
 tool definition before constructing a call.
 
+The tables below contain the 15 tools currently advertised through ordinary
+`tools/list` discovery. Internal UI, API, and MCP parity work does not change
+registry discovery unless the production `tools/list` response changes. Tools
+that remain callable only by an explicit known name must be documented as
+explicit and must not be presented to registries as automatically discovered.
+
 ## Audiences
 
 | Tool | Purpose |

@@ -15,6 +15,32 @@ Update product behavior, setup instructions, tool descriptions, research scope,
 and examples in `reference/` first. Keep portal descriptions concise and link
 back to the hosted setup guide.
 
+## Parity and registry propagation
+
+UI, API, and MCP parity work does not by itself require a new registry
+submission. Registry action depends on which part of the public MCP contract
+changes.
+
+| Change | Registry action |
+| --- | --- |
+| Shared-service refactor with no public contract change | No registry action. Validate the existing endpoint and keep the current submissions. |
+| Behavior change behind an existing tool with compatible inputs and outputs | Update `reference/` and the hosted documentation when the change reaches production. Add a note to an existing review only if the behavior is material to the reviewer. |
+| Tool description, annotations, input schema, output schema, resource, or widget change | Update `reference/`, validate the live discovery response, and amend every open review in place where the submitted metadata or screenshots are now stale. Do not submit a duplicate. |
+| Tool added to or removed from ordinary `tools/list` discovery | Update the documented advertised-tool inventory, client manifests or dashboards that enumerate tools, and every open reviewer record. Re-test discovery in each supported client. |
+| Canonical tool callable only by an explicit known name | Document it as explicit rather than advertised. It does not change registry discovery until it is added to `tools/list`. |
+| Server name, endpoint, transport, authentication, website, repository, icon, or official package metadata change | Publish a new version of the Official MCP Registry metadata, then verify downstream sync and update existing platform submissions in place. |
+| Material change to an immutable GitHub Release or Zenodo snapshot | Publish a new version. Never rewrite an archived snapshot. |
+
+Production is the release boundary. Do not publish staging-only tool claims to
+registry pages. After a production promotion, compare the live `initialize`,
+`tools/list`, resources, OAuth metadata, server card, and Official MCP Registry
+record with the maintained reference before updating any downstream surface.
+
+The company registry chronicle is the submission ledger. Record the impact of
+each public-contract change there, including which existing submissions need an
+in-place amendment, which listings can sync automatically, and which surfaces
+require no action.
+
 ## Distribution surfaces
 
 | Surface | Repository artifact | Distribution mechanism |
@@ -35,5 +61,6 @@ back to the hosted setup guide.
    `text/event-stream` accepted.
 5. Confirm the setup, privacy, terms, icon, OAuth metadata, and server-card URLs
    remain publicly reachable.
-6. Record each submission, review URL, and final listing URL in the company
+6. Classify the release against the parity and registry propagation table.
+7. Record each submission, review URL, and final listing URL in the company
    registry chronicle.
