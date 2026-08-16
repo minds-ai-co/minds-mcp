@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0.0",
+  "id": "__MICROSOFT_MCP_APP_ID__",
+  "developer": {
+    "name": "Minds AI Inc.",
+    "websiteUrl": "https://getminds.ai/",
+    "privacyUrl": "https://getminds.ai/legal/dataprivacy",
+    "termsOfUseUrl": "https://getminds.ai/legal/terms"
+  },
+  "name": {
+    "short": "Minds",
+    "full": "Minds Synthetic Market Research"
+  },
+  "description": {
+    "short": "Grounded synthetic audiences and durable market research studies.",
+    "full": "Build grounded synthetic audiences, run concept and message tests, compare segments, execute reviewable multi-question studies, inspect durable progress, and export evidence with Minds."
+  },
+  "agentConnectors": [
+    {
+      "id": "minds-market-research",
+      "displayName": "Minds Synthetic Market Research",
+      "description": "Create grounded audiences and run reviewable synthetic market research workflows.",
+      "toolSource": {
+        "remoteMcpServer": {
+          "mcpServerUrl": "https://getminds.ai/mcp",
+          "mcpToolDescription": {
+            "file": "mcptools.json"
+          },
+          "authorization": {
+            "type": "AzureKeyVault",
+            "referenceId": "__MICROSOFT_KEY_VAULT_URI__"
+          }
+        }
+      }
+    }
+  ],
+  "icons": {
+    "outline": "Outline.png",
+    "color": "Color.png"
+  },
+  "accentColor": "#FFDD00"
+}
