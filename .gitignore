@@ -1,2 +1,5 @@
 # Local Netlify folder
 .netlify
+
+# Generated Microsoft certification package
+integrations/microsoft-mcp/dist/

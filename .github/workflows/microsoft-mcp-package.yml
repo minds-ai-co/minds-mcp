@@ -1,0 +1,42 @@
+name: Validate Microsoft MCP package
+
+on:
+  pull_request:
+    paths:
+      - "integrations/microsoft-mcp/**"
+      - ".github/workflows/microsoft-mcp-package.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "integrations/microsoft-mcp/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node integrations/microsoft-mcp/scripts/validate.mjs
+      - name: Build package with validation identifiers
+        env:
+          MICROSOFT_MCP_APP_ID: 58466cf4-313e-4960-9871-0b52cb8ea9c9
+          MICROSOFT_KEY_VAULT_URI: https://minds-mcp-certification.vault.azure.net/
+        run: node integrations/microsoft-mcp/scripts/build-package.mjs
+      - name: Validate manifest against Microsoft schema
+        run: |
+          schema_dir="$(mktemp -d)"
+          curl --fail --silent --show-error --location \
+            https://developer.microsoft.com/en-us/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json \
+            --output "$schema_dir/MicrosoftTeams.schema.json"
+          unzip -p integrations/microsoft-mcp/dist/minds-mcp-microsoft-package.zip manifest.json \
+            > "$schema_dir/manifest.json"
+          npx --yes --package ajv-cli@3.3.0 --package ajv@6.12.6 \
+            ajv validate --unknown-formats=ignore \
+            -s "$schema_dir/MicrosoftTeams.schema.json" \
+            -d "$schema_dir/manifest.json"
