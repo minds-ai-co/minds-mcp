@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "Run evidence-grounded synthetic market research with Minds MCP.",
   "author": {
-    "name": "Minds AI Labs Inc.",
+    "name": "Minds",
     "email": "developers@getminds.ai",
     "url": "https://getminds.ai"
   },
@@ -23,7 +23,7 @@
     "displayName": "Minds Market Research",
     "shortDescription": "Test concepts and messages with synthetic customer panels",
     "longDescription": "Build evidence-grounded audiences, run synthetic panel studies, compare segments, inspect disagreement, and export research results from ChatGPT or Codex.",
-    "developerName": "Minds AI Labs Inc.",
+    "developerName": "Minds",
     "category": "Productivity",
     "capabilities": [
       "Interactive",
