@@ -64,3 +64,21 @@ require no action.
 6. Classify the release against the parity and registry propagation table.
 7. Record each submission, review URL, and final listing URL in the company
    registry chronicle.
+
+## Stdio package (`@getminds/mcp`)
+
+`packages/stdio` is a transparent stdio ↔ Streamable HTTP bridge to the hosted
+endpoint, for clients that only launch stdio servers. It authenticates with a
+Minds API key (`MINDS_API_KEY`) and forwards every JSON-RPC message, so it adds
+no tool surface of its own and needs no release when tools change. OAuth
+clients should keep using `https://getminds.ai/mcp` directly.
+
+Publishing (manual, requires the `@getminds` npm organization):
+
+1. `cd packages/stdio && npm test`
+2. Bump `version` in `package.json`.
+3. `npm publish --access public`
+4. Add the npm package to the `ai.getminds/minds` Official MCP Registry entry
+   (`registryType: npm`, `identifier: @getminds/mcp`, transport `stdio`,
+   environment variable `MINDS_API_KEY`); `package.json` already carries the
+   matching `mcpName`.
