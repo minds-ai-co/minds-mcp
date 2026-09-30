@@ -1,0 +1,86 @@
+name: Sync MCP surface
+
+# Keeps README.md's tools table, reference/tools.md, the Microsoft tool snapshot
+# and every manifest version in step with the live Minds MCP server.
+# See DOCUMENTATION.md ("Generated from the live server").
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "README.md"
+      - "reference/**"
+      - "docs/index.html"
+      - "GEMINI.md"
+      - "integrations/microsoft-mcp/**"
+      - "plugin.json"
+      - ".codex-plugin/**"
+      - ".cursor-plugin/**"
+      - "gemini-extension.json"
+      - "scripts/sync-mcp-surface.mjs"
+      - ".github/workflows/sync-mcp-surface.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-mcp-surface-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generated docs match the live server
+        run: node scripts/sync-mcp-surface.mjs --check
+
+  sync:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate from the live server card
+        run: node scripts/sync-mcp-surface.mjs | tee "$RUNNER_TEMP/sync.log"
+      - name: Validate Microsoft package source
+        run: node integrations/microsoft-mcp/scripts/validate.mjs
+      - name: Build pull request body
+        run: |
+          {
+            echo "Automated sync from https://getminds.ai/.well-known/mcp/server-card.json."
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/sync.log"
+            echo '```'
+            echo
+            echo "If a manifest version changed, the official registry entry (ai.getminds/minds) must be republished by a maintainer with registry credentials."
+          } > "$RUNNER_TEMP/body.md"
+      - name: Open or update the sync pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: automation/sync-mcp-surface
+          delete-branch: true
+          commit-message: "docs: sync MCP tool surface from the live server card"
+          title: "docs: sync MCP tool surface from the live server card"
+          body-path: ${{ runner.temp }}/body.md
+          add-paths: |
+            README.md
+            reference/tools.md
+            integrations/microsoft-mcp/mcptools.json
+            plugin.json
+            .codex-plugin/plugin.json
+            .cursor-plugin/plugin.json
+            gemini-extension.json
+            integrations/microsoft-mcp/manifest.template.json

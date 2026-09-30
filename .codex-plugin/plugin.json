@@ -1,6 +1,6 @@
 {
   "name": "minds",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Run evidence-grounded synthetic market research with Minds MCP.",
   "author": {
     "name": "Minds",
@@ -21,8 +21,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Minds Market Research",
-    "shortDescription": "Test concepts and messages with synthetic customer panels",
-    "longDescription": "Build evidence-grounded audiences, run synthetic panel studies, compare segments, inspect disagreement, and export research results from ChatGPT or Codex.",
+    "shortDescription": "Test concepts and messages with synthetic Audiences",
+    "longDescription": "Build evidence-grounded audiences, run synthetic Studies, compare segments, inspect disagreement, and export research results from ChatGPT or Codex.",
     "developerName": "Minds",
     "category": "Productivity",
     "capabilities": [

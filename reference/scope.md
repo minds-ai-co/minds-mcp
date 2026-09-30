@@ -13,7 +13,7 @@ It does not replace representative human fieldwork.
 - segment-comparison hypotheses;
 - questionnaire and study-plan iteration;
 - screening ideas before commissioning fieldwork;
-- structured synthesis of a grounded synthetic panel.
+- structured synthesis of a grounded synthetic Audience.
 
 ## Uses that require additional validation
 

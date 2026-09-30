@@ -15,16 +15,16 @@ durable execution, and export the evidence.
 
 ## How the workflow works
 
-1. List an existing Group or create a grounded Group from an audience brief.
-2. Create a Panel around the decision or research objective.
-3. Ask one focused question, or prepare a structured study draft.
+1. List an existing Audience or create a grounded Audience from a brief.
+2. Create a Study around the decision or research objective.
+3. Ask one focused question, or prepare a structured Study draft.
 4. Review the exact study plan before confirming execution.
 5. Monitor the durable run until it completes.
 6. Inspect disagreement and export the evidence.
 
-Minds separates study planning from execution. `plan_panel_study` does not start
-research. `run_panel_study` requires explicit confirmation of the exact stored
-draft revision.
+Minds separates Study planning from execution. `plan_study_questions` does not
+start research. `run_study_questions` requires explicit confirmation of the exact
+stored draft revision.
 
 ## Authentication and setup
 
@@ -36,8 +36,8 @@ developers@getminds.ai for technical support.
 ## Data handling
 
 Minds processes the audience briefs, research stimuli, questions, source files,
-and account data needed to perform the requested workflow. Groups and Panels are
-private by default. A public sharing link is created only when a user explicitly
+and account data needed to perform the requested workflow. Audiences and Studies
+are private by default. A public sharing link is created only when a user explicitly
 enables link sharing. Public privacy and terms information is available at:
 
 - https://getminds.ai/legal/dataprivacy

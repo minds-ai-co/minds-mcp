@@ -18,6 +18,23 @@ Navigation files and platform configuration may differ, but product behavior,
 setup guidance, tool descriptions, research scope, and examples must be edited in
 `reference/` first.
 
+## Generated from the live server
+
+The live server card (`https://getminds.ai/.well-known/mcp/server-card.json`) is
+the source of truth for tool names and descriptions. `scripts/sync-mcp-surface.mjs`
+regenerates, and must not be edited by hand:
+
+- the tools table in `README.md` between `<!-- tools:start -->` and
+  `<!-- tools:end -->`;
+- `reference/tools.md`;
+- `integrations/microsoft-mcp/mcptools.json`;
+- the `version` of every plugin and extension manifest, from the
+  `ai.getminds/minds` registry manifest (never moving a version backwards).
+
+The `Sync MCP surface` workflow runs it daily and opens a pull request when
+anything changes; on pull requests it runs `--check`, which also fails when a
+hand-written page names a tool the server does not advertise.
+
 ## Platform landing pages
 
 `docs/` and `cloudflare-pages/` are intentionally platform-specific landing and

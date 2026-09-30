@@ -6,7 +6,8 @@ Use the remote endpoint:
 https://getminds.ai/mcp
 ```
 
-OAuth is the preferred authentication method when the client supports it. For
+OAuth 2.1 is the preferred authentication method when the client supports it;
+Minds supports dynamic client registration and Client ID Metadata Documents. For
 clients that accept custom headers, create a Minds API key under **Settings → API
 Keys** and pass it as a bearer token.
 
@@ -15,12 +16,24 @@ Keys** and pass it as a bearer token.
 
 ## ChatGPT
 
-1. Open **Settings**.
-2. Open **Connected Apps**.
-3. Add `https://getminds.ai/mcp`.
-4. Complete OAuth authorization.
+On the web (chatgpt.com):
 
-Panel results can render as interactive widgets inside ChatGPT.
+1. Open **Plugins** and choose **Add → Create MCP App**.
+2. Name it Minds and set the server URL to `https://getminds.ai/mcp`.
+3. Choose OAuth authentication, create the app, and sign in to Minds.
+
+If **Create MCP App** is missing, turn on developer mode or ask your workspace
+admin to allow custom MCP apps.
+
+In the desktop app:
+
+1. Open **Plugins** and choose **Add → Add MCP server**.
+2. Set the type to **Streamable HTTP** and the URL to `https://getminds.ai/mcp`.
+3. Leave the bearer token empty for OAuth, or name an environment variable that
+   holds a `minds_…` API key. Save, restart, and authenticate.
+
+Study results can render as interactive widgets inside ChatGPT. See the
+[full ChatGPT guide](https://getminds.ai/guide/integration-chatgpt).
 
 ## Claude and Claude Desktop
 
@@ -72,8 +85,8 @@ legacy extension is still available from the same repository.
 ## ChatGPT and Codex Plugins
 
 Minds is packaged as a shared ChatGPT and Codex plugin in this repository. Until
-the public directory review is complete, add `https://getminds.ai/mcp` as a
-developer-mode MCP connection and complete OAuth authorization.
+the public directory review is complete, add `https://getminds.ai/mcp` as an MCP
+app (see ChatGPT above) and complete OAuth authorization.
 
 ## VS Code, Windsurf, Langdock, and Open WebUI
 
@@ -86,6 +99,6 @@ when the client supports secure custom headers.
 ## Confirm the connection
 
 Ask the client to list the Minds tools. A successful connection should expose
-audience, panel, study, export, and research-method operations. Tool schemas are
+Audience, Study, Mind, export, and research-method operations. Tool schemas are
 described by the server at runtime; do not hard-code parameters from an old chat
 session.

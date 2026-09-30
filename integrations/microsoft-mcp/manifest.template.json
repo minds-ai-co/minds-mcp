@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
-  "version": "1.0.0",
+  "version": "2.0.3",
   "id": "__MICROSOFT_MCP_APP_ID__",
   "developer": {
     "name": "Minds",

@@ -1,12 +1,12 @@
 # Minds MCP
 
 Use the Minds MCP tools for evidence-grounded synthetic market research: build
-audiences, run panel studies, compare segments, inspect disagreement, and export
+audiences, run Studies, compare segments, inspect disagreement, and export
 results.
 
 - Clarify the decision, audience, market, and research question before creating
   a study when any of them are ambiguous.
-- Prefer a structured study for multi-question research and a direct panel
+- Prefer a structured study for multi-question research and a direct Study
   question for a single, straightforward prompt.
 - Confirm the study plan before starting a durable run.
 - Check the run status instead of assuming a long-running study finished.

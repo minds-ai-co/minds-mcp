@@ -122,7 +122,7 @@
             <span class="step-number">03</span>
             <div>
               <h3>Run the study</h3>
-              <p>Test concepts, messages, products, positioning, or hypotheses across the complete panel.</p>
+              <p>Test concepts, messages, products, positioning, or hypotheses across the complete Study.</p>
             </div>
           </li>
           <li class="reveal">
@@ -161,7 +161,7 @@
           <div class="client-notes">
             <details open>
               <summary>ChatGPT</summary>
-              <p>Open Settings → Connected Apps, add the remote endpoint, and authorize with OAuth.</p>
+              <p>Web: Plugins → Add → Create MCP App, enter the server URL, choose OAuth. Desktop: Plugins → Add → Add MCP server, type Streamable HTTP. <a href="https://getminds.ai/guide/integration-chatgpt">Full guide</a>.</p>
             </details>
             <details>
               <summary>Claude and Claude Desktop</summary>
@@ -187,35 +187,35 @@
 
         <div class="tool-index reveal" role="list">
           <article role="listitem">
-            <code>create_group_from_brief</code>
-            <p>Build a grounded synthetic audience from a population brief.</p>
+            <code>create_audience_from_brief</code>
+            <p>Build a grounded synthetic Audience from a population brief.</p>
           </article>
           <article role="listitem">
-            <code>ask_group</code>
-            <p>Interview, survey, or poll one saved audience.</p>
+            <code>ask_audience</code>
+            <p>Ask one standalone question of one saved Audience.</p>
           </article>
           <article role="listitem">
-            <code>create_panel</code>
-            <p>Create a panel or study around a research goal.</p>
+            <code>create_study</code>
+            <p>Create a Study from Audiences around a research goal.</p>
           </article>
           <article role="listitem">
-            <code>ask_panel</code>
-            <p>Ask one focused question across the complete panel.</p>
+            <code>ask_study</code>
+            <p>Ask one focused question across every Audience in the Study.</p>
           </article>
           <article role="listitem">
-            <code>plan_panel_study</code>
-            <p>Turn a research goal into a structured multi-question plan.</p>
+            <code>plan_study_questions</code>
+            <p>Turn a research goal into a reviewable multi-question draft.</p>
           </article>
           <article role="listitem">
-            <code>run_panel_study</code>
-            <p>Execute an approved plan as a durable server-side study.</p>
+            <code>run_study_questions</code>
+            <p>Execute a confirmed draft revision as a durable server-side run.</p>
           </article>
           <article role="listitem">
-            <code>get_panel_study</code>
-            <p>Inspect progress, outputs, and method artifacts.</p>
+            <code>get_study_status</code>
+            <p>Inspect progress, results, and run artifacts.</p>
           </article>
           <article role="listitem">
-            <code>export_panel</code>
+            <code>export_study</code>
             <p>Export findings in common research and data formats.</p>
           </article>
         </div>
