@@ -13,11 +13,11 @@ manifest.
 
 - `manifest.template.json`: public package metadata with placeholders for the
   Partner Center app ID and Azure Key Vault URI.
-- `mcptools.json`: ASCII-safe snapshot of the advertised MCP tools and schemas.
+- `mcptools.json`: ASCII-safe snapshot of the advertised MCP tools and schemas,
+  generated from the live server card by `scripts/sync-mcp-surface.mjs` at the
+  repository root.
 - `intro.md`: reviewer and administrator documentation.
 - `Color.png` and `Outline.png`: Microsoft 365 package icons.
-- `scripts/sync-tools.mjs`: refreshes the tool snapshot from a deployed Minds
-  MCP endpoint.
 - `scripts/validate.mjs`: validates package structure, metadata, tool titles,
   descriptions, and image dimensions.
 - `scripts/build-package.mjs`: produces a submission-ready ZIP without placing
@@ -25,18 +25,18 @@ manifest.
 
 ## Refresh and validate
 
-Refresh from production only after the intended MCP build is live:
+The daily `Sync MCP surface` workflow refreshes `mcptools.json` from the
+production server card and opens a pull request when it changes. To refresh by
+hand:
 
 ```bash
-MCP_SCHEMA_SOURCE=https://getminds.ai/mcp \
-  node integrations/microsoft-mcp/scripts/sync-tools.mjs
-
+node scripts/sync-mcp-surface.mjs
 node integrations/microsoft-mcp/scripts/validate.mjs
 ```
 
-For pre-release validation, set `MCP_SCHEMA_SOURCE` to the staging endpoint and
-record that the resulting package must not be submitted until production has
-the same tool metadata.
+For pre-release validation, set `MINDS_SERVER_CARD_URL` to the staging server
+card and record that the resulting package must not be submitted until
+production has the same tool metadata.
 
 ## Build the private submission ZIP
 

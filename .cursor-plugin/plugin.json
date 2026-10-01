@@ -1,8 +1,8 @@
 {
   "name": "minds",
   "displayName": "Minds Market Research",
-  "version": "2.0.0",
-  "description": "Run synthetic customer panels for concept testing, message testing, audience research, and segment comparison.",
+  "version": "2.0.3",
+  "description": "Build synthetic Audiences and run Studies for concept testing, message testing, and segment comparison.",
   "author": {
     "name": "Minds",
     "email": "developers@getminds.ai"

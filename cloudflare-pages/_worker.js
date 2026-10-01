@@ -9,7 +9,7 @@ const clients = [
     name: "ChatGPT",
     transport: "Remote connector",
     auth: "OAuth 2.1",
-    route: "Settings → Connected apps",
+    route: "Developer mode → Plugins → plus button",
   },
   {
     name: "Claude",
@@ -179,7 +179,7 @@ const page = `<!doctype html>
       <section>
         <div class="signal">
           <div><p class="eyebrow">What the connection unlocks</p><h2>From brief<br>to evidence.</h2></div>
-          <p>Build grounded synthetic audiences, run durable panel studies, compare segments, and export structured findings. <a href="${SETUP_URL}">Explore Minds MCP →</a></p>
+          <p>Build grounded synthetic audiences, run durable Studies, compare segments, and export structured findings. <a href="${SETUP_URL}">Explore Minds MCP →</a></p>
         </div>
       </section>
     </main>

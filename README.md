@@ -3,8 +3,8 @@
 [![smithery badge](https://smithery.ai/badge/alexander-a4p3/minds)](https://smithery.ai/servers/alexander-a4p3/minds)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21711429.svg)](https://doi.org/10.5281/zenodo.21711429)
 
-Run AI market research from your assistant: synthetic customer panels for concept
-testing, message testing, and segment comparison.
+Run AI market research from your assistant: build synthetic Audiences and run
+Studies for concept testing, message testing, and segment comparison.
 
 **Endpoint:** `https://getminds.ai/mcp` (streamable HTTP)
 **Docs:** https://getminds.ai/mcp/setup
@@ -16,7 +16,7 @@ testing, message testing, and segment comparison.
 **Public API explorer:** https://minds-api-explorer.vercel.app/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-api-explorer
 **API + MCP integration lab:** https://minds-api-mcp-integration-lab-bba685.gitlab.io/?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-repository-integration-lab
 **Archived release:** https://doi.org/10.5281/zenodo.21711429
-**Auth:** OAuth 2.1 with PKCE, or a Minds API key
+**Auth:** OAuth 2.1 with PKCE (dynamic client registration or Client ID Metadata Documents), or a Minds API key (`Authorization: Bearer minds_…`)
 
 > This repository is documentation for a hosted MCP server. There is no code to
 > install or run. The server is operated by [Minds](https://getminds.ai) and the
@@ -39,8 +39,8 @@ research end to end without leaving the assistant.
 Describe an audience in a brief ("German Gen Z grocery shoppers", "enterprise IT
 buyers in fintech") and the server runs deep web research to ground that audience
 in government statistics, peer-reviewed studies, and industry reports rather than
-in generic model priors. Then ask the panel a question, run a structured study,
-and export the results.
+in generic model priors. Then ask the Audience a question, run a structured
+Study, and export the results.
 
 Typical jobs:
 
@@ -51,7 +51,7 @@ Typical jobs:
 - Screening research hypotheses before commissioning fieldwork with real respondents
 
 Studies run durably server side, so a long study survives the chat session that
-started it. Results export to PDF, CSV, XLSX, JSON, and Markdown.
+started it. Results export to PDF, DOCX, PPTX, Markdown, CSV, XLS, and SPSS SAV.
 
 **Scope.** Minds does not replace representative human fieldwork. It replaces the
 slow first pass: sharpening the question, surfacing objections, and deciding which
@@ -61,8 +61,14 @@ assumptions deserve real-respondent validation.
 
 ### ChatGPT
 
-Settings, then Connected Apps, then add `https://getminds.ai/mcp` and authorize via
-OAuth. Panel results render as interactive widgets inline.
+Enable developer mode under **Settings → Security and login**, then open
+**Plugins** and select the plus button. Add `https://getminds.ai/mcp` as a public
+HTTPS connection, choose OAuth, and sign in to Minds. Availability depends on
+your account and workspace policy.
+
+Study results can render as interactive widgets inline. See the
+[official OpenAI connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+and the [Minds setup guide](https://getminds.ai/guide/integration-chatgpt).
 
 ### Claude Desktop and claude.ai
 
@@ -112,37 +118,57 @@ including API key setup, are at https://getminds.ai/mcp/setup.
 
 ### API keys
 
-Generate one in the Minds app under Settings, then API Keys. Keys start with
+Generate one in the Minds app under **Settings → API Keys**. Keys start with
 `minds_` and are passed as `Authorization: Bearer minds_...`.
 
 ## Tools
 
-| Tool | What it does |
-|------|--------------|
-| `list_groups` | List your saved Audiences, segments, and persona collections. |
-| `create_group_from_brief` | Build a grounded synthetic Audience from a population brief via deep web research. |
-| `ask_group` | Ask, survey, or poll a single Audience and get per-respondent answers. |
-| `list_panels` | List your panels, studies, surveys, and focus groups. |
-| `create_panel` | Create a panel or study from a research goal. |
-| `ask_panel` | Ask one straightforward question across a whole panel. |
-| `get_panel_status` | Check panel composition and live progress on in-flight questions. |
-| `export_panel` | Export panel results as PDF, CSV, XLSX, or JSON. |
-| `plan_panel_study` | Draft a structured research plan for multi-question studies, asset audits, and MaxDiff. |
-| `run_panel_study` | Execute a confirmed study plan as a durable server-side run. |
-| `get_panel_study` | Check durable progress, artifacts, and method calculations for a running study. |
-| `list_research_methods` | List supported research methods and which of them can actually execute. |
-| `get_panel_summary` | Return a whole-study summary with semantic blocks and heatmaps. |
-| `list_study_drafts` | List reusable study-plan drafts in the connected workspace. |
-| `save_study_draft` | Save a study plan as a reusable draft before execution. |
+<!-- tools:start -->
+<!-- Generated by scripts/sync-mcp-surface.mjs from the production MCP surface. Do not edit by hand. -->
 
-Research methods: MaxDiff runs through a deterministic adapter. Conjoint is
-planned and cannot execute yet. Call `list_research_methods` for the current
-state rather than assuming.
+The server advertises 27 tools. Clients read the current schemas at runtime;
+the full list with access levels is in [reference/tools.md](reference/tools.md).
+
+| Tool | What it does |
+| --- | --- |
+| `list_audiences` | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. |
+| `import_audience_sources` | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. |
+| `create_audience_from_brief` | Creates an Audience from a free-text brief. |
+| `get_audience_creation_progress` | Read one Audience creation operation and its members’ training progress. |
+| `get_audience_limits` | Returns the Audience size ceilings that apply to the authenticated account before an Audience is created: the per-Audience plan cap including any configured team allowance, the custom-size maximum, and the per-mode ceilings. |
+| `ask_audience` | Asks exactly one standalone question of one existing Audience. |
+| `export_audience` | Exports an Audience brief, or with kind "validation_report" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. |
+| `duplicate_audience` | Copy an Audience with independent copies of its Minds and all they know. |
+| `list_studies` | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. |
+| `create_study` | Creates a Study workspace from existing Audiences or inline Audience configurations. |
+| `ask_study` | Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. |
+| `get_study_status` | Returns and shows a Study's current state: progress for in-flight questions, completed per-Audience results, the linked Minds, Study links, and the status of a requested async export job. |
+| `export_study` | Starts an asynchronous export of Study results and returns an export job ID. |
+| `duplicate_study` | Copy a Study with all its questions and results over the same Audiences. |
+| `export_heatmap` | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. |
+| `run_study_heatmap` | Read or start a question asset heatmap, with the same behavior as Minds UI. |
+| `export_mind` | Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. |
+| `get_shared_mind_knowledge` | Read shared Mind sources and assessments. |
+| `plan_study_questions` | Creates or revises a non-executing draft for a multi-question plan inside an existing Study. |
+| `run_study_questions` | Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. |
+| `list_research_methods` | Lists Minds research methods with availability, complexity, executable status, and fallback metadata. |
+| `list_study_drafts` | Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. |
+| `list_study_templates` | Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. |
+| `save_study_draft` | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. |
+| `manage_study_template` | Saves, explicitly updates or uses a Custom research template. |
+| `delete_study_template` | Permanently deletes one saved Study template owned by the authenticated user. |
+| `get_study_summary` | Returns or refreshes the semantic summary for a Study as Markdown plus flexible evidence blocks. |
+
+Server card: `https://getminds.ai/.well-known/mcp/server-card.json` (`minds-ai`).
+<!-- tools:end -->
+
+Call `list_research_methods` for current executable status, requirements, and
+fallbacks before choosing a research method.
 
 ## Discovery
 
 - Server card: `https://getminds.ai/.well-known/mcp/server-card.json`
-- OAuth protected resource metadata: `https://getminds.ai/.well-known/oauth-protected-resource`
+- OAuth protected resource metadata: `https://getminds.ai/.well-known/oauth-protected-resource/mcp`
 - Registry name: `ai.getminds/minds`
 
 ## Links

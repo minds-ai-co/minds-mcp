@@ -34,9 +34,11 @@ if (remote?.authorization?.type !== "AzureKeyVault") fail("manifest authorizatio
 if (remote?.authorization?.referenceId !== "__MICROSOFT_KEY_VAULT_URI__") fail("Key Vault placeholder changed unexpectedly");
 
 const tools = toolFile.tools;
-if (!Array.isArray(tools) || tools.length !== 18) fail(`expected 18 tools, found ${tools?.length ?? 0}`);
+// The snapshot mirrors the live server card (scripts/sync-mcp-surface.mjs), so its size follows the server.
+if (!Array.isArray(tools) || tools.length === 0) fail("mcptools.json lists no tools");
 const names = new Set();
-const directivePattern = /\b(you must|must first|always call|never call|before calling|after calling|use the .* tool|call the .* tool)\b/i;
+// Cross-tool directives only: "before calling" is fine in prose, "before calling ask_study" is not.
+const directivePattern = /\b(you must|must first|always call|never call|(?:before|after) calling `?[a-z]+_[a-z_]+|use the .* tool|call the .* tool)\b/i;
 for (const tool of tools || []) {
   if (!tool.name) fail("every tool needs a name");
   if (names.has(tool.name)) fail(`duplicate tool name: ${tool.name}`);

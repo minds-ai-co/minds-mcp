@@ -13,7 +13,7 @@ It does not replace representative human fieldwork.
 - segment-comparison hypotheses;
 - questionnaire and study-plan iteration;
 - screening ideas before commissioning fieldwork;
-- structured synthesis of a grounded synthetic panel.
+- structured synthesis of a grounded synthetic Audience.
 
 ## Uses that require additional validation
 
@@ -28,8 +28,8 @@ It does not replace representative human fieldwork.
 Method support changes over time. Call `list_research_methods` before planning a
 study.
 
-- **MaxDiff** executes through a deterministic method adapter.
-- **Conjoint** is planned and cannot currently execute.
+Check each method's executable status, requirements, and fallback metadata. A
+method name in a template or an old example does not establish availability.
 
 Do not infer method availability from an old transcript or this static page; the
 live server response is authoritative.
