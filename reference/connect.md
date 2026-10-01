@@ -49,9 +49,16 @@ Install the public plugin from GitHub:
 agy plugins install https://github.com/minds-ai-co/minds-mcp
 ```
 
-Antigravity discovers OAuth automatically from the remote MCP endpoint. Complete
-authentication in **Settings → Customizations**, then confirm that `minds`
-appears under `/mcp`.
+Or add only the server from the Antigravity CLI:
+
+```bash
+agy mcp add --type http minds https://getminds.ai/mcp
+```
+
+Antigravity registers itself through OAuth dynamic client registration. Open
+**Settings → Customizations** (Cmd+, or Ctrl+,), click **Authenticate** next to
+`minds`, sign in to Minds in the browser, copy the authorization code shown, then
+paste it back and click **Submit**. Confirm that `minds` appears under `/mcp`.
 
 For a manual connection, add the following to `~/.gemini/config/mcp_config.json`
 or the current workspace's `.agents/mcp_config.json`:
@@ -65,6 +72,11 @@ or the current workspace's `.agents/mcp_config.json`:
   }
 }
 ```
+
+To use a Minds API key instead of OAuth, add a header to the same entry:
+`"headers": { "Authorization": "Bearer minds_YOUR_API_KEY" }`.
+
+Step-by-step guide: <https://getminds.ai/guide/integration-antigravity>
 
 Gemini CLI remains supported for Google Cloud enterprise and API-key users. Its
 legacy extension is still available from the same repository.
