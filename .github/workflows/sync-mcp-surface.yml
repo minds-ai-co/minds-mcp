@@ -113,8 +113,13 @@ jobs:
           node scripts/sync-publish.mjs verify "$RUNNER_TEMP/validated-sync.json"
           gh pr merge "$SYNC_PR_NUMBER" --repo "$GITHUB_REPOSITORY" \
             --squash --delete-branch --match-head-commit "$SYNC_HEAD_SHA"
-      - name: Request publication after the automated merge
-        if: steps.sync-pr.outputs.pull-request-operation == 'created' || steps.sync-pr.outputs.pull-request-operation == 'updated'
+      - name: Ensure current main is published
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent
+        run: |
+          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          pages_state=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest" --jq '[.commit, .status] | join(" ")')
+          read -r pages_sha pages_status <<< "$pages_state"
+          if [[ "$main_sha" != "$pages_sha" || "$pages_status" == "errored" ]]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent
+          fi
