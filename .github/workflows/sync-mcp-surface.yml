@@ -47,14 +47,17 @@ jobs:
         run: node scripts/sync-mcp-surface.mjs --check
 
   sync:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
+      pages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -66,6 +69,8 @@ jobs:
         run: node scripts/sync-mcp-surface.mjs --check
       - name: Validate Microsoft package source
         run: node integrations/microsoft-mcp/scripts/validate.mjs
+      - name: Capture the exact validated artifacts
+        run: node scripts/sync-publish.mjs capture "$RUNNER_TEMP/validated-sync.json"
       - name: Build pull request body
         run: |
           {
@@ -76,11 +81,13 @@ jobs:
             echo '```'
             echo
             echo "Sync regression tests, production drift checks, and Microsoft package validation passed before this PR was created."
-            echo "The workflow updates this PR only; portal submissions and archived releases remain separate."
+            echo "The workflow automatically merges only the exact validated generated artifacts; portal submissions and archived releases remain separate."
           } > "$RUNNER_TEMP/body.md"
       - name: Open or update the sync pull request
+        id: sync-pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
+          base: main
           branch: automation/sync-mcp-surface
           delete-branch: true
           commit-message: "docs: sync MCP surface from production"
@@ -89,9 +96,30 @@ jobs:
           add-paths: |
             README.md
             reference/tools.md
+            reference/workflow.md
             integrations/microsoft-mcp/mcptools.json
             plugin.json
             .codex-plugin/plugin.json
             .cursor-plugin/plugin.json
             gemini-extension.json
             integrations/microsoft-mcp/manifest.template.json
+      - name: Verify and merge the validated sync
+        if: steps.sync-pr.outputs.pull-request-operation == 'created' || steps.sync-pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYNC_PR_NUMBER: ${{ steps.sync-pr.outputs.pull-request-number }}
+          SYNC_HEAD_SHA: ${{ steps.sync-pr.outputs.pull-request-head-sha }}
+        run: |
+          node scripts/sync-publish.mjs verify "$RUNNER_TEMP/validated-sync.json"
+          gh pr merge "$SYNC_PR_NUMBER" --repo "$GITHUB_REPOSITORY" \
+            --squash --delete-branch --match-head-commit "$SYNC_HEAD_SHA"
+      - name: Ensure current main is published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          pages_state=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest" --jq '[.commit, .status] | join(" ")')
+          read -r pages_sha pages_status <<< "$pages_state"
+          if [[ "$main_sha" != "$pages_sha" || "$pages_status" == "errored" ]]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent
+          fi

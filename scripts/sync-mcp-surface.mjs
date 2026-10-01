@@ -3,7 +3,7 @@
 // surface, so the documentation never drifts from the server:
 //
 //   - README.md, between <!-- tools:start --> and <!-- tools:end -->
-//   - reference/tools.md (whole file)
+//   - reference/tools.md and reference/workflow.md (whole files)
 //   - integrations/microsoft-mcp/mcptools.json
 //   - "version" in every plugin/extension manifest
 //
@@ -23,6 +23,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateSurface } from "./lib/mcp-surface.mjs";
+import { workflowReference } from "./lib/workflow-reference.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CARD_URL = process.env.MINDS_SERVER_CARD_URL || "https://getminds.ai/.well-known/mcp/server-card.json";
@@ -45,7 +46,6 @@ const HAND_WRITTEN = [
   "README.md",
   "reference/index.md",
   "reference/connect.md",
-  "reference/workflow.md",
   "reference/cookbook.md",
   "reference/scope.md",
   "integrations/microsoft-mcp/intro.md",
@@ -233,6 +233,7 @@ await update(
 
 // reference/tools.md
 await update("reference/tools.md", toolsReference(tools, card, meta));
+await update("reference/workflow.md", workflowReference(tools));
 
 // Microsoft agent connector tool snapshot (ASCII-safe, as the package requires)
 await update(

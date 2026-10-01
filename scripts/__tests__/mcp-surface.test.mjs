@@ -55,7 +55,7 @@ async function sandbox(t) {
   const root = await mkdtemp(path.join(tmpdir(), "minds-mcp-sync-test-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   await mkdir(path.join(root, "scripts/lib"), { recursive: true });
-  for (const file of ["sync-mcp-surface.mjs", "lib/mcp-surface.mjs"]) {
+  for (const file of ["sync-mcp-surface.mjs", "lib/mcp-surface.mjs", "lib/workflow-reference.mjs"]) {
     await copyFile(new URL(`../${file}`, import.meta.url), path.join(root, "scripts", file));
   }
   const data = fixture();
@@ -114,6 +114,6 @@ test("CLI reports drift without writes, regenerates, and remains idempotent", as
   assert.equal(check.code, 0, check.output);
   assert.match((await run()).output, /Generated files are current/);
   assert.equal(JSON.parse(await readFile(path.join(root, "plugin.json"), "utf8")).version, "2.0.3");
-  await writeFile(path.join(root, "reference/workflow.md"), "Call `create_panel`.\n");
+  await writeFile(path.join(root, "reference/cookbook.md"), "Call `create_panel`.\n");
   assert.equal((await run()).code, 1, "stale handwritten workflows block automation too");
 });
