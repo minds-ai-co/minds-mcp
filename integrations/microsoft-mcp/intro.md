@@ -49,8 +49,8 @@ enables link sharing. Public privacy and terms information is available at:
   representative human fieldwork for high-stakes decisions.
 - Long-running studies are asynchronous. Use the status tools until the durable
   run completes.
-- Conjoint is planned and cannot execute yet. Query the research-method catalog
-  for current availability.
+- Query the research-method catalog for current executable status, requirements,
+  and fallback metadata.
 - Advanced methods can require explicit opt-in and plan eligibility.
 - Usage and audience-size limits depend on the connected Minds plan.
 - A user must review the exact structured study draft before execution.

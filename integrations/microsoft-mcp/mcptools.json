@@ -3,7 +3,7 @@
     {
       "name": "ask_audience",
       "title": "Ask One Standalone Audience Question",
-      "description": "Asks exactly one standalone question of one existing Audience. It creates a private Study for that Audience, starts asynchronous answers from its Minds, and returns the Study identifier and its links.\n\nAutomatic classification may reformulate a context-dependent question. The accepted task and its answer contract are returned together, with the original request retained separately. Requests needing clarification or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments must be fetchable HTTP(S) URLs or existing Minds workspace uploads; the Study refuses to start if its Minds cannot read one.",
+      "description": "Asks exactly one standalone question of one existing Audience. It creates a private Study for that Audience, starts asynchronous answers from its Minds, and returns the Study identifier and its links.\n\nThe server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Requests needing clarification or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments can be URLs, Minds uploads or files shared in the conversation (uploaded or generated images, PDFs).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -31,7 +31,7 @@
             "type": "string"
           },
           "attachments": {
-            "description": "Files/images processed once and given to every Audience member as context. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+            "description": "Files/images processed once and given to every Audience member as context. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
             "type": "array",
             "items": {
               "type": "object",
@@ -43,12 +43,12 @@
                   "maxLength": 255
                 },
                 "url": {
-                  "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                  "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL.",
                   "type": "string",
                   "minLength": 1
                 },
                 "path": {
-                  "description": "Storage path of a file already uploaded to Minds. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                  "description": "Storage path of a file already uploaded to Minds (chat/<userId>/...).",
                   "type": "string",
                   "minLength": 1
                 },
@@ -63,6 +63,39 @@
                   "minLength": 1
                 }
               }
+            }
+          },
+          "conversationFiles": {
+            "description": "Stimulus files given to every Audience member, alongside any attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
             }
           }
         },
@@ -163,6 +196,186 @@
               }
             ]
           },
+          "planLimit": {
+            "description": "Present when a plan limit refused, truncated or stopped Study work.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "study_answers (Free plan monthly Study answers) or response_credits (synthetic-response allowance).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "outcome": {
+                    "description": "refused (nothing started or charged), partial (only the first questions run), stopped (a run stopped at the limit), or resume_refused.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "used": {
+                    "description": "Allowance used in the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "limit": {
+                    "description": "Allowance of the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "remaining": {
+                    "description": "Allowance left, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "periodEnd": {
+                    "description": "When the allowance renews (ISO 8601), when known.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "totalQuestionCount": {
+                    "description": "Questions in the request or run, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestionCount": {
+                    "description": "Questions the limit kept from running.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestions": {
+                    "description": "Questions not asked: { index (zero-based), text }.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resumable": {
+                    "description": "True when the run can be continued in place with run_study_questions resume.runId once the plan allows it.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "runId": {
+                    "description": "The run concerned, when one exists.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "executionStarted": {
+                    "description": "Whether any question of this request ran.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "upgradeUrl": {
+                    "description": "Absolute link to the Minds plans page.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "responseCreditsUrl": {
+                    "description": "Absolute link to buy response credits; only for response_credits.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "message": {
+                    "description": "One user-facing sentence with the link(s).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "apiBase": {
             "description": "Minds base URL.",
             "anyOf": [
@@ -212,16 +425,19 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.f4fb213110cc.html"
+          "resourceUri": "ui://widget/response.e83dcbd02055.html"
         },
-        "openai/outputTemplate": "ui://widget/response.f4fb213110cc.html",
-        "ui/resourceUri": "ui://widget/response.f4fb213110cc.html"
+        "openai/outputTemplate": "ui://widget/response.e83dcbd02055.html",
+        "openai/fileParams": [
+          "conversationFiles"
+        ],
+        "ui/resourceUri": "ui://widget/response.e83dcbd02055.html"
       }
     },
     {
       "name": "ask_study",
       "title": "Ask One Standalone Question in a Study",
-      "description": "Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set belongs in one planned and confirmed multi-question block, submitted once rather than question by question.\n\nThe question text can reach the Minds, so it carries only the question, its stimulus and respondent-facing instructions \u2014 never planner or client orchestration notes. Scale, categorical and qualitative questions are classified automatically, and the result carries the question id, status and workspace links.",
+      "description": "Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set belongs in one planned and confirmed multi-question block, submitted once rather than question by question.\n\nThe question text can reach the Minds, so it carries only the question, its stimulus and respondent-facing instructions \u2014 never planner or client orchestration notes. Question types are classified automatically; the result carries the question id, status and workspace links.\n\nAttachments can be files shared in the conversation (uploaded or generated images, PDFs).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -235,6 +451,39 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "conversationFiles": {
+            "description": "Stimulus files given to every participating Mind, alongside any evidence.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
             }
           },
           "study": {
@@ -309,7 +558,7 @@
                 }
               },
               "attachments": {
-                "description": "Files/images processed once and given to every participating Mind. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                "description": "Files/images processed once and given to every participating Mind. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -321,12 +570,12 @@
                       "maxLength": 255
                     },
                     "url": {
-                      "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                      "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL.",
                       "type": "string",
                       "minLength": 1
                     },
                     "path": {
-                      "description": "Storage path of a file already uploaded to Minds. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                      "description": "Storage path of a file already uploaded to Minds (chat/<userId>/...).",
                       "type": "string",
                       "minLength": 1
                     },
@@ -507,6 +756,186 @@
               }
             ]
           },
+          "planLimit": {
+            "description": "Present when a plan limit refused, truncated or stopped Study work.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "study_answers (Free plan monthly Study answers) or response_credits (synthetic-response allowance).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "outcome": {
+                    "description": "refused (nothing started or charged), partial (only the first questions run), stopped (a run stopped at the limit), or resume_refused.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "used": {
+                    "description": "Allowance used in the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "limit": {
+                    "description": "Allowance of the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "remaining": {
+                    "description": "Allowance left, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "periodEnd": {
+                    "description": "When the allowance renews (ISO 8601), when known.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "totalQuestionCount": {
+                    "description": "Questions in the request or run, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestionCount": {
+                    "description": "Questions the limit kept from running.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestions": {
+                    "description": "Questions not asked: { index (zero-based), text }.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resumable": {
+                    "description": "True when the run can be continued in place with run_study_questions resume.runId once the plan allows it.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "runId": {
+                    "description": "The run concerned, when one exists.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "executionStarted": {
+                    "description": "Whether any question of this request ran.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "upgradeUrl": {
+                    "description": "Absolute link to the Minds plans page.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "responseCreditsUrl": {
+                    "description": "Absolute link to buy response credits; only for response_credits.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "message": {
+                    "description": "One user-facing sentence with the link(s).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "apiBase": {
             "description": "Minds base URL.",
             "anyOf": [
@@ -556,10 +985,13 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.f4fb213110cc.html"
+          "resourceUri": "ui://widget/response.e83dcbd02055.html"
         },
-        "openai/outputTemplate": "ui://widget/response.f4fb213110cc.html",
-        "ui/resourceUri": "ui://widget/response.f4fb213110cc.html"
+        "openai/outputTemplate": "ui://widget/response.e83dcbd02055.html",
+        "openai/fileParams": [
+          "conversationFiles"
+        ],
+        "ui/resourceUri": "ui://widget/response.e83dcbd02055.html"
       }
     },
     {
@@ -634,7 +1066,7 @@
                 }
               },
               "files": {
-                "description": "Optional already-uploaded research files. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance.",
+                "description": "Optional already-uploaded research files. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance.",
                 "maxItems": 20,
                 "type": "array",
                 "items": {
@@ -645,7 +1077,7 @@
                       "type": "string"
                     },
                     "url": {
-                      "description": "URL of an already-uploaded file. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                      "description": "URL of an already-uploaded file. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
                       "type": "string",
                       "minLength": 1
                     }
@@ -980,6 +1412,39 @@
                 "pattern": "^[0-9a-f]{64}$"
               }
             }
+          },
+          "conversationFiles": {
+            "description": "Research files (screener, questionnaire, report, respondent data), read like research.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#"
@@ -1036,15 +1501,18 @@
           "sparks:write"
         ],
         "ui": {
-          "resourceUri": "ui://widget/audience.874089a447f6.html",
+          "resourceUri": "ui://widget/audience.7df21953009f.html",
           "visibility": [
             "model",
             "app"
           ]
         },
         "openai/widgetAccessible": true,
-        "openai/outputTemplate": "ui://widget/audience.874089a447f6.html",
-        "ui/resourceUri": "ui://widget/audience.874089a447f6.html"
+        "openai/outputTemplate": "ui://widget/audience.7df21953009f.html",
+        "openai/fileParams": [
+          "conversationFiles"
+        ],
+        "ui/resourceUri": "ui://widget/audience.7df21953009f.html"
       }
     },
     {
@@ -1090,6 +1558,39 @@
             "description": "Set true ONLY when the user explicitly asked for a public/shareable Study link. Defaults to false: the Study is private to its owner and no share URL is generated. Enabling this ALSO publishes every attached Audience and every Mind inside them at world-readable URLs \u2014 including pre-existing Audiences passed via audienceIds. Do not enable it to \"be helpful\".",
             "default": false,
             "type": "boolean"
+          },
+          "conversationFiles": {
+            "description": "Stimulus for the new Study, stored in Minds and returned as attachments (url, path) to pass with its questions. Respondents see a file only once a question carries it. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           }
         },
         "required": [
@@ -1205,7 +1706,10 @@
       },
       "_meta": {
         "openai/toolInvocation/invoking": "Building your Study...",
-        "openai/toolInvocation/invoked": "Study created!"
+        "openai/toolInvocation/invoked": "Study created!",
+        "openai/fileParams": [
+          "conversationFiles"
+        ]
       }
     },
     {
@@ -2029,7 +2533,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns a Study's current state: progress for in-flight questions, completed per-Audience results, the linked Minds, the Study links, and the status of a requested asynchronous export job. Values can be numeric answers or classified summary labels, and message fields carry the original Mind responses where available. locale is the Study's display locale, not a guarantee of the language of every answer.\n\nAn in-flight question reports zero Minds answered for its whole run \u2014 partial per-Mind progress is not persisted \u2014 and then jumps straight to the finished table, so zero is not evidence that a run is stuck.\n\nPass questionId to follow a single question, or runId to follow one confirmed multi-question run, which reports question-level counters only. With neither, the response covers every question the Study has run and grows with questions x Audiences x Minds x answer length.\n\nStudy deletion is not available here.",
+      "description": "Returns and shows a Study's current state: progress for in-flight questions, completed per-Audience results, the linked Minds, Study links, and the status of a requested async export job. Values can be numeric answers or classified summary labels, and message fields carry the original Mind responses where available. locale is the Study's display locale, not a guarantee of the language of every answer.\n\nAn in-flight question reports zero Minds answered for its whole run \u2014 partial per-Mind progress is not persisted \u2014 and then jumps straight to the finished table, so zero is not evidence that a run is stuck.\n\nPass questionId to follow a single question, or runId to follow one confirmed multi-question run, which reports question-level counters only. With neither, the response covers every question the Study has run and grows with questions x Audiences x Minds x answer length.\n\nStudy deletion is not available here.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2219,7 +2723,7 @@
             ]
           },
           "recentResults": {
-            "description": "Completed questions with their per-Audience outputData.",
+            "description": "Completed questions with their per-Audience outputData and stimuli (the media the Minds were shown: name, url, mediaType). For coded qualitative answers, audiences[].themeMentions counts Minds per theme (multi-label, can exceed 100% in total) while distribution counts only each answer's primary theme.",
             "anyOf": [
               {
                 "type": "array",
@@ -2231,11 +2735,191 @@
             ]
           },
           "failedQuestions": {
-            "description": "Questions that failed, with an error.",
+            "description": "Questions that failed, with an error; a question a plan limit kept from running also carries planLimit.",
             "anyOf": [
               {
                 "type": "array",
                 "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planLimit": {
+            "description": "Present when a plan limit refused, truncated or stopped Study work.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "study_answers (Free plan monthly Study answers) or response_credits (synthetic-response allowance).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "outcome": {
+                    "description": "refused (nothing started or charged), partial (only the first questions run), stopped (a run stopped at the limit), or resume_refused.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "used": {
+                    "description": "Allowance used in the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "limit": {
+                    "description": "Allowance of the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "remaining": {
+                    "description": "Allowance left, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "periodEnd": {
+                    "description": "When the allowance renews (ISO 8601), when known.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "totalQuestionCount": {
+                    "description": "Questions in the request or run, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestionCount": {
+                    "description": "Questions the limit kept from running.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestions": {
+                    "description": "Questions not asked: { index (zero-based), text }.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resumable": {
+                    "description": "True when the run can be continued in place with run_study_questions resume.runId once the plan allows it.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "runId": {
+                    "description": "The run concerned, when one exists.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "executionStarted": {
+                    "description": "Whether any question of this request ran.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "upgradeUrl": {
+                    "description": "Absolute link to the Minds plans page.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "responseCreditsUrl": {
+                    "description": "Absolute link to buy response credits; only for response_credits.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "message": {
+                    "description": "One user-facing sentence with the link(s).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": {}
               },
               {
                 "type": "null"
@@ -2326,9 +3010,12 @@
           "visibility": [
             "model",
             "app"
-          ]
+          ],
+          "resourceUri": "ui://widget/response.e83dcbd02055.html"
         },
-        "openai/widgetAccessible": true
+        "openai/outputTemplate": "ui://widget/response.e83dcbd02055.html",
+        "openai/widgetAccessible": true,
+        "ui/resourceUri": "ui://widget/response.e83dcbd02055.html"
       }
     },
     {
@@ -2477,6 +3164,39 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 2000000
+          },
+          "conversationFiles": {
+            "description": "Research files (text, Markdown, CSV, JSON) imported like existingFiles; in sourceIdx order they follow existingFiles and precede files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -2506,6 +3226,9 @@
         "openai/visibility": "public",
         "openai/scopes": [
           "sparks:write"
+        ],
+        "openai/fileParams": [
+          "conversationFiles"
         ]
       }
     },
@@ -3329,6 +4052,39 @@
               "requestId"
             ],
             "additionalProperties": false
+          },
+          "conversationFiles": {
+            "description": "For save or update with a configuration: question attachments added to every saved question. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           }
         },
         "required": [
@@ -3349,12 +4105,17 @@
       "annotations": {
         "title": "Manage Study Template",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/fileParams": [
+          "conversationFiles"
+        ]
       }
     },
     {
@@ -3529,6 +4290,39 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "conversationFiles": {
+            "description": "Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           },
           "study": {
             "description": "Which Study the plan belongs to. Omit entirely to continue the active Study from this MCP session.",
@@ -3850,7 +4644,7 @@
             "type": "object",
             "properties": {
               "source": {
-                "description": "The one main source this study is about. When Minds must evaluate pasted text, use kind prompt and put the exact respondent-visible material in content. Keep research objectives, requested questions, and planner-only instructions in request. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                "description": "The one main source this study is about. When Minds must evaluate pasted text, use kind prompt and put the exact respondent-visible material in content. Keep research objectives, requested questions, and planner-only instructions in request. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
                 "type": "object",
                 "properties": {
                   "kind": {
@@ -3870,7 +4664,7 @@
                     "minLength": 1
                   },
                   "url": {
-                    "description": "Fetchable source URL. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                    "description": "Fetchable source URL. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
                     "type": "string",
                     "minLength": 1
                   },
@@ -3890,7 +4684,7 @@
                 ]
               },
               "attachments": {
-                "description": "Files and websites available to the planned Study (one question block, at most 100). With multiple assets, map every question explicitly (use [] for no assets); an asset no question uses is shown with every question. Give each scoped file a stable id. Remote URLs are copied into durable Minds storage before the draft is saved. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                "description": "Files and websites available to the planned Study (one question block, at most 100). With multiple assets, map every question explicitly (use [] for no assets); an asset no question uses is shown with every question. Give each scoped file a stable id. Remote URLs are copied into durable Minds storage before the draft is saved. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file.",
                 "maxItems": 100,
                 "type": "array",
                 "items": {
@@ -3903,12 +4697,12 @@
                       "maxLength": 255
                     },
                     "url": {
-                      "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                      "description": "Fetchable HTTP(S), signed, or Minds workspace upload URL.",
                       "type": "string",
                       "minLength": 1
                     },
                     "path": {
-                      "description": "Storage path of a file already uploaded to Minds. Pass a fetchable HTTP(S) URL, or an existing Minds workspace upload under chat/<userId>/ (that storage path or its /api/uploads/chat/ URL; request the signed upload with folder \"chat\"). MCP cannot read a local path, and a file the user attached in the chat client is NOT reachable either unless that client also exposes a public URL for it \u2014 most do not. When it is not: send the file CONTENTS to import_audience_sources (UTF-8 text, Markdown, CSV, JSON), which takes contents rather than paths. A PDF or image with no public URL has no MCP route at all \u2014 it must be uploaded in the Minds app first; say so instead of retrying. Study tools import external file URLs into durable Minds storage before saving or running. A temp/, portfolio/, or context/ path \u2014 and any /api/uploads/file-access/ URL \u2014 is refused as not belonging to the workspace owner and is never re-fetched; pass a plain external URL instead. The Study refuses to start if Minds cannot read the asset.",
+                      "description": "Storage path of a file already uploaded to Minds (chat/<userId>/...).",
                       "type": "string",
                       "minLength": 1
                     },
@@ -4082,15 +4876,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.fb5bb14a4446.html",
+          "resourceUri": "ui://widget/plan.37be56146a50.html",
           "visibility": [
             "model",
             "app"
           ]
         },
         "openai/widgetAccessible": true,
-        "openai/outputTemplate": "ui://widget/plan.fb5bb14a4446.html",
-        "ui/resourceUri": "ui://widget/plan.fb5bb14a4446.html"
+        "openai/outputTemplate": "ui://widget/plan.37be56146a50.html",
+        "openai/fileParams": [
+          "conversationFiles"
+        ],
+        "ui/resourceUri": "ui://widget/plan.37be56146a50.html"
       }
     },
     {
@@ -4182,7 +4979,7 @@
         "type": "object",
         "properties": {
           "confirmed": {
-            "description": "Must be true only after the user explicitly confirms this exact draft revision.",
+            "description": "Must be true only after the user explicitly confirms this exact draft revision, or confirms continuing the stopped run named in resume.",
             "type": "boolean",
             "const": true
           },
@@ -4243,7 +5040,7 @@
             }
           },
           "draft": {
-            "description": "The exact confirmed draft revision to execute.",
+            "description": "The exact confirmed draft revision to execute. Required unless resume is given.",
             "type": "object",
             "properties": {
               "id": {
@@ -4263,11 +5060,25 @@
               "id",
               "revision"
             ]
+          },
+          "resume": {
+            "description": "Continue a run that stopped at a plan limit, in place, instead of executing a draft. Its original confirmed questions and answer contracts are kept and questions that already have answers are not asked again. Needs a paid plan.",
+            "type": "object",
+            "properties": {
+              "runId": {
+                "description": "The plan_limited run to continue.",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              }
+            },
+            "required": [
+              "runId"
+            ]
           }
         },
         "required": [
-          "confirmed",
-          "draft"
+          "confirmed"
         ],
         "$schema": "http://json-schema.org/draft-07/schema#"
       },
@@ -4301,6 +5112,219 @@
           },
           "executionStarted": {
             "description": "False when nothing started."
+          },
+          "resumed": {
+            "description": "With resume: true when the stopped run was queued again.",
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requestedQuestionCount": {
+            "description": "Questions in the confirmed plan.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skippedQuestionCount": {
+            "description": "Questions left out of this run by the Free plan Study answer allowance.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planLimit": {
+            "description": "Present when a plan limit refused, truncated or stopped Study work.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "study_answers (Free plan monthly Study answers) or response_credits (synthetic-response allowance).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "outcome": {
+                    "description": "refused (nothing started or charged), partial (only the first questions run), stopped (a run stopped at the limit), or resume_refused.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "used": {
+                    "description": "Allowance used in the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "limit": {
+                    "description": "Allowance of the current period, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "remaining": {
+                    "description": "Allowance left, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "periodEnd": {
+                    "description": "When the allowance renews (ISO 8601), when known.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "totalQuestionCount": {
+                    "description": "Questions in the request or run, when known.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestionCount": {
+                    "description": "Questions the limit kept from running.",
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "skippedQuestions": {
+                    "description": "Questions not asked: { index (zero-based), text }.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resumable": {
+                    "description": "True when the run can be continued in place with run_study_questions resume.runId once the plan allows it.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "runId": {
+                    "description": "The run concerned, when one exists.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "executionStarted": {
+                    "description": "Whether any question of this request ran.",
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "upgradeUrl": {
+                    "description": "Absolute link to the Minds plans page.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "responseCreditsUrl": {
+                    "description": "Absolute link to buy response credits; only for response_credits.",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "message": {
+                    "description": "One user-facing sentence with the link(s).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "workspaceUrl": {
             "description": "Minds workspace link for the Study.",
@@ -4467,6 +5491,39 @@
                 }
               }
             }
+          },
+          "conversationFiles": {
+            "description": "Study context files for the draft: images, video and audio are stimulus respondents see, documents are background. They are kept on later saves of the same draft. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "description": "Download URL the chat host supplies for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_id": {
+                  "description": "The chat host's ID for this file.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#"
@@ -4490,6 +5547,11 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/fileParams": [
+          "conversationFiles"
+        ]
       }
     }
   ]

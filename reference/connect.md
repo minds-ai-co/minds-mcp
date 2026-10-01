@@ -16,24 +16,20 @@ Keys** and pass it as a bearer token.
 
 ## ChatGPT
 
-On the web (chatgpt.com):
+1. Open **Settings → Security and login** and enable **Developer mode**.
+2. Open **Plugins** and select the plus button.
+3. Name the connection Minds and enter `https://getminds.ai/mcp` as the public
+   HTTPS server URL.
+4. Choose OAuth, create the connection, and sign in to Minds.
 
-1. Open **Plugins** and choose **Add → Create MCP App**.
-2. Name it Minds and set the server URL to `https://getminds.ai/mcp`.
-3. Choose OAuth authentication, create the app, and sign in to Minds.
+Developer mode availability depends on your account and workspace policy.
+Study results can render as interactive widgets inside ChatGPT. Consult the
+[official OpenAI connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+and the [Minds ChatGPT guide](https://getminds.ai/guide/integration-chatgpt) for
+current client setup details.
 
-If **Create MCP App** is missing, turn on developer mode or ask your workspace
-admin to allow custom MCP apps.
-
-In the desktop app:
-
-1. Open **Plugins** and choose **Add → Add MCP server**.
-2. Set the type to **Streamable HTTP** and the URL to `https://getminds.ai/mcp`.
-3. Leave the bearer token empty for OAuth, or name an environment variable that
-   holds a `minds_…` API key. Save, restart, and authenticate.
-
-Study results can render as interactive widgets inside ChatGPT. See the
-[full ChatGPT guide](https://getminds.ai/guide/integration-chatgpt).
+After server tools or metadata change, refresh the connection from its detail
+page in ChatGPT Plugins so the client reads the latest definitions.
 
 ## Claude and Claude Desktop
 

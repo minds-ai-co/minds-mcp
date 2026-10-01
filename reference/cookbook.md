@@ -33,9 +33,10 @@ not to claim population-level preference.
 
 1. Create or reuse the intended Audience.
 2. Create a Study around the decision the concept must inform.
-3. Ask one diagnostic question first: what does the concept appear to promise?
-4. Follow with questions about relevance, credibility, objections, and missing
+3. Plan one complete block with an initial diagnostic question about the
+   concept's promise, followed by relevance, credibility, objections, and missing
    information.
+4. Review the whole block and confirm that exact draft revision before running it.
 5. Inspect minority views as well as the majority pattern.
 6. Convert unresolved assumptions into a human-research brief.
 
@@ -67,8 +68,8 @@ Do not assume that a named research method is executable.
 3. Select only an available method.
 4. Use a structured Study plan when the method requires multiple tasks.
 
-MaxDiff currently executes through a deterministic adapter. Conjoint is planned
-but cannot currently execute. The live server response remains authoritative.
+Use the live catalog for each method's executable status, requirements, and
+fallbacks. Availability can change independently of this documentation.
 
 ## Finish with the right validation
 

@@ -12,7 +12,7 @@ assistant.
 | Transport | Streamable HTTP |
 | Authentication | OAuth 2.1 with PKCE (DCR or Client ID Metadata Documents) or Minds API key |
 | Study execution | Durable, server-side runs |
-| Exports | PDF, CSV, XLSX, JSON, and Markdown |
+| Exports | PDF, DOCX, PPTX, Markdown, CSV, XLS, and SPSS SAV |
 
 [Connect Minds to an MCP client](https://getminds.ai/mcp/setup?utm_source=content&utm_medium=content&utm_campaign=content-seo-mcp-reference&utm_content=mcp-docs-overview)
 

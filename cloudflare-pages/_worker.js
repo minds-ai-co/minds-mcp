@@ -9,7 +9,7 @@ const clients = [
     name: "ChatGPT",
     transport: "Remote connector",
     auth: "OAuth 2.1",
-    route: "Plugins → Add → Create MCP App",
+    route: "Developer mode → Plugins → plus button",
   },
   {
     name: "Claude",
