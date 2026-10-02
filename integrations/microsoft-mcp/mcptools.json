@@ -1501,18 +1501,18 @@
           "sparks:write"
         ],
         "ui": {
-          "resourceUri": "ui://widget/audience.7df21953009f.html",
+          "resourceUri": "ui://widget/audience.ef1d94e01358.html",
           "visibility": [
             "model",
             "app"
           ]
         },
         "openai/widgetAccessible": true,
-        "openai/outputTemplate": "ui://widget/audience.7df21953009f.html",
+        "openai/outputTemplate": "ui://widget/audience.ef1d94e01358.html",
         "openai/fileParams": [
           "conversationFiles"
         ],
-        "ui/resourceUri": "ui://widget/audience.7df21953009f.html"
+        "ui/resourceUri": "ui://widget/audience.ef1d94e01358.html"
       }
     },
     {
