@@ -45,15 +45,11 @@ Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-
 
 Tool: `create_audience_from_brief`
 
-Creates an Audience from a free-text brief. The server researches the population, derives its defensible dimensions, and builds Minds with an explicit profile each and exact segment allocation.
-
-New briefs default to the webapp draft workflow: streamed research, distributions, then proposed Minds for review. Rework with `draft.preview=true`, `draft.id`, `draft.sha256` and a separate `draft.rework` instruction. Create the exact approved roster with `draft.preview=false` and its id/checksum only after user acceptance. `grounding.preview=false` remains available for explicitly requested direct creation. `grounding.preview` returns the quota axes for review before any Mind exists; passing the reviewed grounding back with its checksum creates the Audience from exactly what was reviewed. `composition.memberCount` states a size, and the mode ceilings that bound it come from the Audience-limits operation.
-
-Creation is asynchronous: the result carries the operation to poll while it runs. Audiences are private unless link sharing is enabled.
+Researches a free-text population brief and builds Minds with explicit profiles and exact segment allocation. New briefs return an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. Supports draft revisions and reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `draft` | No | object | The webapp Audience draft workflow. Preview proposes real Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. |
+| `draft` | No | object | The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft. |
 | `brief` | No | string | Free-text brief describing the population the Audience should represent. E.g. "California high school students grades 9-12", "Berlin Späti customers", "Spanish lawyers", "management team of Coca Cola". The server runs deep web research on this brief to find demographic / psychographic distributions from authoritative sources, then generates personas that proportionally reflect those distributions. |
 | `name` | No | string | Optional Audience name override. When omitted, the server names the Audience from the brief or the LLM detection result. |
 | `operationId` | No | string | Resume a queued preview or creation by its returned jobId. Reads its v1 operation status without creating or charging anything. Supply this alone; do not repeat the creation brief to check progress. Once the creation completed, the result also says whether every Mind can chat yet (the Audience is ready then) and how many are still learning from their sources in the background; call it again to follow that. |
@@ -62,6 +58,19 @@ Creation is asynchronous: the result carries the operation to poll while it runs
 | `composition` | No | object | How many Minds to create and how the cohort is allocated across the grounded axes. |
 | `grounding` | No | object | Review the quota axes before any Mind exists, and pass a reviewed snapshot back unchanged to create from it. |
 | `conversationFiles` | No | array | Research files (screener, questionnaire, report, respondent data), read like research.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+
+## Submit Audience Review
+
+Tool: `submit_audience_review`
+
+Revise or confirm the displayed Audience review. Reads the owned operation and verifies its displayed checksum before forwarding to the shared Audience creation workflow. Research files and evidence remain server-owned; this tool accepts no file inputs. Confirmation requires the unchanged reviewed brief, name and Mind count.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `operationId` | Yes | string |  |
+| `reviewSha256` | Yes | string |  |
+| `confirm` | Yes | boolean |  |
+| `edits` | Yes | object |  |
 
 ## Audience creation progress
 
@@ -72,6 +81,17 @@ Read one Audience creation operation and its members’ training progress. Never
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `operationId` | Yes | string |  |
+
+## Show Audience Creation
+
+Tool: `render_audience_review`
+
+Shows source research, distributions, proposed Minds, review, confirmation and training for one or more Audience operations. Multiple operations appear in independent tabs within one widget; each Audience has its own review and confirmation.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `operationId` | No | string | Single Audience operation; supply this or operationIds. |
+| `operationIds` | No | array | All Audience operations to display together in one tabbed widget. |
 
 ## Get Audience Limits
 
@@ -192,13 +212,7 @@ Attachments can be files shared in the conversation (uploaded or generated image
 
 Tool: `get_study_status`
 
-Returns and shows a Study's current state: progress for in-flight questions, completed per-Audience results, the linked Minds, Study links, and the status of a requested async export job. Values can be numeric answers or classified summary labels, and message fields carry the original Mind responses where available. locale is the Study's display locale, not a guarantee of the language of every answer.
-
-An in-flight question reports zero Minds answered for its whole run — partial per-Mind progress is not persisted — and then jumps straight to the finished table, so zero is not evidence that a run is stuck.
-
-Pass questionId to follow a single question, or runId to follow one confirmed multi-question run, which reports question-level counters only. With neither, the response covers every question the Study has run and grows with questions x Audiences x Minds x answer length.
-
-Study deletion is not available here.
+Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. locale is the display language. Deletion is unavailable.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -206,6 +220,18 @@ Study deletion is not available here.
 | `runId` | No | string | Multi-question run ID from run_study_questions. Supplying it returns that run: its confirmed plan, question-level progress and response artifacts, instead of the Study-wide view. |
 | `study` | No | object | Which Study to inspect. Omit entirely to use the active Study from this MCP session. |
 | `export` | No | object | Poll one asynchronous export job created by the export operation. |
+
+## Show Final Study Results
+
+Tool: `render_study_results`
+
+Shows final results, summary, key findings, Audience breakdowns and Mind responses for a completed question or multi-question run. Requires exactly one of questionId or runId.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `studyId` | Yes | string |  |
+| `questionId` | No | string |  |
+| `runId` | No | string |  |
 
 ## Export Study Results
 
@@ -309,6 +335,18 @@ With 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` =
 | `draft` | No | object | Revising an existing draft: which draft and revision, and how it should change. Omit for a new draft. |
 | `stimulus` | No | object | Respondent-visible material for the planned block, and how it is assigned to questions. |
 | `policy` | No | object | Evidence policy and language stored in the draft revision and reviewed before execution. |
+
+## Show Study Plan
+
+Tool: `render_study_plan`
+
+Shows a saved Study draft at its current revision for interactive review and confirmation. Research has not started.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `studyId` | Yes | string |  |
+| `draftPlanId` | Yes | string |  |
+| `revision` | Yes | integer |  |
 
 ## Run a Confirmed Multi-Question Block
 
