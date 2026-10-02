@@ -6,8 +6,8 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **27 tools** through ordinary `tools/list` discovery.
-There are **48 canonical callable tools**, excluding aliases.
+The server advertises **31 tools** through ordinary `tools/list` discovery.
+There are **55 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
 
@@ -17,8 +17,10 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | --- | --- | --- | --- | --- |
 | `list_audiences` | List Audiences | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. | read-only | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
-| `create_audience_from_brief` | Create a Grounded Audience from a Brief | Creates an Audience from a free-text brief. | writes | sparks:write |
+| `create_audience_from_brief` | Create a Grounded Audience from a Brief | Researches a free-text population brief and builds Minds with explicit profiles and exact segment allocation. | writes | sparks:write |
+| `submit_audience_review` | Submit Audience Review | Revise or confirm the displayed Audience review. | writes | sparks:read, sparks:write |
 | `get_audience_creation_progress` | Audience creation progress | Read one Audience creation operation and its members’ training progress. | read-only | sparks:read |
+| `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, review, confirmation and training for one or more Audience operations. | read-only | sparks:read |
 | `get_audience_limits` | Get Audience Limits | Returns the Audience size ceilings that apply to the authenticated account before an Audience is created: the per-Audience plan cap including any configured team allowance, the custom-size maximum, and the per-mode ceilings. | read-only | sparks:read |
 | `ask_audience` | Ask One Standalone Audience Question | Asks exactly one standalone question of one existing Audience. | writes | flows:write |
 | `export_audience` | Export Audience Brief | Exports an Audience brief, or with kind "validation_report" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. | writes | sparks:read |
@@ -26,7 +28,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | writes | flows:write |
-| `get_study_status` | Get Study Status | Returns and shows a Study's current state: progress for in-flight questions, completed per-Audience results, the linked Minds, Study links, and the status of a requested async export job. | read-only | flows:read |
+| `get_study_status` | Get Study Status | Returns Study progress, per-Audience results, original Mind responses, links and export status. | read-only | flows:read |
+| `render_study_results` | Show Final Study Results | Shows final results, summary, key findings, Audience breakdowns and Mind responses for a completed question or multi-question run. | read-only | flows:read |
 | `export_study` | Export Study Results | Starts an asynchronous export of Study results and returns an export job ID. | writes | flows:read |
 | `duplicate_study` | Duplicate Study | Copy a Study with all its questions and results over the same Audiences. | writes | flows:write |
 | `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. | writes | flows:read |
@@ -34,6 +37,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `export_mind` | Export Mind Persona Profile | Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. | writes | sparks:read |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Read shared Mind sources and assessments. | read-only | sparks:read |
 | `plan_study_questions` | Plan a Multi-Question Block in a Study | Creates or revises a non-executing draft for a multi-question plan inside an existing Study. | destructive | flows:write |
+| `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |
 | `run_study_questions` | Run a Confirmed Multi-Question Block | Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. | writes | flows:write |
 | `list_research_methods` | List Research Methods | Lists Minds research methods with availability, complexity, executable status, and fallback metadata. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
@@ -109,8 +113,10 @@ discovery response. Registry listings must not describe them as discovered.
 | `chat_with_mind` | Sends one self-contained message to a named Mind and returns its response. |
 | `create_audience` | Creates an Audience from existing Minds. |
 | `create_mind` | Creates a Mind — a persona, expert, digital twin, character, respondent, or agent — from a description of who or what it should be, with no form to fill in first. |
+| `export_figma_comments` | Preview completed Study run feedback or saved image heatmap reactions as native Figma comments. |
 | `get_audience` | Returns one Audience belonging to the authenticated account: its details, its members, and its research grounding. |
 | `get_audience_validation` | Returns how closely an Audience matches real surveys. |
+| `get_billing_catalog` | Read the authenticated user’s existing Stripe subscription prices, response-credit packs and purchase eligibility. |
 | `get_mind_status` | Reports the training progress of a Mind, persona, digital twin, or expert that is still training. |
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
 | `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
@@ -126,6 +132,7 @@ discovery response. Registry listings must not describe them as discovered.
 | `manage_study_draft` | Delete, consume, or reread the original source of a durable Study draft through /api/v1/. |
 | `preview_audience_dataset_segmentation` | Enterprise review step for spreadsheet-grounded Audiences. |
 | `recalibrate_audience` | Re-runs the research grounding of an Audience over MCP, without the user having to redo it by hand in the app. |
+| `start_billing_checkout` | Start a new subscription or response-credit checkout using the same Stripe billing rules as Minds. |
 | `validate_audience` | Starts a validation of an Audience against real published surveys or your own survey files, or cancels one. |
 
 ## Discovery metadata
