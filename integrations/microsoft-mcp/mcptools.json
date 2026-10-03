@@ -3234,6 +3234,34 @@
                                 "scale"
                               ]
                             },
+                            "unit": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "currency",
+                                    "percentage",
+                                    "duration",
+                                    "length",
+                                    "mass",
+                                    "volume",
+                                    "custom"
+                                  ]
+                                },
+                                "code": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80,
+                                  "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "code"
+                              ],
+                              "additionalProperties": false
+                            },
                             "scaleRange": {
                               "minItems": 2,
                               "maxItems": 2,
@@ -3422,6 +3450,34 @@
                                 "ranking",
                                 "scale"
                               ]
+                            },
+                            "unit": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "currency",
+                                    "percentage",
+                                    "duration",
+                                    "length",
+                                    "mass",
+                                    "volume",
+                                    "custom"
+                                  ]
+                                },
+                                "code": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80,
+                                  "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "code"
+                              ],
+                              "additionalProperties": false
                             },
                             "scaleRange": {
                               "minItems": 2,
@@ -3690,6 +3746,34 @@
                         "scale"
                       ]
                     },
+                    "unit": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "currency",
+                            "percentage",
+                            "duration",
+                            "length",
+                            "mass",
+                            "volume",
+                            "custom"
+                          ]
+                        },
+                        "code": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80,
+                          "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "code"
+                      ],
+                      "additionalProperties": false
+                    },
                     "scalePoints": {
                       "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
                       "minItems": 2,
@@ -3930,6 +4014,34 @@
                                 "scale"
                               ]
                             },
+                            "unit": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "currency",
+                                    "percentage",
+                                    "duration",
+                                    "length",
+                                    "mass",
+                                    "volume",
+                                    "custom"
+                                  ]
+                                },
+                                "code": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80,
+                                  "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "code"
+                              ],
+                              "additionalProperties": false
+                            },
                             "scalePoints": {
                               "minItems": 2,
                               "maxItems": 100,
@@ -4103,6 +4215,34 @@
                         "ranking",
                         "scale"
                       ]
+                    },
+                    "unit": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "currency",
+                            "percentage",
+                            "duration",
+                            "length",
+                            "mass",
+                            "volume",
+                            "custom"
+                          ]
+                        },
+                        "code": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80,
+                          "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "code"
+                      ],
+                      "additionalProperties": false
                     },
                     "scalePoints": {
                       "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
@@ -4462,17 +4602,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.b67a2f00904d.html",
+          "resourceUri": "ui://widget/audience.9da2d2d3d4b5.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.b67a2f00904d.html",
+        "openai/outputTemplate": "ui://widget/audience.9da2d2d3d4b5.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.b67a2f00904d.html"
+        "ui/resourceUri": "ui://widget/audience.9da2d2d3d4b5.html"
       }
     },
     {
@@ -4547,17 +4687,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.9ea48b15c67f.html",
+          "resourceUri": "ui://widget/plan.8968aa7c5f0b.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.9ea48b15c67f.html",
+        "openai/outputTemplate": "ui://widget/plan.8968aa7c5f0b.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.9ea48b15c67f.html"
+        "ui/resourceUri": "ui://widget/plan.8968aa7c5f0b.html"
       }
     },
     {
@@ -4886,17 +5026,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.1dbbbeded675.html",
+          "resourceUri": "ui://widget/response.d5052e9f33f1.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.1dbbbeded675.html",
+        "openai/outputTemplate": "ui://widget/response.d5052e9f33f1.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.1dbbbeded675.html"
+        "ui/resourceUri": "ui://widget/response.d5052e9f33f1.html"
       }
     },
     {
