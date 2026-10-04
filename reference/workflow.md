@@ -212,7 +212,7 @@ Attachments can be files shared in the conversation (uploaded or generated image
 
 Tool: `get_study_status`
 
-Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values are formatted in the Study display locale, returned as locale: the language of its confirmed plan, else the owner UI locale. Deletion is unavailable.
+Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English. Deletion is unavailable.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
