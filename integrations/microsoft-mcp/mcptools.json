@@ -209,6 +209,13 @@
                       "null"
                     ]
                   },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
                   "periodEnd": {
                     "description": "When the allowance renews (ISO 8601), when known.",
                     "type": [
@@ -663,6 +670,13 @@
                   },
                   "remaining": {
                     "description": "Allowance left, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
                     "type": [
                       "number",
                       "null"
@@ -2434,6 +2448,13 @@
                   },
                   "remaining": {
                     "description": "Allowance left, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
                     "type": [
                       "number",
                       "null"
@@ -4886,6 +4907,13 @@
                       "null"
                     ]
                   },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
                   "periodEnd": {
                     "description": "When the allowance renews (ISO 8601), when known.",
                     "type": [
@@ -5303,6 +5331,13 @@
                   },
                   "remaining": {
                     "description": "Allowance left, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
                     "type": [
                       "number",
                       "null"
