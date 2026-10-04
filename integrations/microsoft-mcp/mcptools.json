@@ -2210,7 +2210,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values are formatted in the Study display locale, returned as locale: the language of its confirmed plan, else the owner UI locale. Deletion is unavailable.",
+      "description": "Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English. Deletion is unavailable.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4602,17 +4602,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.5ecb931dfb38.html",
+          "resourceUri": "ui://widget/audience.23ae88af2132.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.5ecb931dfb38.html",
+        "openai/outputTemplate": "ui://widget/audience.23ae88af2132.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.5ecb931dfb38.html"
+        "ui/resourceUri": "ui://widget/audience.23ae88af2132.html"
       }
     },
     {
@@ -4687,17 +4687,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.6dc14242ba58.html",
+          "resourceUri": "ui://widget/plan.601e7197fb95.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.6dc14242ba58.html",
+        "openai/outputTemplate": "ui://widget/plan.601e7197fb95.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.6dc14242ba58.html"
+        "ui/resourceUri": "ui://widget/plan.601e7197fb95.html"
       }
     },
     {
@@ -5026,17 +5026,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.f6ace732a071.html",
+          "resourceUri": "ui://widget/response.3655f1b6f1ed.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.f6ace732a071.html",
+        "openai/outputTemplate": "ui://widget/response.3655f1b6f1ed.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.f6ace732a071.html"
+        "ui/resourceUri": "ui://widget/response.3655f1b6f1ed.html"
       }
     },
     {
