@@ -4593,10 +4593,10 @@
         "type": "object",
         "properties": {
           "audienceCreation": {
-            "description": "Single Audience creation snapshot, when only one operation is shown."
+            "description": "Full Audience creation snapshot of the first (initially selected) Audience."
           },
           "audienceCreations": {
-            "description": "Audience creation snapshots displayed together in one widget, in tab order.",
+            "description": "Every displayed Audience in tab order: operationId, name and phase. Read a full snapshot with get_audience_creation_progress.",
             "anyOf": [
               {
                 "type": "array",
@@ -4623,17 +4623,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.23ae88af2132.html",
+          "resourceUri": "ui://widget/audience.f9ef61b712db.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.23ae88af2132.html",
+        "openai/outputTemplate": "ui://widget/audience.f9ef61b712db.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.23ae88af2132.html"
+        "ui/resourceUri": "ui://widget/audience.f9ef61b712db.html"
       }
     },
     {
@@ -4708,17 +4708,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.601e7197fb95.html",
+          "resourceUri": "ui://widget/plan.4051e32bfd6f.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.601e7197fb95.html",
+        "openai/outputTemplate": "ui://widget/plan.4051e32bfd6f.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.601e7197fb95.html"
+        "ui/resourceUri": "ui://widget/plan.4051e32bfd6f.html"
       }
     },
     {
@@ -5054,17 +5054,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.3655f1b6f1ed.html",
+          "resourceUri": "ui://widget/response.7a84fc2355f7.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.3655f1b6f1ed.html",
+        "openai/outputTemplate": "ui://widget/response.7a84fc2355f7.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.3655f1b6f1ed.html"
+        "ui/resourceUri": "ui://widget/response.7a84fc2355f7.html"
       }
     },
     {
