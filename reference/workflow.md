@@ -276,7 +276,7 @@ Exports a completed website heatmap from a Study result, identified by the messa
 
 Tool: `run_study_heatmap`
 
-Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires Premium. Selecting a different video does not change the question results.
+Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires a paid plan. Selecting a different video does not change the question results.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
