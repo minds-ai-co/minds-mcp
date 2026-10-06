@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery returns the best fuzzy name match instead of a page. Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients.
+Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery returns the best fuzzy name match instead of a page. Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
