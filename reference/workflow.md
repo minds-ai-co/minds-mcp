@@ -49,7 +49,7 @@ Researches a free-text population brief and builds Minds with explicit profiles 
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `draft` | No | object | The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft. |
+| `draft` | No | object | The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft; that confirmation needs nothing else (omit the brief and every other option): the server creates exactly the reviewed draft from its stored request. |
 | `brief` | No | string | Free-text brief describing the population the Audience should represent. E.g. "California high school students grades 9-12", "Berlin Späti customers", "Spanish lawyers", "management team of Coca Cola". The server runs deep web research on this brief to find demographic / psychographic distributions from authoritative sources, then generates personas that proportionally reflect those distributions. |
 | `name` | No | string | Optional Audience name override. When omitted, the server names the Audience from the brief or the LLM detection result. |
 | `operationId` | No | string | Resume a queued preview or creation by its returned jobId. Reads its v1 operation status without creating or charging anything. Supply this alone; do not repeat the creation brief to check progress. Once the creation completed, the result also says whether every Mind can chat yet (the Audience is ready then) and how many are still learning from their sources in the background; call it again to follow that. |
@@ -91,7 +91,7 @@ Shows source research, distributions, proposed Minds, review, confirmation and t
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `operationId` | No | string | Single Audience operation; supply this or operationIds. |
-| `operationIds` | No | array | All Audience operations to display together in one tabbed widget. |
+| `operationIds` | No | array | All Audience operations to display together in one tabbed widget, at most 20. |
 
 ## Get Audience Limits
 
@@ -150,7 +150,7 @@ Copy an Audience with independent copies of its Minds and all they know.
 | --- | --- | --- | --- |
 | `audienceId` | Yes | string | Audience to duplicate; you must be able to edit it. The copy is private and gets new Minds (profiles, knowledge, embeddings) plus the grounding, sources, formations and finished validations; it counts against the Mind allowance. Refused while the Audience is still being built. |
 | `name` | No | string | Name of the copy. Defaults to "<name> (copy)". |
-| `idempotencyKey` | No | string | Retry key. Reuse the key a failed or timed-out call returned so the retry cannot create a second copy. |
+| `idempotencyKey` | No | string | Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name. |
 
 ## List Studies
 
@@ -258,7 +258,7 @@ Copy a Study with all its questions and results over the same Audiences.
 | --- | --- | --- | --- |
 | `studyId` | Yes | string | Study to duplicate; you must be able to open it. The private copy keeps every answer, chart, heatmap, summary and finished run; a schedule is copied paused. Audiences are shared, not copied (use duplicate_audience). Refused while a run is live. |
 | `name` | No | string | Name of the copy. Defaults to "<name> (copy)". |
-| `idempotencyKey` | No | string | Retry key. Reuse the key a failed or timed-out call returned so the retry cannot create a second copy. |
+| `idempotencyKey` | No | string | Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name. |
 
 ## Export Website Heatmap
 
@@ -328,7 +328,7 @@ With 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` =
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. |
-| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected. |
+| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected. A fixed instrument runs as Custom research (guided-research): a saved Study template's configuration.questions can be passed here, but a template methodId other than guided-research (a calculator-backed method such as Van Westendorp or MaxDiff) is not applied; manage_study_template action use runs the saved method in a web-app draft. |
 | `idempotencyKey` | No | string | Optional stable retry key. When omitted the tool derives one from its own arguments, so a repeated identical call (including a host retry after a timeout) returns the draft revision that was already saved instead of planning again. Pass a fresh key to force a new plan for identical input. |
 | `conversationFiles` | No | array | Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 | `study` | No | object | Which Study the plan belongs to. Omit entirely to continue the active Study from this MCP session. |
@@ -393,7 +393,7 @@ Lists durable unfinished study drafts, or returns the complete saved planning st
 
 Tool: `list_study_templates`
 
-Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the registered research method the Study runs under, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.
+Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the saved research method, which a transcribed plan does not apply, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -428,7 +428,7 @@ A template stores its questions, response settings, question attachments and the
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `action` | Yes | "save", "update", "use" |  |
+| `action` | Yes | "save", "update", "use" | save, update or use. There is no delete action: delete a template with delete_study_template and its templateId. |
 | `templateId` | No | string |  |
 | `save` | No | object |  |
 | `update` | No | object |  |

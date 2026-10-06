@@ -814,7 +814,7 @@
         "type": "object",
         "properties": {
           "draft": {
-            "description": "The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft.",
+            "description": "The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft; that confirmation needs nothing else (omit the brief and every other option): the server creates exactly the reviewed draft from its stored request.",
             "type": "object",
             "properties": {
               "preview": {
@@ -1201,6 +1201,10 @@
                   "minLength": 1,
                   "maxLength": 200
                 }
+              },
+              "trainMembers": {
+                "description": "Deprecated; omit it. Every member of every Audience is trained individually in the background, including reviewed-dataset cohorts of more than ~40 Minds (each keeps its deterministic cohort profile and the request locale). true is accepted as a no-op; false is rejected, because it used to create untrained Minds with an empty system prompt that reported ready. Cost and time: one Mind training per member; a 100-Mind cohort takes tens of minutes to a few hours. The tool returns as soon as the Audience exists (structuredContent.audience.memberTraining reports what was queued); wait until every member reports readyToChat (get_mind_status, GET /api/v1/minds/{id}/training, or readiness.isReady from GET /api/v1/audiences/{id}/progress) before running a Study, which refuses Audiences with untrained members; the Audience is ready at that point. Members keep learning from their sources in the background for a few more minutes (readiness.learning, then readiness.fullyTrained); nothing needs to wait for it. readyToChat means the member can answer, not that it researched anything: a member whose collection found nothing keeps one generated context item and still reports ready, so check knowledgeState.fallbackOnly on the members before treating the Audience as evidence-backed.",
+                "type": "boolean"
               }
             }
           },
@@ -1551,7 +1555,7 @@
             "maxLength": 200
           },
           "idempotencyKey": {
-            "description": "Retry key. Reuse the key a failed or timed-out call returned so the retry cannot create a second copy.",
+            "description": "Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name.",
             "type": "string",
             "minLength": 1,
             "maxLength": 128
@@ -1617,7 +1621,7 @@
             "maxLength": 200
           },
           "idempotencyKey": {
-            "description": "Retry key. Reuse the key a failed or timed-out call returned so the retry cannot create a second copy.",
+            "description": "Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name.",
             "type": "string",
             "minLength": 1,
             "maxLength": 128
@@ -2285,7 +2289,7 @@
                 ]
               },
               "jobId": {
-                "description": "Export job ID returned by export_study. Pass it with exportKind and exportFormat to poll that exact artifact.",
+                "description": "Export job ID returned by export_study. Pass it with the export kind and format of that job to poll that exact artifact.",
                 "type": "string",
                 "minLength": 1
               }
@@ -3131,7 +3135,7 @@
     {
       "name": "list_study_templates",
       "title": "List Study Templates",
-      "description": "Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the registered research method the Study runs under, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.",
+      "description": "Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the saved research method, which a transcribed plan does not apply, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3178,7 +3182,8 @@
               "save",
               "update",
               "use"
-            ]
+            ],
+            "description": "save, update or use. There is no delete action: delete a template with delete_study_template and its templateId."
           },
           "templateId": {
             "type": "string",
@@ -3729,7 +3734,7 @@
             "minLength": 1
           },
           "questions": {
-            "description": "Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected.",
+            "description": "Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected. A fixed instrument runs as Custom research (guided-research): a saved Study template's configuration.questions can be passed here, but a template methodId other than guided-research (a calculator-backed method such as Van Westendorp or MaxDiff) is not applied; manage_study_template action use runs the saved method in a web-app draft.",
             "minItems": 1,
             "maxItems": 200,
             "type": "array",
@@ -4577,8 +4582,9 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "operationIds": {
-            "description": "All Audience operations to display together in one tabbed widget.",
+            "description": "All Audience operations to display together in one tabbed widget, at most 20.",
             "minItems": 1,
+            "maxItems": 20,
             "type": "array",
             "items": {
               "type": "string",
@@ -4623,17 +4629,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.47429170f8c6.html",
+          "resourceUri": "ui://widget/audience.14b7a83d412d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.47429170f8c6.html",
+        "openai/outputTemplate": "ui://widget/audience.14b7a83d412d.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.47429170f8c6.html"
+        "ui/resourceUri": "ui://widget/audience.14b7a83d412d.html"
       }
     },
     {
@@ -4708,17 +4714,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.8ab8e9374bfd.html",
+          "resourceUri": "ui://widget/plan.bb57e1ba6693.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.8ab8e9374bfd.html",
+        "openai/outputTemplate": "ui://widget/plan.bb57e1ba6693.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.8ab8e9374bfd.html"
+        "ui/resourceUri": "ui://widget/plan.bb57e1ba6693.html"
       }
     },
     {
@@ -5054,17 +5060,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.2ad5ebd1ca63.html",
+          "resourceUri": "ui://widget/response.e2231ae39b36.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.2ad5ebd1ca63.html",
+        "openai/outputTemplate": "ui://widget/response.e2231ae39b36.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.2ad5ebd1ca63.html"
+        "ui/resourceUri": "ui://widget/response.e2231ae39b36.html"
       }
     },
     {
@@ -5262,7 +5268,7 @@
             ]
           },
           "runId": {
-            "description": "Durable run; poll it with get_study_run.",
+            "description": "Durable run; poll it with get_study_status (study.id and runId).",
             "type": [
               "string",
               "null"
