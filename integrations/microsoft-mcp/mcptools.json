@@ -918,7 +918,7 @@
                 "maximum": 6000
               },
               "audienceCreationMode": {
-                "description": "How the Audience is sized. \"balanced\" (default): compact and representative for everyday research. It is the only mode with a hard wall on a size you state \u2014 a memberCount above 20 is refused with 403 MODE_CAP. \"segment_coverage\": two representatives per limiting grounded cell, from a 10-Mind floor; automatic sizing stops at 50, but a memberCount you state is bounded only by your plan. \"benchmark_depth\": repeated representation of limiting grounded cells for validation-ready segmentation; bounded by your plan allowance. The deeper two require a Team (enterprise) plan \u2014 on other plans the server SILENTLY downgrades to \"balanced\" and echoes the effective mode in structuredContent.audience.audienceCreationMode. Call get_audience_limits to see the ceilings that apply to your account.",
+                "description": "How the Audience is sized. \"balanced\" (default): compact and representative for everyday research. It is the only mode with a hard wall on a size you state \u2014 a memberCount above 20 is refused with 403 MODE_CAP. \"segment_coverage\": two representatives per limiting grounded cell, from a 10-Mind floor; automatic sizing stops at 50, but a memberCount you state is bounded only by your plan. \"benchmark_depth\": repeated representation of limiting grounded cells for validation-ready segmentation; bounded by your plan allowance. The deeper two require a Pro or Enterprise plan \u2014 on other plans the server SILENTLY downgrades to \"balanced\" and echoes the effective mode in structuredContent.audience.audienceCreationMode. Call get_audience_limits to see the ceilings that apply to your account.",
                 "type": "string",
                 "enum": [
                   "balanced",
@@ -4623,17 +4623,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.f9ef61b712db.html",
+          "resourceUri": "ui://widget/audience.47429170f8c6.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.f9ef61b712db.html",
+        "openai/outputTemplate": "ui://widget/audience.47429170f8c6.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.f9ef61b712db.html"
+        "ui/resourceUri": "ui://widget/audience.47429170f8c6.html"
       }
     },
     {
@@ -4708,17 +4708,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.4051e32bfd6f.html",
+          "resourceUri": "ui://widget/plan.8ab8e9374bfd.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.4051e32bfd6f.html",
+        "openai/outputTemplate": "ui://widget/plan.8ab8e9374bfd.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.4051e32bfd6f.html"
+        "ui/resourceUri": "ui://widget/plan.8ab8e9374bfd.html"
       }
     },
     {
@@ -5054,23 +5054,23 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.7a84fc2355f7.html",
+          "resourceUri": "ui://widget/response.2ad5ebd1ca63.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.7a84fc2355f7.html",
+        "openai/outputTemplate": "ui://widget/response.2ad5ebd1ca63.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.7a84fc2355f7.html"
+        "ui/resourceUri": "ui://widget/response.2ad5ebd1ca63.html"
       }
     },
     {
       "name": "run_study_heatmap",
       "title": "Run Study Asset Heatmap",
-      "description": "Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires Premium. Selecting a different video does not change the question results.",
+      "description": "Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires a paid plan. Selecting a different video does not change the question results.",
       "inputSchema": {
         "type": "object",
         "properties": {
