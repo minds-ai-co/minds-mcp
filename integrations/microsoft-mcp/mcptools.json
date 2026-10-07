@@ -1329,7 +1329,7 @@
     {
       "name": "create_study",
       "title": "Create a Study",
-      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nThis always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate Study.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.",
+      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nA Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1368,6 +1368,10 @@
           "isLinkSharingEnabled": {
             "default": false,
             "description": "Set true ONLY when the user explicitly asked for a public/shareable Study link. Defaults to false: the Study is private to its owner and no share URL is generated. Enabling this ALSO publishes every attached Audience and every Mind inside them at world-readable URLs \u2014 including pre-existing Audiences passed via audienceIds. Do not enable it to \"be helpful\".",
+            "type": "boolean"
+          },
+          "allowDuplicateName": {
+            "description": "Create even though a Study with exactly this name exists. Only when the user asked for a separate Study with the same name.",
             "type": "boolean"
           },
           "conversationFiles": {
@@ -4762,17 +4766,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.a48d1b5d3f04.html",
+          "resourceUri": "ui://widget/audience.0514d8fa1277.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.a48d1b5d3f04.html",
+        "openai/outputTemplate": "ui://widget/audience.0514d8fa1277.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.a48d1b5d3f04.html"
+        "ui/resourceUri": "ui://widget/audience.0514d8fa1277.html"
       }
     },
     {
@@ -4850,17 +4854,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.855401b56d86.html",
+          "resourceUri": "ui://widget/plan.f4dc9fa5a52a.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.855401b56d86.html",
+        "openai/outputTemplate": "ui://widget/plan.f4dc9fa5a52a.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.855401b56d86.html"
+        "ui/resourceUri": "ui://widget/plan.f4dc9fa5a52a.html"
       }
     },
     {
@@ -5196,17 +5200,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.35a54923f6da.html",
+          "resourceUri": "ui://widget/response.1fd0615ef680.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.35a54923f6da.html",
+        "openai/outputTemplate": "ui://widget/response.1fd0615ef680.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.35a54923f6da.html"
+        "ui/resourceUri": "ui://widget/response.1fd0615ef680.html"
       }
     },
     {
