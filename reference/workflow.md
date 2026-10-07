@@ -170,7 +170,7 @@ Tool: `create_study`
 
 Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.
 
-This always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate Study.
+A Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.
 
 Any request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.
 
@@ -182,6 +182,7 @@ Creation is atomic and rolls back partial Audience failures. Studies are private
 | `audienceConfigs` | No | array | Preferred field for new Audiences to create and attach atomically. |
 | `audienceIds` | No | array | Preferred field for existing Audience IDs to attach — use list_audiences to find IDs. |
 | `isLinkSharingEnabled` | No | boolean | Set true ONLY when the user explicitly asked for a public/shareable Study link. Defaults to false: the Study is private to its owner and no share URL is generated. Enabling this ALSO publishes every attached Audience and every Mind inside them at world-readable URLs — including pre-existing Audiences passed via audienceIds. Do not enable it to "be helpful". Default: false. |
+| `allowDuplicateName` | No | boolean | Create even though a Study with exactly this name exists. Only when the user asked for a separate Study with the same name. |
 | `conversationFiles` | No | array | Stimulus for the new Study, stored in Minds and returned as attachments (url, path) to pass with its questions. Respondents see a file only once a question carries it. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
 ## Ask One Standalone Question in a Study
