@@ -153,17 +153,17 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `duplicate_study` | Copy a Study with all its questions and results over the same Audiences. |
 | `export_heatmap` | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. |
 | `run_study_heatmap` | Read or start a question asset heatmap, with the same behavior as Minds UI. |
-| `export_mind` | Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. |
+| `export_mind` | Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). |
 | `get_shared_mind_knowledge` | Read shared Mind sources and assessments. |
 | `plan_study_questions` | Creates or revises a non-executing draft for a multi-question plan inside an existing Study. |
 | `render_study_plan` | Shows a saved Study draft at its current revision for interactive review and confirmation. |
 | `run_study_questions` | Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. |
 | `list_research_methods` | Lists Minds research methods with availability, complexity, executable status, and fallback metadata. |
-| `list_study_drafts` | Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. |
-| `list_study_templates` | Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. |
+| `list_study_drafts` | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. |
+| `list_study_templates` | Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. |
 | `save_study_draft` | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. |
 | `manage_study_template` | Saves, explicitly updates or uses a Custom research template. |
-| `delete_study_template` | Permanently deletes one saved Study template owned by the authenticated user. |
+| `delete_study_template` | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. |
 | `get_study_summary` | Returns or refreshes the semantic summary for a Study as Markdown plus flexible evidence blocks. |
 
 Server card: `https://getminds.ai/.well-known/mcp/server-card.json` (`minds-ai`).

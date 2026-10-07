@@ -16,7 +16,7 @@
                 "type": "string"
               },
               "name": {
-                "description": "Audience name to fuzzy-match among the newest 1,000 visible Audiences. Use an exact audienceId for older records.",
+                "description": "Audience name: exact or partial (case-insensitive), with a fuzzy fallback for typos.",
                 "type": "string"
               }
             }
@@ -401,7 +401,7 @@
                 "type": "string"
               },
               "name": {
-                "description": "Study name (fuzzy matched among the newest 1,000 visible Studies; use studyId for older records). Omit with studyId to continue the active Study from this MCP session.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to continue the active Study from this MCP session.",
                 "type": "string"
               }
             }
@@ -1005,29 +1005,39 @@
                 }
               },
               "datasetSegmentation": {
-                "description": "Reviewed variable roles, distributions, and privacy-safe pairwise relationships returned by preview_audience_dataset_segmentation. Requires audienceCreationMode=\"benchmark_depth\". Structural variables shape one generalizable representative cohort; outcomes remain held out and joint combinations remain audit evidence only. Copy `respondentCount` and `recommendedMindCount` through from the preview \u2014 they cap the cohort size.",
+                "description": "Which variables of a respondent dataset shape the cohort. A draft whose research.files include a respondent dataset (XLS, XLSX, CSV, SPSS .sav; Pro plan, audienceCreationMode=\"benchmark_depth\") reads it and proposes this selection itself; its review lists every variable with its role and observed shares. Omit this on the first draft. To change the variables, revise that draft (draft.preview:true with its id and sha256, the same brief and research.files) passing {fileName, sheetName, segmentationColumns} from the review with the keys the user chose. Structural variables shape one representative cohort; outcomes stay held out.",
                 "type": "object",
                 "properties": {
                   "fileName": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The dataset's file name, as the draft's datasetSegmentation review names it. The same file must be in research.files (or conversationFiles)."
                   },
                   "sheetName": {
                     "type": "string"
                   },
+                  "segmentationColumns": {
+                    "minItems": 1,
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Keys of the variables the user kept after review. These are the only ones that shape the cohort."
+                  },
                   "respondentCount": {
-                    "description": "Total respondent rows in the reviewed sheet, copied from the preview.",
+                    "description": "Legacy: total respondent rows in the reviewed sheet. Omit with a selection.",
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991
                   },
                   "recommendedMindCount": {
-                    "description": "Preview-recommended cohort size. Caps how many Minds the benchmark run creates.",
+                    "description": "Legacy: preview-recommended cohort size, which caps the cohort. Omit with a selection.",
                     "type": "integer",
                     "exclusiveMinimum": 0,
                     "maximum": 9007199254740991
                   },
                   "variables": {
-                    "description": "Variable-level distributions from the preview (preferred over `columns` when present).",
+                    "description": "Legacy: variable-level distributions (preferred over `columns` when present). Omit with a selection.",
                     "maxItems": 200,
                     "type": "array",
                     "items": {
@@ -1085,7 +1095,7 @@
                     }
                   },
                   "columns": {
-                    "description": "Column-level distributions from the preview. Used when `variables` is absent.",
+                    "description": "Legacy: column-level distributions, used when `variables` is absent. Omit with a selection.",
                     "maxItems": 200,
                     "type": "array",
                     "items": {
@@ -1142,16 +1152,8 @@
                       ]
                     }
                   },
-                  "segmentationColumns": {
-                    "minItems": 1,
-                    "maxItems": 200,
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Keys of the variables the user kept after review. These are the only ones that shape the cohort."
-                  },
                   "combinations": {
+                    "description": "Legacy: observed joint profiles as audit counts. Omit with a selection.",
                     "maxItems": 5000,
                     "type": "array",
                     "items": {
@@ -1175,8 +1177,7 @@
                         "respondentCount",
                         "sharePct"
                       ]
-                    },
-                    "description": "Observed joint profiles as audit counts. Copy the ids and counts from the preview; per-cell values are not needed."
+                    }
                   },
                   "retainedCombinationIds": {
                     "maxItems": 5000,
@@ -1188,8 +1189,7 @@
                 },
                 "required": [
                   "fileName",
-                  "segmentationColumns",
-                  "combinations"
+                  "segmentationColumns"
                 ]
               },
               "excludeDistributions": {
@@ -1203,7 +1203,7 @@
                 }
               },
               "trainMembers": {
-                "description": "Deprecated; omit it. Every member of every Audience is trained individually in the background, including reviewed-dataset cohorts of more than ~40 Minds (each keeps its deterministic cohort profile and the request locale). true is accepted as a no-op; false is rejected, because it used to create untrained Minds with an empty system prompt that reported ready. Cost and time: one Mind training per member; a 100-Mind cohort takes tens of minutes to a few hours. The tool returns as soon as the Audience exists (structuredContent.audience.memberTraining reports what was queued); wait until every member reports readyToChat (get_mind_status, GET /api/v1/minds/{id}/training, or readiness.isReady from GET /api/v1/audiences/{id}/progress) before running a Study, which refuses Audiences with untrained members; the Audience is ready at that point. Members keep learning from their sources in the background for a few more minutes (readiness.learning, then readiness.fullyTrained); nothing needs to wait for it. readyToChat means the member can answer, not that it researched anything: a member whose collection found nothing keeps one generated context item and still reports ready, so check knowledgeState.fallbackOnly on the members before treating the Audience as evidence-backed.",
+                "description": "Deprecated; omit it. Every member of every Audience is trained individually in the background, including reviewed-dataset cohorts of more than ~40 Minds (each keeps its deterministic cohort profile and the request locale). true is accepted as a no-op; false is rejected, because it used to create untrained Minds with an empty system prompt that reported ready. Cost and time: one Mind training per member; a 100-Mind cohort takes tens of minutes to a few hours. The tool returns as soon as the Audience exists (structuredContent.audience.memberTraining reports what was queued); wait until every member reports readyToChat (readiness.isReady when this tool is called again with the returned operationId) before running a Study, which refuses Audiences with untrained members; the Audience is ready at that point. Members keep learning from their sources in the background for a few more minutes (readiness.learning, then readiness.fullyTrained); nothing needs to wait for it. readyToChat means the member can answer, not that it researched anything: a member whose collection found nothing keeps one generated context item and still reports ready, so check knowledgeState.fallbackOnly on the members before treating the Audience as evidence-backed.",
                 "type": "boolean"
               }
             }
@@ -1213,7 +1213,7 @@
             "type": "object",
             "properties": {
               "preview": {
-                "description": "Review the quota axes BEFORE any Mind exists. When true, the server runs research grounding and deterministic cohort allocation without creating an Audience or Minds or consuming a generation allowance. To revise a saved preview without repeating research, pass its unchanged reviewedGroundingJson/SHA pair together with groundingPreview and the revised exclusion/allocation options. Fresh research uses the same durable operation as the public REST API; this tool returns its operation immediately so the widget can stream sources and distributions. New briefs default to the full webapp draft with proposed Minds; reviewed respondent datasets use a quota-only review. Setting false without reviewed evidence still returns a preview. Present the plan and wait until the user confirms it, then set grounding.preview:false with the unchanged reviewedGroundingJson/SHA pair and the same allocation options. Supplying saved evidence without an explicit false keeps it in review. The response includes effective target percentages and integer counts; explicit allocation targets that do not match grounded axes fail closed.",
+                "description": "Review the quota axes BEFORE any Mind exists. When true, the server runs research grounding and deterministic cohort allocation without creating an Audience or Minds or consuming a generation allowance. To revise a saved preview without repeating research, pass its unchanged reviewedGroundingJson/SHA pair together with groundingPreview and the revised exclusion/allocation options. Fresh research uses the same durable operation as the public REST API; this tool returns its operation immediately so the widget can stream sources and distributions. New briefs, including respondent datasets, default to the full webapp draft with proposed Minds; only a legacy full dataset payload uses a quota-only review. Setting false without reviewed evidence still returns a preview. Present the plan and wait until the user confirms it, then set grounding.preview:false with the unchanged reviewedGroundingJson/SHA pair and the same allocation options. Supplying saved evidence without an explicit false keeps it in review. The response includes effective target percentages and integer counts; explicit allocation targets that do not match grounded axes fail closed.",
                 "type": "boolean"
               },
               "reviewedJson": {
@@ -1329,7 +1329,7 @@
     {
       "name": "create_study",
       "title": "Create a Study",
-      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nThis always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Settle the Audience set before calling \u2014 nothing adds an Audience to an existing Study afterwards, and Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds.",
+      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nThis always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate Study.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1498,7 +1498,7 @@
     {
       "name": "delete_study_template",
       "title": "Delete Study Template",
-      "description": "Permanently deletes one saved Study template owned by the authenticated user. The template and its stored configuration are gone; Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.",
+      "description": "Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template owned by the authenticated user. Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1807,7 +1807,7 @@
                 "type": "string"
               },
               "name": {
-                "description": "Study name (fuzzy matched among the newest 1,000 visible Studies; use studyId for older records).",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos).",
                 "type": "string"
               }
             }
@@ -1870,7 +1870,7 @@
     {
       "name": "export_mind",
       "title": "Export Mind Persona Profile",
-      "description": "Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.",
+      "description": "Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2029,7 +2029,7 @@
                 "type": "string"
               },
               "name": {
-                "description": "Study name (fuzzy matched among the newest 1,000 visible Studies; use studyId for older records). Omit with studyId to export the active Study.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to export the active Study.",
                 "type": "string"
               }
             }
@@ -2228,7 +2228,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English. Deletion is unavailable.",
+      "description": "Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2255,7 +2255,7 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "name": {
-                "description": "Study name (fuzzy matched among the newest 1,000 visible Studies; use studyId for older records). Omit with studyId to use the active Study.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to use the active Study.",
                 "type": "string"
               }
             }
@@ -2653,7 +2653,7 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "name": {
-                "description": "Study name to fuzzy-match among the newest 1,000 visible Studies; use studyId for older records. Omit with studyId to use the active Study.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to use the active Study.",
                 "type": "string"
               }
             }
@@ -2829,12 +2829,12 @@
     {
       "name": "list_audiences",
       "title": "List Audiences",
-      "description": "Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery returns the best fuzzy name match instead of a page. Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.",
+      "description": "Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "searchQuery": {
-            "description": "Search for an Audience by name (fuzzy matching supported). Returns the best match.",
+            "description": "Filters by name (case-insensitive, all matches, paged with limit/offset); the closest name when nothing matches. Omit to browse.",
             "type": "string"
           },
           "limit": {
@@ -2982,12 +2982,12 @@
     {
       "name": "list_studies",
       "title": "List Studies",
-      "description": "Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. Each row carries the Study's Audiences with their Mind counts, stored message count, sharing state and links. searchQuery returns the best fuzzy name match instead of a page.\n\nA Study is the persistent workspace holding its Audiences, questions, multi-question blocks, results, exports and history. Its Minds and per-question results come from the Study status rather than this listing. Study deletion is not available here.",
+      "description": "Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. Each row carries the Study's Audiences with their Mind counts, stored message count, sharing state and links. searchQuery filters by name (case-insensitive, all matches, paged). Minds and per-question results come from the Study status.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "searchQuery": {
-            "description": "Search for a Study by name (fuzzy matching supported). Returns the best match.",
+            "description": "Filters by name (case-insensitive, all matches, paged with limit/offset); the closest name when nothing matches. Omit to browse.",
             "type": "string"
           },
           "limit": {
@@ -3079,15 +3079,33 @@
     {
       "name": "list_study_drafts",
       "title": "List Study Drafts",
-      "description": "Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. Draft records are distinct from running or completed studies.",
+      "description": "Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. Draft records are distinct from running or completed studies.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "draftId": {
-            "description": "Exact study draft ID to retrieve. Omit to list all resumable study drafts owned by the authenticated user.",
+            "description": "Exact study draft ID to retrieve with its complete saved planning state. Omit to list draft summaries.",
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "searchQuery": {
+            "description": "Case-insensitive part of the draft name; returns every match, paged.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "limit": {
+            "description": "Drafts per page, newest first (default 20, max 50).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "description": "Number of drafts to skip; pass nextOffset from the previous page to continue.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#"
@@ -3096,10 +3114,10 @@
         "type": "object",
         "properties": {
           "draft": {
-            "description": "The requested draft, or null."
+            "description": "The requested draft with its complete saved planning state, or null."
           },
           "drafts": {
-            "description": "Resumable drafts.",
+            "description": "One page of resumable draft summaries, without saved planning state.",
             "anyOf": [
               {
                 "type": "array",
@@ -3111,9 +3129,44 @@
             ]
           },
           "totalCount": {
-            "description": "Number of drafts returned.",
+            "description": "Total number of items available.",
             "type": [
               "number",
+              "null"
+            ]
+          },
+          "shownCount": {
+            "description": "Number of items in this response.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "limit": {
+            "description": "Page size used.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "offset": {
+            "description": "Offset of this page.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nextOffset": {
+            "description": "Offset of the next page; absent on the last page.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "searchQuery": {
+            "description": "The name search this page answers.",
+            "type": [
+              "string",
               "null"
             ]
           }
@@ -3135,15 +3188,33 @@
     {
       "name": "list_study_templates",
       "title": "List Study Templates",
-      "description": "Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the saved research method, which a transcribed plan does not apply, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.",
+      "description": "Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. configuration.questions is a fixed, pre-registered instrument and configuration.methodId the research method it runs with; both can be planned as they are.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "templateId": {
-            "description": "Omit to list your own and team-shared Study templates.",
+            "description": "Exact template to return in full. Omit to list template summaries.",
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "searchQuery": {
+            "description": "Case-insensitive part of the template name; returns every match, paged.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "limit": {
+            "description": "Templates per page, most used first (default 20, max 50).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "description": "Number of templates to skip; pass nextOffset from the previous page to continue.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#"
@@ -3152,7 +3223,49 @@
         "type": "object",
         "properties": {
           "data": {
-            "description": "Study templates."
+            "description": "One page of template summaries (id, name, revision, methodId, questionCount), or the complete template requested by templateId."
+          },
+          "totalCount": {
+            "description": "Total number of items available.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "shownCount": {
+            "description": "Number of items in this response.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "limit": {
+            "description": "Page size used.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "offset": {
+            "description": "Offset of this page.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nextOffset": {
+            "description": "Offset of the next page; absent on the last page.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "searchQuery": {
+            "description": "The name search this page answers.",
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -3734,7 +3847,7 @@
             "minLength": 1
           },
           "questions": {
-            "description": "Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected. A fixed instrument runs as Custom research (guided-research): a saved Study template's configuration.questions can be passed here, but a template methodId other than guided-research (a calculator-backed method such as Van Westendorp or MaxDiff) is not applied; manage_study_template action use runs the saved method in a web-app draft.",
+            "description": "Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli in the same call; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research).",
             "minItems": 1,
             "maxItems": 200,
             "type": "array",
@@ -3956,7 +4069,7 @@
             }
           },
           "study": {
-            "description": "Which Study the plan belongs to. Omit entirely to continue the active Study from this MCP session.",
+            "description": "Which Study the plan belongs to, and optionally Audiences to add to it first. Omit entirely to continue the active Study from this MCP session.",
             "type": "object",
             "properties": {
               "id": {
@@ -3966,8 +4079,19 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "name": {
-                "description": "Study name to fuzzy-match among the newest 1,000 visible Studies; use studyId for older records. Omit with studyId to continue the active Study.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to continue the active Study.",
                 "type": "string"
+              },
+              "audienceIds": {
+                "description": "Existing Audience IDs to add to this Study before planning. Already attached ones are a no-op; if any is refused (no access, paid Marketplace add-on missing) none is added and nothing is planned. With link sharing on, added Audiences and their Minds become publicly readable.",
+                "minItems": 1,
+                "maxItems": 50,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
               }
             }
           },
@@ -4453,9 +4577,15 @@
             }
           },
           "policy": {
-            "description": "Evidence policy and language stored in the draft revision and reviewed before execution.",
+            "description": "Research method, evidence policy and language stored in the draft revision and reviewed before execution.",
             "type": "object",
             "properties": {
+              "methodId": {
+                "description": "Registered research method for the plan's first module: a Study template's configuration.methodId (van-westendorp, gabor-granger, maxdiff, conjoint, kano, nps, top-box, key-drivers, turf, \u2026) or any method list_research_methods reports as executable; anything else is rejected. Works with request (the planner plans for the method) and with questions (kept exactly, asked alongside the tasks a calculator method designs when the Study runs). Configuration the request, questions or answers do not state (a Van Westendorp subject, MaxDiff items, a currency) comes back as confirmation questions. Omit to let the planner choose; a revision keeps the method selected earlier.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
               "sourcePolicy": {
                 "description": "Evidence policy stored in the draft and reviewed before execution. Defaults to request_only for a controlled Study. Use auto only for an explicitly designed experiment that should allow relevant Mind-knowledge retrieval; response-mode rules still control live web search.",
                 "type": "string",
@@ -4538,6 +4668,9 @@
               "string",
               "null"
             ]
+          },
+          "audienceAttachment": {
+            "description": "With study.audienceIds: attached (added now) and alreadyAttached Audience IDs."
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -4629,17 +4762,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.14b7a83d412d.html",
+          "resourceUri": "ui://widget/audience.a48d1b5d3f04.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.14b7a83d412d.html",
+        "openai/outputTemplate": "ui://widget/audience.a48d1b5d3f04.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.14b7a83d412d.html"
+        "ui/resourceUri": "ui://widget/audience.a48d1b5d3f04.html"
       }
     },
     {
@@ -4697,6 +4830,9 @@
               "string",
               "null"
             ]
+          },
+          "audienceAttachment": {
+            "description": "With study.audienceIds: attached (added now) and alreadyAttached Audience IDs."
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -4714,17 +4850,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.bb57e1ba6693.html",
+          "resourceUri": "ui://widget/plan.855401b56d86.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.bb57e1ba6693.html",
+        "openai/outputTemplate": "ui://widget/plan.855401b56d86.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.bb57e1ba6693.html"
+        "ui/resourceUri": "ui://widget/plan.855401b56d86.html"
       }
     },
     {
@@ -5060,17 +5196,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.e2231ae39b36.html",
+          "resourceUri": "ui://widget/response.35a54923f6da.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.e2231ae39b36.html",
+        "openai/outputTemplate": "ui://widget/response.35a54923f6da.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.e2231ae39b36.html"
+        "ui/resourceUri": "ui://widget/response.35a54923f6da.html"
       }
     },
     {
@@ -5149,7 +5285,7 @@
     {
       "name": "run_study_questions",
       "title": "Run a Confirmed Multi-Question Block",
-      "description": "Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. One execution submits the whole draft \u2014 every named module and every question \u2014 as a single durable run; there is no per-question or per-module execution.\n\nBefore queuing, the server revalidates the revision, method availability and reviewed capabilities, and checks that required respondent-visible material is readable. It refuses the entire run if it is not, before any Mind is used or any quota spent.\n\nItems are answered in order, as one respondent would: every Mind answers an item in parallel, and each Mind sees its own earlier answers in this run, never another Mind's. So an item may build on an earlier one, and order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. After the run, answers that contradict the same Mind's other answers are flagged for review, never changed.",
+      "description": "Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft \u2014 every named module and every question \u2014 as a single durable run; there is no per-question or per-module execution.\n\nBefore queuing, the server revalidates the revision, method availability and reviewed capabilities, and checks that required respondent-visible material is readable. It refuses the entire run if it is not, before any Mind is used or any quota spent.\n\nItems are answered in order, as one respondent would: every Mind answers an item in parallel, and each Mind sees its own earlier answers in this run, never another Mind's. So an item may build on an earlier one, and order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. After the run, answers that contradict the same Mind's other answers are flagged for review, never changed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5209,7 +5345,7 @@
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "name": {
-                "description": "Study name to fuzzy-match among the newest 1,000 visible Studies; use studyId for older records. Omit with studyId to run in the active Study.",
+                "description": "Study name (exact or partial, case-insensitive; fuzzy fallback for typos). Omit with studyId to run in the active Study.",
                 "type": "string"
               }
             }
@@ -5466,7 +5602,7 @@
     {
       "name": "save_study_draft",
       "title": "Save Study Draft",
-      "description": "Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. It saves the objective, context, selected Audiences, method, questions, sources, and current planner step. Revisions replace the saved planning state and require the exact draft ID and expected revision; stale writes are rejected. For a retryable creation, choose idempotencyKey before the first save and reuse it after an uncertain result.",
+      "description": "Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. It saves the objective, context, selected Audiences, method, questions, sources, and current planner step. Revisions change only the fields given and require the exact draft ID and expected revision; stale writes are rejected. For a retryable creation, choose idempotencyKey before the first save and reuse it after an uncertain result.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5486,8 +5622,7 @@
             }
           },
           "methodId": {
-            "default": "guided-research",
-            "description": "Research method selected for the draft. Use list_research_methods as the availability authority.",
+            "description": "Research method selected for the draft. Use list_research_methods as the availability authority. When omitted on create, guided-research applies; when omitted on a revision, the saved method is kept.",
             "type": "string",
             "enum": [
               "guided-research",
@@ -5510,8 +5645,7 @@
             ]
           },
           "questions": {
-            "default": [],
-            "description": "Manual research questions in their intended order.",
+            "description": "Manual research questions in their intended order. When omitted on create, the draft has none; when omitted on a revision, the saved questions are kept.",
             "type": "array",
             "items": {
               "type": "string",
@@ -5544,12 +5678,10 @@
           },
           "planner": {
             "description": "Planner state to restore when the draft is reopened.",
-            "default": {},
             "type": "object",
             "properties": {
               "mode": {
-                "default": "custom",
-                "description": "Planning mode to restore. Defaults to custom for agent-authored planning state.",
+                "description": "Planning mode to restore. When omitted on create, custom applies; when omitted on a revision, the saved mode is kept.",
                 "type": "string",
                 "enum": [
                   "quick",
@@ -5557,8 +5689,7 @@
                 ]
               },
               "currentStep": {
-                "default": "context",
-                "description": "Exact planner step to reopen, such as context, audiences, method, questions, or confirm. The legacy value groups remains accepted when reopening an older draft.",
+                "description": "Exact planner step to reopen, such as context, audiences, method, questions, or confirm. The legacy value groups remains accepted when reopening an older draft. When omitted on create, context applies; when omitted on a revision, the saved step is kept.",
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 100
@@ -5567,7 +5698,6 @@
           },
           "context": {
             "description": "Research context captured so far.",
-            "default": {},
             "type": "object",
             "properties": {
               "objective": {
@@ -5584,8 +5714,7 @@
                 "format": "uri"
               },
               "sourceUrls": {
-                "default": [],
-                "description": "Ordered source URLs supplied as Study context.",
+                "description": "Ordered source URLs supplied as Study context. When omitted on create, the draft has none; when omitted on a revision, the saved URLs are kept.",
                 "type": "array",
                 "items": {
                   "type": "string",
