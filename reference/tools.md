@@ -34,17 +34,17 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `duplicate_study` | Duplicate Study | Copy a Study with all its questions and results over the same Audiences. | writes | flows:write |
 | `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. | writes | flows:read |
 | `run_study_heatmap` | Run Study Asset Heatmap | Read or start a question asset heatmap, with the same behavior as Minds UI. | writes | flows:read, flows:write |
-| `export_mind` | Export Mind Persona Profile | Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. | writes | sparks:read |
+| `export_mind` | Export Mind Persona Profile | Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). | writes | sparks:read |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Read shared Mind sources and assessments. | read-only | sparks:read |
 | `plan_study_questions` | Plan a Multi-Question Block in a Study | Creates or revises a non-executing draft for a multi-question plan inside an existing Study. | destructive | flows:write |
 | `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |
 | `run_study_questions` | Run a Confirmed Multi-Question Block | Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. | writes | flows:write |
 | `list_research_methods` | List Research Methods | Lists Minds research methods with availability, complexity, executable status, and fallback metadata. | read-only | flows:read |
-| `list_study_drafts` | List Study Drafts | Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
-| `list_study_templates` | List Study Templates | Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. | read-only | flows:read |
+| `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
+| `list_study_templates` | List Study Templates | Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. | read-only | flows:read |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |
 | `manage_study_template` | Manage Study Template | Saves, explicitly updates or uses a Custom research template. | destructive | flows:write |
-| `delete_study_template` | Delete Study Template | Permanently deletes one saved Study template owned by the authenticated user. | destructive | flows:write |
+| `delete_study_template` | Delete Study Template | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. | destructive | flows:write |
 | `get_study_summary` | Get Study Summary | Returns or refreshes the semantic summary for a Study as Markdown plus flexible evidence blocks. | writes | flows:write |
 
 ## Legacy names
@@ -121,14 +121,14 @@ discovery response. Registry listings must not describe them as discovered.
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
 | `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
 | `list_formations` | Lists the saved segmentations visible to the authenticated account on an Audience it can view: shared segmentations and the caller's own private ones. |
-| `list_minds` | Lists the Minds belonging to the authenticated account, with fuzzy name search. |
+| `list_minds` | Lists the Minds belonging to the authenticated account, with name search. |
 | `list_model_connections` | Lists the authenticated team’s model connections with IDs, current revisions, endpoints, and verified text, structured-output, streaming, and tool capabilities. |
 | `manage_audience` | Read or follow an Audience, inspect build progress, update, delete, change membership, or regenerate member images through /api/v1/ endpoints. |
 | `manage_chat` | Create a stateful single-Mind, multi-Mind, or Study chat; send a message; or delete the chat through /api/v1/ endpoints. |
 | `manage_formation` | List, preview, read, create, delete, or recompute an Audience segmentation through /api/v1/ endpoints. |
 | `manage_mind` | Read, update, delete, retrain, or regenerate an existing Mind through the canonical v1 API. |
 | `manage_mind_knowledge` | List, add links, files, or keywords, update, delete, enrich, and inspect a Mind’s knowledge through /api/v1/ endpoints. |
-| `manage_study` | Read, delete, enable or disable link sharing, or invite collaborators to an existing Study through the v1 API. |
+| `manage_study` | Read, delete, enable or disable link sharing, invite collaborators to, add Audiences to (add_audiences) or remove an Audience from (remove_audience) an existing Study through the v1 API. |
 | `manage_study_draft` | Delete, consume, or reread the original source of a durable Study draft through /api/v1/. |
 | `preview_audience_dataset_segmentation` | Enterprise review step for spreadsheet-grounded Audiences. |
 | `recalibrate_audience` | Re-runs the research grounding of an Audience over MCP, without the user having to redo it by hand in the app. |

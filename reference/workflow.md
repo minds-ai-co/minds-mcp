@@ -19,11 +19,11 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery returns the best fuzzy name match instead of a page. Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
+Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `searchQuery` | No | string | Search for an Audience by name (fuzzy matching supported). Returns the best match. |
+| `searchQuery` | No | string | Filters by name (case-insensitive, all matches, paged with limit/offset); the closest name when nothing matches. Omit to browse. |
 | `limit` | No | integer | Audiences per page, most recently updated first (default 20, max 100). |
 | `offset` | No | integer | Number of Audiences to skip; pass nextOffset from the previous page to continue. |
 | `includeMinds` | No | boolean | Also return each Audience's member Minds (id, name, discipline). Default false: Audiences carry a Mind count only. |
@@ -156,13 +156,11 @@ Copy an Audience with independent copies of its Minds and all they know.
 
 Tool: `list_studies`
 
-Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. Each row carries the Study's Audiences with their Mind counts, stored message count, sharing state and links. searchQuery returns the best fuzzy name match instead of a page.
-
-A Study is the persistent workspace holding its Audiences, questions, multi-question blocks, results, exports and history. Its Minds and per-question results come from the Study status rather than this listing. Study deletion is not available here.
+Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. Each row carries the Study's Audiences with their Mind counts, stored message count, sharing state and links. searchQuery filters by name (case-insensitive, all matches, paged). Minds and per-question results come from the Study status.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `searchQuery` | No | string | Search for a Study by name (fuzzy matching supported). Returns the best match. |
+| `searchQuery` | No | string | Filters by name (case-insensitive, all matches, paged with limit/offset); the closest name when nothing matches. Omit to browse. |
 | `limit` | No | integer | Studies per page, newest first (default 20, max 100). |
 | `offset` | No | integer | Number of Studies to skip; pass nextOffset from the previous page to continue. |
 
@@ -172,11 +170,11 @@ Tool: `create_study`
 
 Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.
 
-This always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Settle the Audience set before calling — nothing adds an Audience to an existing Study afterwards, and Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate.
+This always creates: a matching name never attaches to an existing Study, and only a byte-identical repeat of the same call replays the Study the first one made, reported as replayed: true. Studies cannot be deleted here, so calling again with one extra Audience leaves a permanent duplicate Study.
 
 Any request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.
 
-Creation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds.
+Creation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -212,7 +210,7 @@ Attachments can be files shared in the conversation (uploaded or generated image
 
 Tool: `get_study_status`
 
-Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English. Deletion is unavailable.
+Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -290,7 +288,7 @@ Read or start a question asset heatmap, with the same behavior as Minds UI. For 
 
 Tool: `export_mind`
 
-Generates a branded profile for one existing Mind, identified by exact ID or the best fuzzy name match among the newest 1,000 Minds. Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.
+Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -328,13 +326,13 @@ With 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` =
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. |
-| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli. Repeated question texts or colliding ids are rejected. A fixed instrument runs as Custom research (guided-research): a saved Study template's configuration.questions can be passed here, but a template methodId other than guided-research (a calculator-backed method such as Van Westendorp or MaxDiff) is not applied; manage_study_template action use runs the saved method in a web-app draft. |
+| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli in the same call; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
 | `idempotencyKey` | No | string | Optional stable retry key. When omitted the tool derives one from its own arguments, so a repeated identical call (including a host retry after a timeout) returns the draft revision that was already saved instead of planning again. Pass a fresh key to force a new plan for identical input. |
 | `conversationFiles` | No | array | Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
-| `study` | No | object | Which Study the plan belongs to. Omit entirely to continue the active Study from this MCP session. |
+| `study` | No | object | Which Study the plan belongs to, and optionally Audiences to add to it first. Omit entirely to continue the active Study from this MCP session. |
 | `draft` | No | object | Revising an existing draft: which draft and revision, and how it should change. Omit for a new draft. |
 | `stimulus` | No | object | Respondent-visible material for the planned block, and how it is assigned to questions. |
-| `policy` | No | object | Evidence policy and language stored in the draft revision and reviewed before execution. |
+| `policy` | No | object | Research method, evidence policy and language stored in the draft revision and reviewed before execution. |
 
 ## Show Study Plan
 
@@ -352,7 +350,7 @@ Shows a saved Study draft at its current revision for interactive review and con
 
 Tool: `run_study_questions`
 
-Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. One execution submits the whole draft — every named module and every question — as a single durable run; there is no per-question or per-module execution.
+Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft — every named module and every question — as a single durable run; there is no per-question or per-module execution.
 
 Before queuing, the server revalidates the revision, method availability and reviewed capabilities, and checks that required respondent-visible material is readable. It refuses the entire run if it is not, before any Mind is used or any quota spent.
 
@@ -383,37 +381,43 @@ Lists Minds research methods with availability, complexity, executable status, a
 
 Tool: `list_study_drafts`
 
-Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. Draft records are distinct from running or completed studies.
+Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. Draft records are distinct from running or completed studies.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `draftId` | No | string | Exact study draft ID to retrieve. Omit to list all resumable study drafts owned by the authenticated user. |
+| `draftId` | No | string | Exact study draft ID to retrieve with its complete saved planning state. Omit to list draft summaries. |
+| `searchQuery` | No | string | Case-insensitive part of the draft name; returns every match, paged. |
+| `limit` | No | integer | Drafts per page, newest first (default 20, max 50). |
+| `offset` | No | integer | Number of drafts to skip; pass nextOffset from the previous page to continue. |
 
 ## List Study Templates
 
 Tool: `list_study_templates`
 
-Lists your own and team-shared Study templates, most used first, or returns one exact template including its revision, research method, questions, response settings and question attachments. configuration.methodId names the saved research method, which a transcribed plan does not apply, and configuration.questions is a fixed, pre-registered instrument ready to be transcribed into a question plan.
+Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. configuration.questions is a fixed, pre-registered instrument and configuration.methodId the research method it runs with; both can be planned as they are.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `templateId` | No | string | Omit to list your own and team-shared Study templates. |
+| `templateId` | No | string | Exact template to return in full. Omit to list template summaries. |
+| `searchQuery` | No | string | Case-insensitive part of the template name; returns every match, paged. |
+| `limit` | No | integer | Templates per page, most used first (default 20, max 50). |
+| `offset` | No | integer | Number of templates to skip; pass nextOffset from the previous page to continue. |
 
 ## Save Study Draft
 
 Tool: `save_study_draft`
 
-Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. It saves the objective, context, selected Audiences, method, questions, sources, and current planner step. Revisions replace the saved planning state and require the exact draft ID and expected revision; stale writes are rejected. For a retryable creation, choose idempotencyKey before the first save and reuse it after an uncertain result.
+Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. It saves the objective, context, selected Audiences, method, questions, sources, and current planner step. Revisions change only the fields given and require the exact draft ID and expected revision; stale writes are rejected. For a retryable creation, choose idempotencyKey before the first save and reuse it after an uncertain result.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `name` | No | string | Sidebar name for the Study draft. |
 | `audienceIds` | No | array | Existing Audience IDs selected for the Study. Preferred. |
-| `methodId` | No | "guided-research", "single-question", "questionnaire", "guided-qualitative-exploration", "ranked-preferences", "segment-comparison", "visual-asset-analysis", "recommendation-synthesis", "maxdiff", "conjoint", "nps", "top-box", "key-drivers", "turf", "gabor-granger", "van-westendorp", "kano" | Research method selected for the draft. Use list_research_methods as the availability authority. Default: "guided-research". |
-| `questions` | No | array | Manual research questions in their intended order. Default: []. |
+| `methodId` | No | "guided-research", "single-question", "questionnaire", "guided-qualitative-exploration", "ranked-preferences", "segment-comparison", "visual-asset-analysis", "recommendation-synthesis", "maxdiff", "conjoint", "nps", "top-box", "key-drivers", "turf", "gabor-granger", "van-westendorp", "kano" | Research method selected for the draft. Use list_research_methods as the availability authority. When omitted on create, guided-research applies; when omitted on a revision, the saved method is kept. |
+| `questions` | No | array | Manual research questions in their intended order. When omitted on create, the draft has none; when omitted on a revision, the saved questions are kept. |
 | `draft` | No | object | Which durable draft to revise, and the retry key. Omit to create a new draft. |
-| `planner` | No | object | Planner state to restore when the draft is reopened. Default: {}. |
-| `context` | No | object | Research context captured so far. Default: {}. |
+| `planner` | No | object | Planner state to restore when the draft is reopened. |
+| `context` | No | object | Research context captured so far. |
 | `conversationFiles` | No | array | Study context files for the draft: images, video and audio are stimulus respondents see, documents are background. They are kept on later saves of the same draft. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
 ## Manage Study Template
@@ -439,7 +443,7 @@ A template stores its questions, response settings, question attachments and the
 
 Tool: `delete_study_template`
 
-Permanently deletes one saved Study template owned by the authenticated user. The template and its stored configuration are gone; Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.
+Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template owned by the authenticated user. Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
