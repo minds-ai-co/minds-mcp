@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
+Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience's workspaceUrl is the authenticated workspace link, valid verbatim; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-
 
 Tool: `create_audience_from_brief`
 
-Researches a free-text population brief and builds Minds with explicit profiles and exact segment allocation. New briefs return an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. Supports draft revisions and reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
+Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; draft.rework or the displayed review revises that draft before confirmation, and creation requires the user-accepted draft or quota snapshot and its checksum. Every new brief starts a separate draft and, once confirmed, a separate Audience. An Audience that already exists is changed in place by recalibrating it by its id, never rebuilt from a new brief. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -76,11 +76,13 @@ Revise or confirm the displayed Audience review. Reads the owned operation and v
 
 Tool: `get_audience_creation_progress`
 
-Read one Audience creation operation and its members’ training progress. Never starts or retries creation.
+Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `operationId` | Yes | string |  |
+| `operationId` | No | string | Audience creation operation id. |
+| `audienceId` | No | string | An existing Audience, instead of operationId. |
+| `recalibrationId` | No | string | With audienceId: the operation id returned by recalibrate_audience. |
 
 ## Show Audience Creation
 
@@ -97,11 +99,11 @@ Shows source research, distributions, proposed Minds, review, confirmation and t
 
 Tool: `get_audience_limits`
 
-Returns the Audience size ceilings that apply to the authenticated account before an Audience is created: the per-Audience plan cap including any configured team allowance, the custom-size maximum, and the per-mode ceilings. Relevant whenever a size is named, "as many as possible" is asked for, or a creation mode is chosen.
+Returns the Audience size ceilings for the authenticated account before an Audience is created: the per-Audience plan cap (including any team allowance), the custom-size maximum and the per-mode ceilings. Relevant whenever a size is named, "as many as possible" is asked for, or a creation mode is chosen.
 
-The two mode ceilings are different things. `automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` bounds a size you state, and only "balanced" has one — exceeding it is refused with MODE_CAP. In the deeper modes a stated size is bounded by `memberCap` alone.
+`automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` bounds a size you state, and only "balanced" has one (exceeding it is refused with MODE_CAP). In the deeper modes a stated size is bounded by `memberCap` alone.
 
-These are sizes for each Audience, not workspace capacity, remaining credits, or a reservation. The response names the account and team the allowance belongs to, which can differ from another connector or browser login.
+These are per-Audience sizes, not workspace capacity, credits or a reservation, for the account and team the response names.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -151,6 +153,22 @@ Copy an Audience with independent copies of its Minds and all they know.
 | `audienceId` | Yes | string | Audience to duplicate; you must be able to edit it. The copy is private and gets new Minds (profiles, knowledge, embeddings) plus the grounding, sources, formations and finished validations; it counts against the Mind allowance. Refused while the Audience is still being built. |
 | `name` | No | string | Name of the copy. Defaults to "<name> (copy)". |
 | `idempotencyKey` | No | string | Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name. |
+
+## Change an Existing Audience
+
+Tool: `recalibrate_audience`
+
+Changes an existing Audience in place: it keeps its id and its Minds keep theirs, so Studies, shares and chats keep working, and no Mind is deleted. Covers composition and trait edits, a population pivot, adding members, an exact chart selection (`distributions`), new sources and going deeper (`deepen`), and re-runs its research grounding. Owner-only. Asynchronous: the result is an accepted operation with its id, not a completed change. Refused with 409 while another recalibration of the Audience runs, and with 409 AUDIENCE_MINDS_SHARED when members also belong to other Audiences unless allowSharedMinds is set. Reusing requestKey with identical input retries safely.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `audience` | No | object | Which existing Audience to change. Give the id when known, otherwise the name. |
+| `requestKey` | No | string | Stable retry key. Reuse with identical input to recover the same recalibration operation, including its completed result. |
+| `research` | No | object | What to change and the evidence for it. Omit it (and distributions/deepen) to re-run the research from the original brief. |
+| `distributions` | No | array | Optional exact active distribution selection from the grounding review. Supplying this uses selection mode and applies the user-authored composition directly, including exact shares: to set a chart to e.g. 70% Female / 30% Male, send the complete active set with that chart's `pct` values changed. They become the user's targets beside the evidence (shown as "Set by you"); no research runs and the members are re-allocated to them. |
+| `deepen` | No | object | Go deeper, in the background: research what the Audience still lacks — every standard dimension its evidence reports missing or assumed, plus `topics` — and add it; every chart the Audience has stays, and stronger evidence replaces weaker only for the same question or dimension. Go deeper runs in the background and this tool returns at once; get_audience_creation_progress with the audienceId follows research.phase (researching, then researched). Not combinable with distributions, query or requestedDistribution. Refused with 409 AUDIENCE_RESEARCH_RUNNING while the Audience's background research is still running (it goes deeper on its own and updates the Audience when done). |
+| `conversationFiles` | No | array | New first-party research files added to sources.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+| `allowSharedMinds` | No | boolean | Recalibration rewrites member profiles and retrains knowledge on the Mind itself, so members that also belong to other Audiences change there too. The API refuses with 409 AUDIENCE_MINDS_SHARED (listing the Minds and the other Audiences) unless this is true. Set it only after the user explicitly accepts that reach. |
 
 ## List Studies
 
@@ -275,7 +293,7 @@ Exports a completed website heatmap from a Study result, identified by the messa
 
 Tool: `run_study_heatmap`
 
-Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires a paid plan. Selecting a different video does not change the question results.
+The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. assetKey names the asset by its saved upload path (chat/...) or normalized URL; only assets assigned to that question qualify. get returns assetHeatmaps keyed by asset; start with assetKey reuses a completed analysis of that asset, without it the analysis can run again. Starting uses one response per Mind and a paid plan, and a website is visited at its public URL. Question results do not change.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -316,11 +334,9 @@ Creates or revises a non-executing draft for a multi-question plan inside an exi
 
 This is the setup operation for any questionnaire, survey, battery, section or request containing two or more known questions: include every question known now in this one draft, grouped into cohesive named modules in respondent order. A one-question draft is only for genuinely standalone research, or a follow-up whose wording depends on results that do not exist yet.
 
-It records respondent-visible questions, response formats and confirmation questions for review.
+The draft holds respondent-visible questions, response formats and confirmation questions for review. `request` describes what to ask and gets designed questions; `questions` is a fixed instrument, kept exactly as written (a question sent as qualitative whose own text lists its answers is kept as the choice question that text states).
 
-Pass `request` to have the planner design the questions, or `questions` for a fixed instrument, which is transcribed exactly and bypasses the planner; a question sent as qualitative whose own text lists its answers becomes the choice question that text states.
-
-Items are answered in order: each Mind sees its own earlier answers in the run (never another Mind's), so an item may build on an earlier one. For skip logic, give an item `askIf` instead of "if not, answer N/A" wording: only respondents whose own earlier answer matches are asked.
+Each Mind sees its own earlier answers in the run (never another Mind's), so an item may build on an earlier one. For skip logic, give an item `askIf` instead of "if not, answer N/A" wording: only respondents whose own earlier answer matches are asked.
 
 With 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` = none); an omitted question gets every attachment, an unused attachment goes with every question.
 
@@ -351,11 +367,11 @@ Shows a saved Study draft at its current revision for interactive review and con
 
 Tool: `run_study_questions`
 
-Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft — every named module and every question — as a single durable run; there is no per-question or per-module execution.
+Runs one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft as a single durable run.
 
-Before queuing, the server revalidates the revision, method availability and reviewed capabilities, and checks that required respondent-visible material is readable. It refuses the entire run if it is not, before any Mind is used or any quota spent.
+The run is refused as a whole, before any Mind is used or any quota spent, when the revision, method availability or reviewed capabilities no longer hold or required respondent-visible material is unreadable.
 
-Items are answered in order, as one respondent would: every Mind answers an item in parallel, and each Mind sees its own earlier answers in this run, never another Mind's. So an item may build on an earlier one, and order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. After the run, answers that contradict the same Mind's other answers are flagged for review, never changed.
+Every Mind answers the items in order, as one respondent would, seeing only its own earlier answers in this run, so order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. Answers that contradict the same Mind's other answers are flagged, never changed.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -372,11 +388,11 @@ Items are answered in order, as one respondent would: every Mind answers an item
 
 Tool: `list_research_methods`
 
-Lists Minds research methods with availability, complexity, executable status, and fallback metadata. Results distinguish currently executable methods from experimental or planned methods.
+Lists the research methods a Study can use, with availability, complexity and fallback method, and whether each can run now or is experimental or planned.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `includePlanned` | No | boolean | Include methods that are currently planned/non-executable so the model can explain framework compatibility. Availability is dynamic; only entries with executable:true can run. Default: true. |
+| `includePlanned` | No | boolean | Include experimental and planned methods that cannot run yet. Availability is dynamic; only entries with executable:true can run. Default: true. |
 
 ## List Study Drafts
 
@@ -425,19 +441,15 @@ Creates or checkpoints an unfinished Quick or Custom Study draft without startin
 
 Tool: `manage_study_template`
 
-Saves, explicitly updates or uses a Custom research template. Deleting one is a separate operation.
-
-Templates are private by default; an owner can share one with their current team, and teammates can read and use a shared template but cannot change it.
-
-A template stores its questions, response settings, question attachments and the research method in configuration.methodId. A calculator-backed method (Van Westendorp, Gabor-Granger, MaxDiff, conjoint, Kano, NPS, top-box, key drivers, TURF) designs its own tasks when the Study runs, and the saved questions are asked alongside them. Use creates an independent editable draft in the Minds web app and never starts research; that draft is finished in the app rather than over MCP. There, the questions of a predefined template are adapted to the Study's goal, context and Audiences, in the language of the brief; standardized instrument items keep their wording (a published validated translation, otherwise the original language), and when adaptation fails or would change the template structure, the saved questions are used as written. A custom template keeps its saved wording unless adaptation is requested. Updates and use require the current revision, and save.requestId makes creation retry-safe.
+Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. It never starts research. A template stores its questions, response settings, question attachments and research method (configuration.methodId). Templates are private by default; an owner can share one with their current team, and teammates can read and use a shared template but cannot change it. An update permanently replaces the saved template. Update and use require the current revision, and save.requestId makes creation retry-safe.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `action` | Yes | "save", "update", "use" | save, update or use. There is no delete action: delete a template with delete_study_template and its templateId. |
 | `templateId` | No | string |  |
-| `save` | No | object |  |
+| `save` | No | object | A calculator-backed method in configuration.methodId (Van Westendorp, Gabor-Granger, MaxDiff, conjoint, Kano, NPS, top-box, key drivers, TURF) designs its own tasks when the Study runs, and the saved questions are asked alongside them. |
 | `update` | No | object |  |
-| `use` | No | object |  |
+| `use` | No | object | The draft is finished in the web app. There a predefined template is adapted to the Study's goal, context and Audiences in the language of the brief (standardized instrument items keep their wording); when adaptation fails or would change the template structure, the saved questions are used as written. A custom template keeps its saved wording unless adaptation is requested. |
 | `conversationFiles` | No | array | For save or update with a configuration: question attachments added to every saved question. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
 ## Delete Study Template
@@ -454,11 +466,11 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 
 Tool: `get_study_summary`
 
-Returns or refreshes the semantic summary for a Study as Markdown plus flexible evidence blocks. Website, image, and video analyses retain heatmap-compatible block metadata.
+Returns the semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). With refresh it regenerates that summary from the stored answers. The summary is derived and can be regenerated again at any time; no answers, questions or Studies are changed or deleted.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `refresh` | No | boolean | Generate or refresh the summary instead of only reading the persisted summary. Default: false. |
+| `refresh` | No | boolean | Regenerate the summary from the stored answers instead of only reading it. Only the derived summary is replaced; answers are unchanged. Default: false. |
 | `force` | No | boolean | Regenerate even when the covered message range is unchanged. Default: false. |
 | `length` | No | "short", "standard", "detailed" | Default: "standard". |
 | `study` | No | object | Which Study to summarize. Omit entirely to use the active Study from this MCP session. |
