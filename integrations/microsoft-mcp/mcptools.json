@@ -809,7 +809,7 @@
     {
       "name": "create_audience_from_brief",
       "title": "Create a Grounded Audience from a Brief",
-      "description": "Researches a free-text population brief and builds Minds with explicit profiles and exact segment allocation. New briefs return an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. Supports draft revisions and reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.",
+      "description": "Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; draft.rework or the displayed review revises that draft before confirmation, and creation requires the user-accepted draft or quota snapshot and its checksum. Every new brief starts a separate draft and, once confirmed, a separate Audience. An Audience that already exists is changed in place by recalibrating it by its id, never rebuilt from a new brief. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1291,6 +1291,18 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "existingAudiences": {
+            "description": "The caller's existing Audiences with exactly this name (id, name, workspaceUrl), when a new brief was started; this call still creates a separate Audience.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -2095,19 +2107,29 @@
     {
       "name": "get_audience_creation_progress",
       "title": "Audience creation progress",
-      "description": "Read one Audience creation operation and its members\u2019 training progress. Never starts or retries creation.",
+      "description": "Reads progress and never starts or retries anything: an Audience creation by operationId, with its members\u2019 training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration\u2019s status, retained result or terminal error.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "operationId": {
+            "description": "Audience creation operation id.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "audienceId": {
+            "description": "An existing Audience, instead of operationId.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "recalibrationId": {
+            "description": "With audienceId: the operation id returned by recalibrate_audience.",
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "operationId"
-        ],
         "$schema": "http://json-schema.org/draft-07/schema#"
       },
       "outputSchema": {
@@ -2115,6 +2137,19 @@
         "properties": {
           "audienceCreation": {
             "description": "Current Audience creation and member training snapshot."
+          },
+          "audienceId": {
+            "description": "Existing Audience read by audienceId.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "audienceRecalibration": {
+            "description": "One recalibration receipt: id, status, progress, retained result or terminal error."
+          },
+          "audienceProgress": {
+            "description": "Existing Audience member readiness, background research and coverage."
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -2146,7 +2181,7 @@
     {
       "name": "get_audience_limits",
       "title": "Get Audience Limits",
-      "description": "Returns the Audience size ceilings that apply to the authenticated account before an Audience is created: the per-Audience plan cap including any configured team allowance, the custom-size maximum, and the per-mode ceilings. Relevant whenever a size is named, \"as many as possible\" is asked for, or a creation mode is chosen.\n\nThe two mode ceilings are different things. `automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` bounds a size you state, and only \"balanced\" has one \u2014 exceeding it is refused with MODE_CAP. In the deeper modes a stated size is bounded by `memberCap` alone.\n\nThese are sizes for each Audience, not workspace capacity, remaining credits, or a reservation. The response names the account and team the allowance belongs to, which can differ from another connector or browser login.",
+      "description": "Returns the Audience size ceilings for the authenticated account before an Audience is created: the per-Audience plan cap (including any team allowance), the custom-size maximum and the per-mode ceilings. Relevant whenever a size is named, \"as many as possible\" is asked for, or a creation mode is chosen.\n\n`automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` bounds a size you state, and only \"balanced\" has one (exceeding it is refused with MODE_CAP). In the deeper modes a stated size is bounded by `memberCap` alone.\n\nThese are per-Audience sizes, not workspace capacity, credits or a reservation, for the account and team the response names.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2623,13 +2658,13 @@
     {
       "name": "get_study_summary",
       "title": "Get Study Summary",
-      "description": "Returns or refreshes the semantic summary for a Study as Markdown plus flexible evidence blocks. Website, image, and video analyses retain heatmap-compatible block metadata.",
+      "description": "Returns the semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). With refresh it regenerates that summary from the stored answers. The summary is derived and can be regenerated again at any time; no answers, questions or Studies are changed or deleted.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "refresh": {
             "default": false,
-            "description": "Generate or refresh the summary instead of only reading the persisted summary.",
+            "description": "Regenerate the summary from the stored answers instead of only reading it. Only the derived summary is replaced; answers are unchanged.",
             "type": "boolean"
           },
           "force": {
@@ -2833,7 +2868,7 @@
     {
       "name": "list_audiences",
       "title": "List Audiences",
-      "description": "Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and workspace or shared links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience carries a workspaceUrl, the authenticated workspace link that stays valid verbatim, plus the top-level workspaceUrl for the Audience list; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.",
+      "description": "Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience's workspaceUrl is the authenticated workspace link, valid verbatim; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2872,6 +2907,18 @@
           },
           "audiences": {
             "description": "Audiences: id, name, workspaceUrl, mindCount, sharing state, and member Minds when includeMinds was set.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duplicateNames": {
+            "description": "Names shared by several of the caller's Audiences on this page: name and the ids carrying it.",
             "anyOf": [
               {
                 "type": "array",
@@ -2941,13 +2988,13 @@
     {
       "name": "list_research_methods",
       "title": "List Research Methods",
-      "description": "Lists Minds research methods with availability, complexity, executable status, and fallback metadata. Results distinguish currently executable methods from experimental or planned methods.",
+      "description": "Lists the research methods a Study can use, with availability, complexity and fallback method, and whether each can run now or is experimental or planned.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "includePlanned": {
             "default": true,
-            "description": "Include methods that are currently planned/non-executable so the model can explain framework compatibility. Availability is dynamic; only entries with executable:true can run.",
+            "description": "Include experimental and planned methods that cannot run yet. Availability is dynamic; only entries with executable:true can run.",
             "type": "boolean"
           }
         },
@@ -3289,7 +3336,7 @@
     {
       "name": "manage_study_template",
       "title": "Manage Study Template",
-      "description": "Saves, explicitly updates or uses a Custom research template. Deleting one is a separate operation.\n\nTemplates are private by default; an owner can share one with their current team, and teammates can read and use a shared template but cannot change it.\n\nA template stores its questions, response settings, question attachments and the research method in configuration.methodId. A calculator-backed method (Van Westendorp, Gabor-Granger, MaxDiff, conjoint, Kano, NPS, top-box, key drivers, TURF) designs its own tasks when the Study runs, and the saved questions are asked alongside them. Use creates an independent editable draft in the Minds web app and never starts research; that draft is finished in the app rather than over MCP. There, the questions of a predefined template are adapted to the Study's goal, context and Audiences, in the language of the brief; standardized instrument items keep their wording (a published validated translation, otherwise the original language), and when adaptation fails or would change the template structure, the saved questions are used as written. A custom template keeps its saved wording unless adaptation is requested. Updates and use require the current revision, and save.requestId makes creation retry-safe.",
+      "description": "Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. It never starts research. A template stores its questions, response settings, question attachments and research method (configuration.methodId). Templates are private by default; an owner can share one with their current team, and teammates can read and use a shared template but cannot change it. An update permanently replaces the saved template. Update and use require the current revision, and save.requestId makes creation retry-safe.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3308,6 +3355,7 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "save": {
+            "description": "A calculator-backed method in configuration.methodId (Van Westendorp, Gabor-Granger, MaxDiff, conjoint, Kano, NPS, top-box, key drivers, TURF) designs its own tasks when the Study runs, and the saved questions are asked alongside them.",
             "type": "object",
             "properties": {
               "name": {
@@ -3754,6 +3802,7 @@
             "additionalProperties": false
           },
           "use": {
+            "description": "The draft is finished in the web app. There a predefined template is adapted to the Study's goal, context and Audiences in the language of the brief (standardized instrument items keep their wording); when adaptation fails or would change the template structure, the saved questions are used as written. A custom template keeps its saved wording unless adaptation is requested.",
             "type": "object",
             "properties": {
               "expectedRevision": {
@@ -3841,7 +3890,7 @@
     {
       "name": "plan_study_questions",
       "title": "Plan a Multi-Question Block in a Study",
-      "description": "Creates or revises a non-executing draft for a multi-question plan inside an existing Study. Saving never starts research. To change a draft, pass `draft.id` with its current `draft.revision` \u2014 re-sending a reworded `request` creates a SECOND draft instead of revising; a stale revision is rejected.\n\nThis is the setup operation for any questionnaire, survey, battery, section or request containing two or more known questions: include every question known now in this one draft, grouped into cohesive named modules in respondent order. A one-question draft is only for genuinely standalone research, or a follow-up whose wording depends on results that do not exist yet.\n\nIt records respondent-visible questions, response formats and confirmation questions for review.\n\nPass `request` to have the planner design the questions, or `questions` for a fixed instrument, which is transcribed exactly and bypasses the planner; a question sent as qualitative whose own text lists its answers becomes the choice question that text states.\n\nItems are answered in order: each Mind sees its own earlier answers in the run (never another Mind's), so an item may build on an earlier one. For skip logic, give an item `askIf` instead of \"if not, answer N/A\" wording: only respondents whose own earlier answer matches are asked.\n\nWith 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` = none); an omitted question gets every attachment, an unused attachment goes with every question.",
+      "description": "Creates or revises a non-executing draft for a multi-question plan inside an existing Study. Saving never starts research. To change a draft, pass `draft.id` with its current `draft.revision` \u2014 re-sending a reworded `request` creates a SECOND draft instead of revising; a stale revision is rejected.\n\nThis is the setup operation for any questionnaire, survey, battery, section or request containing two or more known questions: include every question known now in this one draft, grouped into cohesive named modules in respondent order. A one-question draft is only for genuinely standalone research, or a follow-up whose wording depends on results that do not exist yet.\n\nThe draft holds respondent-visible questions, response formats and confirmation questions for review. `request` describes what to ask and gets designed questions; `questions` is a fixed instrument, kept exactly as written (a question sent as qualitative whose own text lists its answers is kept as the choice question that text states).\n\nEach Mind sees its own earlier answers in the run (never another Mind's), so an item may build on an earlier one. For skip logic, give an item `askIf` instead of \"if not, answer N/A\" wording: only respondents whose own earlier answer matches are asked.\n\nWith 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` = none); an omitted question gets every attachment, an unused attachment goes with every question.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4706,6 +4755,294 @@
       }
     },
     {
+      "name": "recalibrate_audience",
+      "title": "Change an Existing Audience",
+      "description": "Changes an existing Audience in place: it keeps its id and its Minds keep theirs, so Studies, shares and chats keep working, and no Mind is deleted. Covers composition and trait edits, a population pivot, adding members, an exact chart selection (`distributions`), new sources and going deeper (`deepen`), and re-runs its research grounding. Owner-only. Asynchronous: the result is an accepted operation with its id, not a completed change. Refused with 409 while another recalibration of the Audience runs, and with 409 AUDIENCE_MINDS_SHARED when members also belong to other Audiences unless allowSharedMinds is set. Reusing requestKey with identical input retries safely.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "audience": {
+            "description": "Which existing Audience to change. Give the id when known, otherwise the name.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Audience ID (UUID). Preferred when known.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Audience name: exact or partial (case-insensitive), with a fuzzy fallback for typos.",
+                "type": "string"
+              }
+            }
+          },
+          "requestKey": {
+            "description": "Stable retry key. Reuse with identical input to recover the same recalibration operation, including its completed result.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "research": {
+            "description": "What to change and the evidence for it. Omit it (and distributions/deepen) to re-run the research from the original brief.",
+            "type": "object",
+            "properties": {
+              "instruction": {
+                "description": "The change the user wants, folded into the replayed original brief. Its reach decides how members change: a composition edit (\"make men 40%\", \"add an income distribution\") re-allocates only members whose segment changed; a trait change (\"now they are all vegan\", \"SMB owners instead of enterprise buyers\") evolves members in place (same name and portrait, rewritten profile, knowledge retrained); a population pivot (\"now Gen-Z students instead of retirees\") rebuilds every member in place with a new persona, portrait and knowledge; an additive instruction (\"and now add 10 African consumers\") adds new members within the plan limits and leaves the others untouched. Mind ids never change and no Mind is deleted. Use this, not query, to adjust the Audience.",
+                "type": "string",
+                "maxLength": 4000
+              },
+              "requestedDistribution": {
+                "description": "Exact topic that must materialize as a new distribution, alongside instruction, when the user explicitly asks to add one. Without research evidence it is added as an assumption and flagged as such.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "sources": {
+                "description": "Optional new first-party files, links, or keywords to add to the durable audience evidence before recalibration.",
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 300
+                        },
+                        "url": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2000
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "url"
+                      ]
+                    }
+                  },
+                  "links": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  },
+                  "keywords": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    }
+                  }
+                }
+              },
+              "query": {
+                "description": "Replaces the research topic entirely, only when the user wants to steer away from the original brief. When omitted, the original brief and attachments are replayed.",
+                "type": "string",
+                "maxLength": 4000
+              }
+            }
+          },
+          "distributions": {
+            "description": "Optional exact active distribution selection from the grounding review. Supplying this uses selection mode and applies the user-authored composition directly, including exact shares: to set a chart to e.g. 70% Female / 30% Male, send the complete active set with that chart's `pct` values changed. They become the user's targets beside the evidence (shown as \"Set by you\"); no research runs and the members are re-allocated to them.",
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "dimension": {
+                  "type": "string",
+                  "enum": [
+                    "age",
+                    "gender",
+                    "income",
+                    "life_stage",
+                    "representation",
+                    "education",
+                    "employment_status",
+                    "marital_status",
+                    "household_size",
+                    "household_income",
+                    "geography",
+                    "occupation",
+                    "industry",
+                    "gender_identity",
+                    "source_sex",
+                    "nationality",
+                    "visual_presentation",
+                    "duration_years",
+                    "none"
+                  ]
+                },
+                "tier": {
+                  "type": "string",
+                  "enum": [
+                    "target",
+                    "broader",
+                    "general",
+                    "global"
+                  ]
+                },
+                "category": {
+                  "type": "string",
+                  "enum": [
+                    "demographic",
+                    "geographic",
+                    "psychographic",
+                    "behavioral",
+                    "firmographic"
+                  ]
+                },
+                "distribution": {
+                  "minItems": 1,
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "pct": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "sourceIdx": {
+                        "type": "integer",
+                        "minimum": -1,
+                        "maximum": 9007199254740991
+                      },
+                      "canonical": {
+                        "type": "string",
+                        "maxLength": 200
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "pct",
+                      "sourceIdx"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "distribution"
+              ]
+            }
+          },
+          "deepen": {
+            "description": "Go deeper, in the background: research what the Audience still lacks \u2014 every standard dimension its evidence reports missing or assumed, plus `topics` \u2014 and add it; every chart the Audience has stays, and stronger evidence replaces weaker only for the same question or dimension. Go deeper runs in the background and this tool returns at once; get_audience_creation_progress with the audienceId follows research.phase (researching, then researched). Not combinable with distributions, query or requestedDistribution. Refused with 409 AUDIENCE_RESEARCH_RUNNING while the Audience's background research is still running (it goes deeper on its own and updates the Audience when done).",
+            "type": "object",
+            "properties": {
+              "topics": {
+                "description": "More topics or dimensions to research (e.g. \"media use\", \"income\").",
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              }
+            }
+          },
+          "conversationFiles": {
+            "description": "New first-party research files added to sources.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Download URL the chat host supplies for this file."
+                },
+                "file_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The chat host's ID for this file."
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
+          },
+          "allowSharedMinds": {
+            "description": "Recalibration rewrites member profiles and retrains knowledge on the Mind itself, so members that also belong to other Audiences change there too. The API refuses with 409 AUDIENCE_MINDS_SHARED (listing the Minds and the other Audiences) unless this is true. Set it only after the user explicitly accepts that reach.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "audienceId": {
+            "description": "Audience being changed in place.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operation": {
+            "description": "Durable recalibration receipt: id, requestKey, status, progress, statusUrl, retained result or terminal error."
+          },
+          "research": {
+            "description": "Go deeper research receipt, when deepen was supplied."
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Change an Existing Audience",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/visibility": "public",
+        "openai/scopes": [
+          "sparks:write"
+        ],
+        "openai/fileParams": [
+          "conversationFiles"
+        ]
+      }
+    },
+    {
       "name": "render_audience_review",
       "title": "Show Audience Creation",
       "description": "Shows source research, distributions, proposed Minds, review, confirmation and training for one or more Audience operations. Multiple operations appear in independent tabs within one widget; each Audience has its own review and confirmation.",
@@ -4766,17 +5103,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.843173f4f201.html",
+          "resourceUri": "ui://widget/audience.972a0f9ca0ff.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.843173f4f201.html",
+        "openai/outputTemplate": "ui://widget/audience.972a0f9ca0ff.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.843173f4f201.html"
+        "ui/resourceUri": "ui://widget/audience.972a0f9ca0ff.html"
       }
     },
     {
@@ -4854,17 +5191,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.fe31ee06ecad.html",
+          "resourceUri": "ui://widget/plan.d69f934b5acf.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.fe31ee06ecad.html",
+        "openai/outputTemplate": "ui://widget/plan.d69f934b5acf.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.fe31ee06ecad.html"
+        "ui/resourceUri": "ui://widget/plan.d69f934b5acf.html"
       }
     },
     {
@@ -5200,23 +5537,23 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.40eda695283c.html",
+          "resourceUri": "ui://widget/response.49b7af9a8619.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.40eda695283c.html",
+        "openai/outputTemplate": "ui://widget/response.49b7af9a8619.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.40eda695283c.html"
+        "ui/resourceUri": "ui://widget/response.49b7af9a8619.html"
       }
     },
     {
       "name": "run_study_heatmap",
       "title": "Run Study Asset Heatmap",
-      "description": "Read or start a question asset heatmap, with the same behavior as Minds UI. For a specific video or image pass assetKey: its saved upload path (chat/...) or normalized URL. Only assets assigned to that question can be analyzed. GET returns assetHeatmaps keyed by asset identity; start with assetKey reuses completed analysis for that asset, while start without assetKey can rerun analysis. Website analysis visits the assigned public URL. Starting analysis uses one response per Mind and requires a paid plan. Selecting a different video does not change the question results.",
+      "description": "The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action \"get\" reads it, \"start\" analyses it. assetKey names the asset by its saved upload path (chat/...) or normalized URL; only assets assigned to that question qualify. get returns assetHeatmaps keyed by asset; start with assetKey reuses a completed analysis of that asset, without it the analysis can run again. Starting uses one response per Mind and a paid plan, and a website is visited at its public URL. Question results do not change.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5289,7 +5626,7 @@
     {
       "name": "run_study_questions",
       "title": "Run a Confirmed Multi-Question Block",
-      "description": "Executes one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft \u2014 every named module and every question \u2014 as a single durable run; there is no per-question or per-module execution.\n\nBefore queuing, the server revalidates the revision, method availability and reviewed capabilities, and checks that required respondent-visible material is readable. It refuses the entire run if it is not, before any Mind is used or any quota spent.\n\nItems are answered in order, as one respondent would: every Mind answers an item in parallel, and each Mind sees its own earlier answers in this run, never another Mind's. So an item may build on an earlier one, and order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. After the run, answers that contradict the same Mind's other answers are flagged for review, never changed.",
+      "description": "Runs one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft as a single durable run.\n\nThe run is refused as a whole, before any Mind is used or any quota spent, when the revision, method availability or reviewed capabilities no longer hold or required respondent-visible material is unreadable.\n\nEvery Mind answers the items in order, as one respondent would, seeing only its own earlier answers in this run, so order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. Answers that contradict the same Mind's other answers are flagged, never changed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5915,6 +6252,18 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "existingAudiences": {
+            "description": "The caller's existing Audiences with exactly this name (id, name, workspaceUrl), when a new brief was started; this call still creates a separate Audience.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
