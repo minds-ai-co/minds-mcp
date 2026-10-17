@@ -1,0 +1,39 @@
+{
+  "name": "@getminds/mcp",
+  "version": "1.0.0",
+  "description": "Minds MCP over stdio: a bridge to the hosted Minds MCP server (https://getminds.ai/mcp) for clients that only speak stdio.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "minds-mcp": "bin/minds-mcp.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "mcpName": "ai.getminds/minds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minds-ai-co/minds-mcp.git",
+    "directory": "packages/stdio"
+  },
+  "homepage": "https://getminds.ai/mcp/setup",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "minds",
+    "synthetic-research"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0"
+  },
+  "devDependencies": {
+    "zod": "^3.25.76"
+  }
+}
