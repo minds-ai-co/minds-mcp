@@ -1,0 +1,25 @@
+{
+  "status": "draft_not_submitted",
+  "submissionUrl": "https://x.ai/bot/marketplace/submit-a-plugin",
+  "fields": {
+    "organizationName": "Minds",
+    "organizationHandle": "minds",
+    "websiteUrl": "https://getminds.ai/mcp/setup",
+    "logotypeUrl": "https://raw.githubusercontent.com/minds-ai-co/minds-mcp/main/assets/logo.svg",
+    "requestedPlatforms": ["Grok Bot"],
+    "mcpServerUrlOrPublicRepository": "https://getminds.ai/mcp",
+    "briefDescription": "Build synthetic Audiences and run Studies for concept testing, message testing, and segment comparison with Minds.",
+    "testingInstructions": "Connect the remote HTTPS MCP server at https://getminds.ai/mcp using your own Minds account through OAuth. Review https://getminds.ai/mcp/setup. Discover tools, read account allowances and research methods, then follow integrations/grok-bot/review-checklist.md in https://github.com/minds-ai-co/minds-mcp. Test the reviewed research workflow in a dedicated QA workspace. Each importer authenticates their own account; no creator credentials are included."
+  },
+  "publisherContactRequiredAtSubmission": ["firstName", "lastName", "workEmail"],
+  "publicTechnicalContact": "developers@getminds.ai",
+  "testedLocallyAndInApp": false,
+  "publicBotTemplateUrl": null,
+  "submissionReceipt": null,
+  "remainingRequirements": [
+    "Complete the Grok Bot in-app test using an eligible signed-in account.",
+    "Check whether the existing Cursor publisher review can include Grok Bot before sending a potentially duplicate plugin application.",
+    "Publish and inspect the sanitized Bot template separately; MCP plugin review does not establish a Bot catalog listing.",
+    "Supply publisher contact details and review the current publisher terms at submission time."
+  ]
+}
