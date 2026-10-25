@@ -13,8 +13,9 @@ Use this when a positioning decision depends on different buyer roles.
    description for each segment.
 3. Use `create_study` to create one Study that contains both Audiences.
 4. Ask the same focused positioning question across the Study with `ask_study`.
-5. Use `get_study_summary` to inspect agreement, disagreement, and segment
-   differences.
+5. Use `read_study_summary` to inspect the saved whole-Study summary. If it
+   needs generating or updating, obtain explicit approval before calling
+   `refresh_study_summary`; inspect agreement, disagreement, and segment differences.
 6. Export the result with `export_study` for the decision record.
 
 Example population briefs:
@@ -53,7 +54,8 @@ Use this sequence when the study must survive the initiating chat session.
 3. Confirm the plan.
 4. Call `run_study_questions` with the confirmed draft and revision.
 5. Poll `get_study_status` with the returned `runId` until the run completes.
-6. Use `get_study_summary` for the whole-study view.
+6. Use `read_study_summary` for the saved whole-Study view. Obtain explicit
+   approval before generating or updating it with `refresh_study_summary`.
 7. Export the result in the format required by the next consumer.
 
 Durable execution means the server-side run continues independently of the chat

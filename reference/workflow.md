@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). Each Audience's workspaceUrl is the authenticated workspace link, valid verbatim; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks a paid Marketplace Audience the user has not subscribed to: prefer the user's own Audiences, and only use it after the user subscribes.
+Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). workspaceUrl, when present, is the authenticated workspace link, valid verbatim; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks an Audience unavailable under the connected account's existing entitlement; its links and commercial details are omitted. Use an available Audience instead. The first page also lists open drafts (openDrafts): before a new brief, rework the matching draft or recalibrate the matching Audience.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -45,11 +45,11 @@ Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-
 
 Tool: `create_audience_from_brief`
 
-Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; draft.rework or the displayed review revises that draft before confirmation, and creation requires the user-accepted draft or quota snapshot and its checksum. Every new brief starts a separate draft and, once confirmed, a separate Audience. An Audience that already exists is changed in place by recalibrating it by its id, never rebuilt from a new brief. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
+Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. A change to a draft under review is a draft.rework of that draft, never a new brief, which leaves another open draft. Recalibrate an existing Audience by its id. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `draft` | No | object | The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft. Set preview:false with both id and sha256 only after the user confirms the displayed draft; that confirmation needs nothing else (omit the brief and every other option): the server creates exactly the reviewed draft from its stored request. |
+| `draft` | No | object | The webapp Audience draft workflow. Preview proposes Minds before Create; id and sha256 identify the exact reviewed roster. Rework revises that draft in place: every change the user asks for while reviewing it (size, market, wording, an axis to drop, a file to add) is preview:true with this id and sha256 and the change as rework, never a new brief. The brief may be omitted on a rework; any option sent with it, such as composition.memberCount or research.files, replaces the draft's stored one. Set preview:false with both id and sha256 only after the user confirms the displayed draft; that confirmation needs nothing else (omit the brief and every other option): the server creates exactly the reviewed draft from its stored request. |
 | `brief` | No | string | Free-text brief describing the population the Audience should represent. E.g. "California high school students grades 9-12", "Berlin Späti customers", "Spanish lawyers", "management team of Coca Cola". The server runs deep web research on this brief to find demographic / psychographic distributions from authoritative sources, then generates personas that proportionally reflect those distributions. |
 | `name` | No | string | Optional Audience name override. When omitted, the server names the Audience from the brief or the LLM detection result. |
 | `operationId` | No | string | Resume a queued preview or creation by its returned jobId. Reads its v1 operation status without creating or charging anything. Supply this alone; do not repeat the creation brief to check progress. Once the creation completed, the result also says whether every Mind can chat yet (the Audience is ready then) and how many are still learning from their sources in the background; call it again to follow that. |
@@ -59,24 +59,11 @@ Researches a free-text population brief and builds a new Audience of Minds with 
 | `grounding` | No | object | Review the quota axes before any Mind exists, and pass a reviewed snapshot back unchanged to create from it. |
 | `conversationFiles` | No | array | Research files (screener, questionnaire, report, respondent data), read like research.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
-## Submit Audience Review
-
-Tool: `submit_audience_review`
-
-Revise or confirm the displayed Audience review. Reads the owned operation and verifies its displayed checksum before forwarding to the shared Audience creation workflow. Research files and evidence remain server-owned; this tool accepts no file inputs. Confirmation requires the unchanged reviewed brief, name and Mind count.
-
-| Input | Required | Type / allowed values | Guidance |
-| --- | --- | --- | --- |
-| `operationId` | Yes | string |  |
-| `reviewSha256` | Yes | string |  |
-| `confirm` | Yes | boolean |  |
-| `edits` | Yes | object |  |
-
 ## Audience creation progress
 
 Tool: `get_audience_creation_progress`
 
-Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error.
+Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error. Validation needs 10 ready members; for a final score wait until all are trained and research is done.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -88,7 +75,7 @@ Reads progress and never starts or retries anything: an Audience creation by ope
 
 Tool: `render_audience_review`
 
-Shows source research, distributions, proposed Minds, review, confirmation and training for one or more Audience operations. Multiple operations appear in independent tabs within one widget; each Audience has its own review and confirmation.
+Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. Multiple operations appear in independent tabs within one widget.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -99,11 +86,9 @@ Shows source research, distributions, proposed Minds, review, confirmation and t
 
 Tool: `get_audience_limits`
 
-Returns the Audience size ceilings for the authenticated account before an Audience is created: the per-Audience plan cap (including any team allowance), the custom-size maximum and the per-mode ceilings. Relevant whenever a size is named, "as many as possible" is asked for, or a creation mode is chosen.
+Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. Sample sizes the plan allows: up to `customSizeMax` Minds per Audience, or several Audiences in one Study for a larger sample, each costing one response per Mind per question.
 
-`automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` bounds a size you state, and only "balanced" has one (exceeding it is refused with MODE_CAP). In the deeper modes a stated size is bounded by `memberCap` alone.
-
-These are per-Audience sizes, not workspace capacity, credits or a reservation, for the account and team the response names.
+`automaticSizingCeiling` bounds the size the server picks when memberCount is omitted; `explicitCountCeiling` is the stated size above which a deeper mode builds it (only "balanced", on plans with one); otherwise `memberCap` alone bounds a stated size. Sizes are per Audience for the account and team named, not a reservation.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -115,7 +100,7 @@ Tool: `ask_audience`
 
 Asks exactly one standalone question of one existing Audience. It creates a private Study for that Audience, starts asynchronous answers from its Minds, and returns the Study identifier and its links.
 
-The server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Requests needing clarification or generated questions return planning_required before execution.
+The server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.
 
 Out of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.
 
@@ -124,9 +109,10 @@ Attachments can be URLs, Minds uploads or files shared in the conversation (uplo
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `audience` | No | object | Which Audience to ask. Give the id when known, otherwise the name. |
-| `question` | Yes | string | Exactly one respondent-visible standalone question for every Mind in the Audience. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the concept, question, and instructions the Minds should receive. Never place planner-only or MCP-client orchestration instructions here. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution. |
+| `question` | Yes | string | Exactly one respondent-visible standalone question for every Mind in the Audience. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the question and the instructions the Minds should receive. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution. |
 | `name` | No | string | Optional name for the Study created to ask this question. Defaults to the Audience name. |
 | `attachments` | No | array | Files/images processed once and given to every Audience member as context. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. |
+| `textAttachments` | No | array | Pasted material the question is about: a newsletter, an email, ad copy, a concept or any other text the user shared and wants the Minds to react to. Put it here verbatim, one entry per piece, instead of inside the question. Each entry is stored as a Markdown file and given to the Minds like an uploaded attachment; a brief or background note sent here is read as such and not shown to them. |
 | `conversationFiles` | No | array | Stimulus files given to every Audience member, alongside any attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
 ## Export Audience Brief
@@ -146,11 +132,11 @@ Exports an Audience brief, or with kind "validation_report" the report of its va
 
 Tool: `duplicate_audience`
 
-Copy an Audience with independent copies of its Minds and all they know.
+Permanently copy an Audience with independent copies of its Minds and all they know.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `audienceId` | Yes | string | Audience to duplicate; you must be able to edit it. The copy is private and gets new Minds (profiles, knowledge, embeddings) plus the grounding, sources, formations and finished validations; it counts against the Mind allowance. Refused while the Audience is still being built. |
+| `audienceId` | Yes | string | Audience to duplicate; you must be able to edit it. The copy is private and gets new Minds (profiles, knowledge, embeddings) plus the grounding, sources, formations and finished validations; it counts against the Mind allowance. While the Audience is still being built the copy is its last good state; copied members without a working version are retrained on their own. |
 | `name` | No | string | Name of the copy. Defaults to "<name> (copy)". |
 | `idempotencyKey` | No | string | Retry key. Without one, an identical call within 15 minutes returns the same copy instead of a second one; send a new key only to deliberately make another copy of the same source with the same name. |
 
@@ -158,17 +144,34 @@ Copy an Audience with independent copies of its Minds and all they know.
 
 Tool: `recalibrate_audience`
 
-Changes an existing Audience in place: it keeps its id and its Minds keep theirs, so Studies, shares and chats keep working, and no Mind is deleted. Covers composition and trait edits, a population pivot, adding members, an exact chart selection (`distributions`), new sources and going deeper (`deepen`), and re-runs its research grounding. Owner-only. Asynchronous: the result is an accepted operation with its id, not a completed change. Refused with 409 while another recalibration of the Audience runs, and with 409 AUDIENCE_MINDS_SHARED when members also belong to other Audiences unless allowSharedMinds is set. Reusing requestKey with identical input retries safely.
+Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. Covers composition and trait edits, a population pivot, adding members, an exact chart selection (`distributions`), new sources and going deeper (`deepen`), and re-runs its research grounding. Owner, or verified Minds staff with existing direct Audience admin collaboration or an active owner-issued support grant. Staff support is limited to composition amendments: no growth, new sources, Go deeper or shared-Mind waiver. Asynchronous: the result is an accepted operation with its id, not a completed change. Queues behind another edit of the Audience and waits for a Study run on its members. Members shared with other Audiences are replaced here by copies with new ids. Reusing requestKey with identical input retries safely.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `audience` | No | object | Which existing Audience to change. Give the id when known, otherwise the name. |
 | `requestKey` | No | string | Stable retry key. Reuse with identical input to recover the same recalibration operation, including its completed result. |
 | `research` | No | object | What to change and the evidence for it. Omit it (and distributions/deepen) to re-run the research from the original brief. |
-| `distributions` | No | array | Optional exact active distribution selection from the grounding review. Supplying this uses selection mode and applies the user-authored composition directly, including exact shares: to set a chart to e.g. 70% Female / 30% Male, send the complete active set with that chart's `pct` values changed. They become the user's targets beside the evidence (shown as "Set by you"); no research runs and the members are re-allocated to them. |
-| `deepen` | No | object | Go deeper, in the background: research what the Audience still lacks — every standard dimension its evidence reports missing or assumed, plus `topics` — and add it; every chart the Audience has stays, and stronger evidence replaces weaker only for the same question or dimension. Go deeper runs in the background and this tool returns at once; get_audience_creation_progress with the audienceId follows research.phase (researching, then researched). Not combinable with distributions, query or requestedDistribution. Refused with 409 AUDIENCE_RESEARCH_RUNNING while the Audience's background research is still running (it goes deeper on its own and updates the Audience when done). |
+| `distributions` | No | array | Optional exact active distribution selection from the grounding review. Supplying this uses selection mode and applies the user-authored composition directly, including exact shares: to set a chart to e.g. 70% Female / 30% Male, send the complete active set with that chart's `pct` values changed. They become the user's targets beside the evidence (shown as "Set by you"); no research runs and the members are re-allocated to them. Send each chart's stored `name`, `label` and `sourceIdx` from the Audience's stored grounding (structuredContent audience.grounding.distributions); the Audience's saved evidence is reattached to every chart and value it already has (names shown in the text output may be translated; use the stored ones). A chart or value it does not have yet (send `sourceIdx: -1`) is added as the user's target. |
+| `deepen` | No | object | Go deeper, in the background: research what the Audience still lacks — every standard dimension its evidence reports missing or assumed, plus `topics` — and add it; every chart the Audience has stays, and stronger evidence replaces weaker only for the same question or dimension. Go deeper runs in the background and this tool returns at once; get_audience_creation_progress with the audienceId follows research.phase (researching, then researched). Not combinable with distributions, query or requestedDistribution. Asked while the Audience's background research is still running, it is queued behind that research and starts when it finishes. |
 | `conversationFiles` | No | array | New first-party research files added to sources.files. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
-| `allowSharedMinds` | No | boolean | Recalibration rewrites member profiles and retrains knowledge on the Mind itself, so members that also belong to other Audiences change there too. The API refuses with 409 AUDIENCE_MINDS_SHARED (listing the Minds and the other Audiences) unless this is true. Set it only after the user explicitly accepts that reach. |
+| `allowSharedMinds` | No | boolean | Recalibration rewrites member profiles and retrains knowledge on the Mind itself. Members that also belong to other Audiences are copied into this Audience first, so the other Audiences stay unchanged. Set this only when the user explicitly wants those members rewritten in place, in every Audience they belong to. |
+
+## Manage Audience Support Access
+
+Tool: `manage_audience_support`
+
+Manage owner-issued, expiring staff access to one Audience’s composition and receipts. Staff cannot self-grant. Revocation stops new work at checkpoints; completed changes remain. No membership, growth, deletion or billing changes.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `action` | Yes | "list_assigned", "list_access", "activity", "grant", "revoke" | list_assigned shows current staff grants. Only the Audience owner can grant or revoke. |
+| `audienceId` | No | string | Required except for list_assigned. |
+| `grantId` | No | string | Required for revoke; returned by list_access. |
+| `staffEmail` | No | string | For grant: the confirmed getminds.ai staff account authorized by the customer owner. |
+| `reason` | No | string | For grant: the agreed support task or case reason. |
+| `expiresAt` | No | string | For grant: expiry within 30 days, ISO 8601. |
+| `requestKey` | No | string | For grant: stable UUID retry key; identical retries return the same grant. |
+| `cursor` | No | string | For lists/activity: nextCursor from the previous page. |
 
 ## List Studies
 
@@ -207,17 +210,15 @@ Creation is atomic and rolls back partial Audience failures. Studies are private
 
 Tool: `ask_study`
 
-Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results.
+Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions. These require one confirmed block, submitted once rather than question by question.
 
-Out of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set belongs in one planned and confirmed multi-question block, submitted once rather than question by question.
+Durably accepts before interpretation or execution. Review-required requests return planning_required for explicit confirmation. Question text can reach the Minds: respondent-facing only, never planner or client orchestration notes. Pasted reaction material verbatim in evidence.textAttachments. Returns IDs and links.
 
-The question text can reach the Minds, so it carries only the question, its stimulus and respondent-facing instructions — never planner or client orchestration notes. Question types are classified automatically; the result carries the question id, status and workspace links.
-
-Attachments can be files shared in the conversation (uploaded or generated images, PDFs).
+Accepts files shared in the conversation (uploaded or generated images, PDFs).
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `question` | Yes | string | Exactly ONE respondent-visible standalone question or result-dependent adaptive follow-up for every selected Mind. Never concatenate, enumerate, or otherwise place a questionnaire, survey, battery, section, cohesive question set, or two or more known questions in this field. The system may classify or reformat it, but any text here can reach the Minds and influence their answers. Include only the single question, its necessary stimulus, and respondent-facing instructions. Never place planner-only or MCP-client orchestration instructions here. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution. |
+| `question` | Yes | string | Exactly ONE respondent-visible standalone question or result-dependent adaptive follow-up for every selected Mind. Never concatenate, enumerate, or otherwise place a questionnaire, survey, battery, section, cohesive question set, or two or more known questions in this field. The system may classify or reformat it, but any text here can reach the Minds and influence their answers. Include only the single question and respondent-facing instructions. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in evidence.textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here, nor tool errors, status messages, Minds or other internal links, or your own process notes. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution. |
 | `audienceIds` | No | array | Optional subset of the Study's Audiences to ask; defaults to all Audiences. |
 | `conversationFiles` | No | array | Stimulus files given to every participating Mind, alongside any evidence.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 | `study` | No | object | Which Study to ask in. Omit entirely to continue the active Study from this MCP session. |
@@ -231,10 +232,12 @@ Tool: `get_study_status`
 
 Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English.
 
+requestPreparations tracks durable interpretation, plan review and run admission separately from answers. clientRequestId selects that preparation as questionId.
+
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `questionId` | No | string | Return only this question: the questionId from ask_study or ask_audience, or from an activeQuestions/recentResults entry. Keeps the response small. Omit to cover every question the Study has run. |
-| `runId` | No | string | Multi-question run ID from run_study_questions. Supplying it returns that run: its confirmed plan, question-level progress and response artifacts, instead of the Study-wide view. |
+| `runId` | No | string | Multi-question run ID from start_study_run. Supplying it returns that run: its confirmed plan, question-level progress and response artifacts, instead of the Study-wide view. |
 | `study` | No | object | Which Study to inspect. Omit entirely to use the active Study from this MCP session. |
 | `export` | No | object | Poll one asynchronous export job created by the export operation. |
 
@@ -242,7 +245,7 @@ Returns Study progress, per-Audience results, original Mind responses, links and
 
 Tool: `render_study_results`
 
-Shows final results, summary, key findings, Audience breakdowns and Mind responses for a completed question or multi-question run. Requires exactly one of questionId or runId.
+Shows the results of finished questions (summary, key findings, Audience breakdowns, Mind responses): one question, or a run's finished questions while the rest still run. Use it whenever the user asks about results. Requires exactly one of questionId or runId.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -269,7 +272,7 @@ Starts an asynchronous export of Study results and returns an export job ID. Sup
 
 Tool: `duplicate_study`
 
-Copy a Study with all its questions and results over the same Audiences.
+Permanently copy a Study with its questions and results over the same Audiences.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -289,18 +292,30 @@ Exports a completed website heatmap from a Study result, identified by the messa
 | `force` | No | boolean | Regenerate the ZIP archive instead of returning the cached artifact. |
 | `study` | No | object | Which Study the heatmap belongs to. |
 
-## Run Study Asset Heatmap
+## Read Study Asset Heatmap
 
-Tool: `run_study_heatmap`
+Tool: `get_study_heatmap`
 
-The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. assetKey names the asset by its saved upload path (chat/...) or normalized URL; only assets assigned to that question qualify. get returns assetHeatmaps keyed by asset; start with assetKey reuses a completed analysis of that asset, without it the analysis can run again. Starting uses one response per Mind and a paid plan, and a website is visited at its public URL. Question results do not change.
+Reads saved heatmaps of an assigned question asset. Optional assetKey selects its saved upload path or normalized URL. Returns assetHeatmaps without starting analysis, spending responses or visiting websites.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `studyId` | No | string |  |
 | `studyName` | No | string |  |
 | `messageId` | Yes | string |  |
-| `action` | No | "get", "start" | Default: "get". |
+| `assetKey` | No | string |  |
+
+## Start Study Asset Heatmap
+
+Tool: `start_study_heatmap`
+
+Starts attention analysis of an assigned image, video or website. Uses one response per Mind and needs a paid plan. assetKey reuses completed analysis of that asset; omitting it may replace earlier derived results. Websites are visited publicly. Explicit approval is required; question answers are preserved.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `studyId` | No | string |  |
+| `studyName` | No | string |  |
+| `messageId` | Yes | string |  |
 | `assetKey` | No | string |  |
 
 ## Export Mind Persona Profile
@@ -326,30 +341,60 @@ Read shared Mind sources and assessments.
 | --- | --- | --- | --- |
 | `shareId` | Yes | string | UUID from /minds/shared/{shareId}; not the Mind ID. The share must be public or link-enabled. Uploads, source bodies and private metadata are excluded. |
 
-## Plan a Multi-Question Block in a Study
+## Create Study Plan
 
-Tool: `plan_study_questions`
+Tool: `create_study_plan`
 
-Creates or revises a non-executing draft for a multi-question plan inside an existing Study. Saving never starts research. To change a draft, pass `draft.id` with its current `draft.revision` — re-sending a reworded `request` creates a SECOND draft instead of revising; a stale revision is rejected.
-
-This is the setup operation for any questionnaire, survey, battery, section or request containing two or more known questions: include every question known now in this one draft, grouped into cohesive named modules in respondent order. A one-question draft is only for genuinely standalone research, or a follow-up whose wording depends on results that do not exist yet.
-
-The draft holds respondent-visible questions, response formats and confirmation questions for review. `request` describes what to ask and gets designed questions; `questions` is a fixed instrument, kept exactly as written (a question sent as qualitative whose own text lists its answers is kept as the choice question that text states).
-
-Each Mind sees its own earlier answers in the run (never another Mind's), so an item may build on an earlier one. For skip logic, give an item `askIf` instead of "if not, answer N/A" wording: only respondents whose own earlier answer matches are asked.
-
-With 2+ attachments, map each question in `stimulus.questionAttachments` (`[]` = none); an omitted question gets every attachment, an unused attachment goes with every question.
+Creates a non-executing draft in an existing Study with its Audiences already attached. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. Saving bounded history may prune older revisions. Research has not started; the returned draft revision needs review and later explicit confirmation.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. |
-| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers, questionResponses, or suggestQuestionStimuli in the same call; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. Write only the user's research brief and context relevant to the research question. Never tool errors, status or retry messages, Minds or other internal links, or your own process notes. |
+| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers or questionResponses in the same call (refused); suggestQuestionStimuli has no effect here, place files with questionAttachments; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
 | `idempotencyKey` | No | string | Optional stable retry key. When omitted the tool derives one from its own arguments, so a repeated identical call (including a host retry after a timeout) returns the draft revision that was already saved instead of planning again. Pass a fresh key to force a new plan for identical input. |
 | `conversationFiles` | No | array | Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
-| `study` | No | object | Which Study the plan belongs to, and optionally Audiences to add to it first. Omit entirely to continue the active Study from this MCP session. |
-| `draft` | No | object | Revising an existing draft: which draft and revision, and how it should change. Omit for a new draft. |
-| `stimulus` | No | object | Respondent-visible material for the planned block, and how it is assigned to questions. |
-| `policy` | No | object | Research method, evidence policy and language stored in the draft revision and reviewed before execution. |
+| `stimulus` | No | object | Source and attachments shown to the respondents, with per-question assignments. |
+| `policy` | No | object | Research method and locale for this plan. Each Mind automatically uses its relevant knowledge alongside the assigned Study stimulus. |
+
+## Revise Study Plan
+
+Tool: `revise_study_plan`
+
+Revises one saved draft at its current draft.id and draft.revision without starting research. Accepts edits, refinement, clarification answers or response-format corrections. Stale revisions fail. Fixed questions stay verbatim when only clarification answers change. Bounded history may prune older revisions; the changed draft requires review again.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. Write only the user's research brief and context relevant to the research question. Never tool errors, status or retry messages, Minds or other internal links, or your own process notes. |
+| `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers or questionResponses in the same call (refused); suggestQuestionStimuli has no effect here, place files with questionAttachments; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
+| `idempotencyKey` | No | string | Optional stable retry key. When omitted the tool derives one from its own arguments, so a repeated identical call (including a host retry after a timeout) returns the draft revision that was already saved instead of planning again. Pass a fresh key to force a new plan for identical input. |
+| `conversationFiles` | No | array | Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+| `stimulus` | No | object | Source and attachments shown to the respondents, with per-question assignments. |
+| `policy` | No | object | Research method and locale for this plan. Each Mind automatically uses its relevant knowledge alongside the assigned Study stimulus. |
+| `draft` | Yes | object | Existing draft and current revision, with the requested changes or clarification answers. |
+
+## Read Study Plan
+
+Tool: `get_study_plan`
+
+Reads the latest saved revision and full review of one draft. Creates or changes nothing and starts no research.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `draftPlanId` | Yes | string | Existing draft plan to read at its latest revision. |
+
+## Attach Audiences to Study
+
+Tool: `attach_study_audiences`
+
+Adds existing accessible Audiences without removing others, planning or starting research. Returns attached and alreadyAttached IDs; retries are safe. With link sharing on, the Audiences and their Minds become publicly readable. Access and plan eligibility are validated first.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `audienceIds` | Yes | array | One to 50 existing Audiences to attach to this Study. |
 
 ## Show Study Plan
 
@@ -363,32 +408,39 @@ Shows a saved Study draft at its current revision for interactive review and con
 | `draftPlanId` | Yes | string |  |
 | `revision` | Yes | integer |  |
 
-## Run a Confirmed Multi-Question Block
+## Start Confirmed Study Run
 
-Tool: `run_study_questions`
+Tool: `start_study_run`
 
-Runs one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. A request to skip review, pick settings or not ask is not confirmation; only a later user turn confirming the displayed revision is. One execution submits the whole draft as a single durable run.
-
-The run is refused as a whole, before any Mind is used or any quota spent, when the revision, method availability or reviewed capabilities no longer hold or required respondent-visible material is unreadable.
-
-Every Mind answers the items in order, as one respondent would, seeing only its own earlier answers in this run, so order effects can arise as in a fielded survey. Items with askIf are asked only of Minds whose own earlier answer matched. Answers that contradict the same Mind's other answers are flagged, never changed.
+Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. One execution submits the whole draft as a single durable run. It is refused as a whole before using Minds or quota if the revision, capabilities, method or source-readability checks fail. Advanced methods need explicit opt-in. Each Mind answers in order seeing its own earlier answers; askIf gates items. Contradictions are flagged, never rewritten.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `confirmed` | Yes | true | Must be true only after the user explicitly confirms this exact draft revision, or confirms continuing the stopped run named in resume. |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `draft` | Yes | object | Exact saved draft and revision the user reviewed and confirmed in a later turn. |
+| `confirmed` | Yes | true | True only after the user explicitly confirms this exact displayed draft revision in a later turn. |
 | `advancedMethodOptIn` | No | boolean | Explicit opt-in for an advanced method. Omit or false to keep simple methods. |
 | `audienceIds` | No | array | Optional subset of the Study's Audiences to include. |
 | `idempotencyKey` | No | string | Stable UUID for safe retries. |
 | `modelConnection` | No | object | Verified caller-team connection for Mind answers and verbatim rendering. Select only when the user requests it; confirmation pins this connection revision, and retries must keep it. Supporting analysis retains platform models. |
-| `study` | No | object | Which Study to run in. Omit entirely to use the active Study from this MCP session. |
-| `draft` | No | object | The exact confirmed draft revision to execute. Required unless resume is given. |
-| `resume` | No | object | Continue a run that stopped at a plan limit, in place, instead of executing a draft. Its original confirmed questions and answer contracts are kept and questions that already have answers are not asked again. Needs a paid plan. |
+
+## Resume Study Run
+
+Tool: `resume_study_run`
+
+Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. Keeps the originally confirmed questions and response contracts and does not ask questions already answered. Does not start a new draft or change the run design.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `runId` | Yes | string | Existing plan-limited run to resume in place. |
+| `confirmed` | Yes | true | The user explicitly approved continuing this stopped run. |
 
 ## List Research Methods
 
 Tool: `list_research_methods`
 
-Lists the research methods a Study can use, with availability, complexity and fallback method, and whether each can run now or is experimental or planned.
+Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. includePlanned only filters the returned catalog. It does not create, configure or execute a method, and the catalog cannot be edited through this tool.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -434,23 +486,42 @@ Creates or checkpoints an unfinished Quick or Custom Study draft without startin
 | `questions` | No | array | Manual research questions in their intended order. When omitted on create, the draft has none; when omitted on a revision, the saved questions are kept. |
 | `draft` | No | object | Which durable draft to revise, and the retry key. Omit to create a new draft. |
 | `planner` | No | object | Planner state to restore when the draft is reopened. |
-| `context` | No | object | Research context captured so far. |
+| `context` | No | object | Research context captured so far: only the user's brief and material relevant to the research question, never tool errors, status messages, internal links or process notes. |
 | `conversationFiles` | No | array | Study context files for the draft: images, video and audio are stimulus respondents see, documents are background. They are kept on later saves of the same draft. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
 
-## Manage Study Template
+## Save Study Template
 
-Tool: `manage_study_template`
+Tool: `save_study_template`
 
-Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. It never starts research. A template stores its questions, response settings, question attachments and research method (configuration.methodId). Templates are private by default; an owner can share one with their current team, and teammates can read and use a shared template but cannot change it. An update permanently replaces the saved template. Update and use require the current revision, and save.requestId makes creation retry-safe.
+Creates a private Custom template with its questions, response settings, attachments and method. template.requestId enables safe retries. Does not change existing templates, create a draft or start research.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `action` | Yes | "save", "update", "use" | save, update or use. There is no delete action: delete a template with delete_study_template and its templateId. |
-| `templateId` | No | string |  |
-| `save` | No | object | A calculator-backed method in configuration.methodId (Van Westendorp, Gabor-Granger, MaxDiff, conjoint, Kano, NPS, top-box, key drivers, TURF) designs its own tasks when the Study runs, and the saved questions are asked alongside them. |
-| `update` | No | object |  |
-| `use` | No | object | The draft is finished in the web app. There a predefined template is adapted to the Study's goal, context and Audiences in the language of the brief (standardized instrument items keep their wording); when adaptation fails or would change the template structure, the saved questions are used as written. A custom template keeps its saved wording unless adaptation is requested. |
-| `conversationFiles` | No | array | For save or update with a configuration: question attachments added to every saved question. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+| `template` | Yes | object | Name, configuration and optional stable requestId for the new private template. |
+| `conversationFiles` | No | array | Attachments added to every saved template question. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+
+## Update Study Template
+
+Tool: `update_study_template`
+
+Updates one owned Custom template at update.expectedRevision. Replaces supplied fields without restore history and may share it with the team. Requires explicit approval; stale revisions fail. Does not start research.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `templateId` | Yes | string |  |
+| `update` | Yes | object | Changes to the owned template and its current expectedRevision. |
+| `conversationFiles` | No | array | Attachments added to every question of the supplied configuration. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+
+## Create Draft From Study Template
+
+Tool: `use_study_template`
+
+Creates an independent editable Study draft from a readable template at use.expectedRevision. Reuse use.requestId for retries of the same intended draft. Fresh context and Audiences are added in the web app; the template is unchanged and research does not start.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `templateId` | Yes | string |  |
+| `use` | Yes | object | Current expectedRevision and a requestId reused only for retries of this same intended draft. |
 
 ## Delete Study Template
 
@@ -462,15 +533,59 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 | --- | --- | --- | --- |
 | `templateId` | Yes | string | Template to delete permanently. Owner only. |
 
-## Get Study Summary
+## Read Study Summary
 
-Tool: `get_study_summary`
+Tool: `read_study_summary`
 
-Returns the semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). With refresh it regenerates that summary from the stored answers. The summary is derived and can be regenerated again at any time; no answers, questions or Studies are changed or deleted.
+Reads saved whole-Study Markdown, evidence blocks and metadata. Does not regenerate or replace the summary.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `refresh` | No | boolean | Regenerate the summary from the stored answers instead of only reading it. Only the derived summary is replaced; answers are unchanged. Default: false. |
-| `force` | No | boolean | Regenerate even when the covered message range is unchanged. Default: false. |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+
+## Refresh Study Summary
+
+Tool: `refresh_study_summary`
+
+Generates and saves a whole-Study summary after explicit approval. Replaces the prior summary without restore history; answers and questions are preserved. force regenerates unchanged coverage. Returns Markdown and evidence blocks.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
+| `force` | No | boolean | Regenerate even when message coverage is unchanged, replacing the saved summary. Default: false. |
 | `length` | No | "short", "standard", "detailed" | Default: "standard". |
-| `study` | No | object | Which Study to summarize. Omit entirely to use the active Study from this MCP session. |
+| `confirmed` | Yes | true | The user explicitly approved replacing the saved summary without restore history. |
+
+## Plan a Multi-Question Block in a Study
+
+Tool: `plan_study_questions`
+
+Deprecated alias of create_study_plan and revise_study_plan; identical behaviour.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `request` | No | See schema |  |
+| `questions` | No | See schema |  |
+| `idempotencyKey` | No | See schema |  |
+| `conversationFiles` | No | array | Stimulus files for the planned block, added to stimulus.attachments. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+| `study` | No | See schema |  |
+| `draft` | No | See schema |  |
+| `stimulus` | No | See schema |  |
+| `policy` | No | See schema |  |
+
+## Run a Confirmed Multi-Question Block
+
+Tool: `run_study_questions`
+
+Deprecated alias of start_study_run; identical behaviour.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `confirmed` | No | See schema |  |
+| `advancedMethodOptIn` | No | See schema |  |
+| `audienceIds` | No | See schema |  |
+| `idempotencyKey` | No | See schema |  |
+| `modelConnection` | No | See schema |  |
+| `study` | No | See schema |  |
+| `draft` | No | See schema |  |
+| `resume` | No | See schema |  |
