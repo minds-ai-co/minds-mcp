@@ -6,8 +6,8 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **32 tools** through ordinary `tools/list` discovery.
-There are **55 canonical callable tools**, excluding aliases.
+The server advertises **42 tools** through ordinary `tools/list` discovery.
+There are **70 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
 
@@ -18,35 +18,45 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_audiences` | List Audiences | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. | read-only | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
 | `create_audience_from_brief` | Create a Grounded Audience from a Brief | Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. | writes | sparks:write |
-| `submit_audience_review` | Submit Audience Review | Revise or confirm the displayed Audience review. | writes | sparks:read, sparks:write |
 | `get_audience_creation_progress` | Audience creation progress | Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error. | read-only | sparks:read |
-| `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, review, confirmation and training for one or more Audience operations. | read-only | sparks:read |
-| `get_audience_limits` | Get Audience Limits | Returns the Audience size ceilings for the authenticated account before an Audience is created: the per-Audience plan cap (including any team allowance), the custom-size maximum and the per-mode ceilings. | read-only | sparks:read |
-| `ask_audience` | Ask One Standalone Audience Question | Asks exactly one standalone question of one existing Audience. | writes | flows:write |
+| `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. | read-only | sparks:read |
+| `get_audience_limits` | Get Audience Limits | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. | read-only | sparks:read |
+| `ask_audience` | Ask One Standalone Audience Question | Asks exactly one standalone question of one existing Audience. | destructive | flows:write |
 | `export_audience` | Export Audience Brief | Exports an Audience brief, or with kind "validation_report" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. | writes | sparks:read |
-| `duplicate_audience` | Duplicate Audience | Copy an Audience with independent copies of its Minds and all they know. | writes | sparks:write |
-| `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id and its Minds keep theirs, so Studies, shares and chats keep working, and no Mind is deleted. | destructive | sparks:write |
+| `duplicate_audience` | Duplicate Audience | Permanently copy an Audience with independent copies of its Minds and all they know. | writes | sparks:write |
+| `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
+| `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
 | `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
-| `ask_study` | Ask One Standalone Question in a Study | Submits exactly one respondent-visible question in an existing Study: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | writes | flows:write |
+| `ask_study` | Ask One Standalone Question in a Study | Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
 | `get_study_status` | Get Study Status | Returns Study progress, per-Audience results, original Mind responses, links and export status. | read-only | flows:read |
-| `render_study_results` | Show Final Study Results | Shows final results, summary, key findings, Audience breakdowns and Mind responses for a completed question or multi-question run. | read-only | flows:read |
+| `render_study_results` | Show Final Study Results | Shows the results of finished questions (summary, key findings, Audience breakdowns, Mind responses): one question, or a run's finished questions while the rest still run. | read-only | flows:read |
 | `export_study` | Export Study Results | Starts an asynchronous export of Study results and returns an export job ID. | writes | flows:read |
-| `duplicate_study` | Duplicate Study | Copy a Study with all its questions and results over the same Audiences. | writes | flows:write |
+| `duplicate_study` | Duplicate Study | Permanently copy a Study with its questions and results over the same Audiences. | writes | flows:write |
 | `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. | writes | flows:read |
-| `run_study_heatmap` | Run Study Asset Heatmap | The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. | writes | flows:read, flows:write |
+| `get_study_heatmap` | Read Study Asset Heatmap | Reads saved heatmaps of an assigned question asset. | read-only | flows:read |
+| `start_study_heatmap` | Start Study Asset Heatmap | Starts attention analysis of an assigned image, video or website. | destructive | flows:write |
 | `export_mind` | Export Mind Persona Profile | Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). | writes | sparks:read |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Read shared Mind sources and assessments. | read-only | sparks:read |
-| `plan_study_questions` | Plan a Multi-Question Block in a Study | Creates or revises a non-executing draft for a multi-question plan inside an existing Study. | destructive | flows:write |
+| `create_study_plan` | Create Study Plan | Creates a non-executing draft in an existing Study with its Audiences already attached. | destructive | flows:write |
+| `revise_study_plan` | Revise Study Plan | Revises one saved draft at its current draft.id and draft.revision without starting research. | destructive | flows:write |
+| `get_study_plan` | Read Study Plan | Reads the latest saved revision and full review of one draft. | read-only | flows:read |
+| `attach_study_audiences` | Attach Audiences to Study | Adds existing accessible Audiences without removing others, planning or starting research. | writes | flows:write |
 | `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |
-| `run_study_questions` | Run a Confirmed Multi-Question Block | Runs one stored draft revision inside its Study, after the person has explicitly confirmed that exact revision. | writes | flows:write |
-| `list_research_methods` | List Research Methods | Lists the research methods a Study can use, with availability, complexity and fallback method, and whether each can run now or is experimental or planned. | read-only | flows:read |
+| `start_study_run` | Start Confirmed Study Run | Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. | destructive | flows:write |
+| `resume_study_run` | Resume Study Run | Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. | destructive | flows:write |
+| `list_research_methods` | List Research Methods | Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
 | `list_study_templates` | List Study Templates | Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. | read-only | flows:read |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |
-| `manage_study_template` | Manage Study Template | Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. | destructive | flows:write |
+| `save_study_template` | Save Study Template | Creates a private Custom template with its questions, response settings, attachments and method. | writes | flows:write |
+| `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |
+| `use_study_template` | Create Draft From Study Template | Creates an independent editable Study draft from a readable template at use.expectedRevision. | writes | flows:write |
 | `delete_study_template` | Delete Study Template | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. | destructive | flows:write |
-| `get_study_summary` | Get Study Summary | Returns the semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). | writes | flows:write |
+| `read_study_summary` | Read Study Summary | Reads saved whole-Study Markdown, evidence blocks and metadata. | read-only | flows:read |
+| `refresh_study_summary` | Refresh Study Summary | Generates and saves a whole-Study summary after explicit approval. | destructive | flows:write |
+| `plan_study_questions` | Plan a Multi-Question Block in a Study | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. | destructive | flows:write |
+| `run_study_questions` | Run a Confirmed Multi-Question Block | Deprecated alias of start_study_run; identical behaviour. | destructive | flows:write |
 
 ## Legacy names
 
@@ -115,24 +125,29 @@ discovery response. Registry listings must not describe them as discovered.
 | `create_audience` | Creates an Audience from existing Minds. |
 | `create_mind` | Creates a Mind — a persona, expert, digital twin, character, respondent, or agent — from a description of who or what it should be, with no form to fill in first. |
 | `export_figma_comments` | Preview completed Study run feedback or saved image heatmap reactions as native Figma comments. |
+| `filter_audience_minds` | Narrows an Audience the account can view to the Minds whose filter attributes match, and lists the attributes present with per-value counts. |
 | `get_audience` | Returns one Audience belonging to the authenticated account: its details, its members, and its research grounding. |
 | `get_audience_validation` | Returns how closely an Audience matches real surveys. |
 | `get_billing_catalog` | Read the authenticated user’s existing Stripe subscription prices, response-credit packs and purchase eligibility. |
 | `get_mind_status` | Reports the training progress of a Mind, persona, digital twin, or expert that is still training. |
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
 | `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
+| `get_study_summary` | Returns the saved semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). |
 | `list_formations` | Lists the saved segmentations visible to the authenticated account on an Audience it can view: shared segmentations and the caller's own private ones. |
-| `list_minds` | Lists the Minds belonging to the authenticated account, with name search. |
+| `list_minds` | Lists the Minds the authenticated account can open, with name search: its own Minds and Minds shared with it directly, with its team, or through an Audience or Study it owns or can open. |
 | `list_model_connections` | Lists the authenticated team’s model connections with IDs, current revisions, endpoints, and verified text, structured-output, streaming, and tool capabilities. |
-| `manage_audience` | Read or follow an Audience, inspect build progress, update, delete, change membership, or regenerate member images through /api/v1/ endpoints. |
+| `manage_audience` | Read or follow an Audience, inspect build progress, update, delete, change its Minds (add_member/remove_member), list or remove the people who accepted an invitation (list_collaborators; remove_collaborator with userId revokes their invitations, without email), or regenerate member images through /api/v1/ endpoints. |
 | `manage_chat` | Create a stateful single-Mind, multi-Mind, or Study chat; send a message; or delete the chat through /api/v1/ endpoints. |
 | `manage_formation` | List, preview, read, create, delete, or recompute an Audience segmentation through /api/v1/ endpoints. |
 | `manage_mind` | Read, update, delete, retrain, or regenerate an existing Mind through the canonical v1 API. |
 | `manage_mind_knowledge` | List, add links, files, or keywords, update, delete, enrich, and inspect a Mind’s knowledge through /api/v1/ endpoints. |
-| `manage_study` | Read, delete, enable or disable link sharing, invite collaborators to, add Audiences to (add_audiences) or remove an Audience from (remove_audience) an existing Study through the v1 API. |
+| `manage_study` | Read, delete, enable or disable link sharing, share with or unshare from the owner's team (set_team_sharing; no invitation is sent), invite collaborators to, list (list_collaborators) or remove (remove_collaborator with userId; revokes their invitations and their read access to the Study's Audiences and Minds, without email) collaborators of, add Audiences to (add_audiences) or remove an Audience from (remove_audience) an existing Study through the v1 API. |
 | `manage_study_draft` | Delete, consume, or reread the original source of a durable Study draft through /api/v1/. |
+| `manage_study_template` | Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. |
 | `preview_audience_dataset_segmentation` | Enterprise review step for spreadsheet-grounded Audiences. |
-| `start_billing_checkout` | Start a new subscription or response-credit checkout using the same Stripe billing rules as Minds. |
+| `run_study_heatmap` | The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. |
+| `share_study_template` | Shares one saved Study template the user owns with specific people by email, lists who has that access, cancels a pending invitation, or removes an accepted member. |
+| `start_billing_checkout` | Start a subscription, response-credit purchase, or auto-recharge consent checkout using the same Stripe billing rules as Minds. |
 | `validate_audience` | Starts a validation of an Audience against real published surveys or your own survey files, or cancels one. |
 
 ## Discovery metadata

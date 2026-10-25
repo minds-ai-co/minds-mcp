@@ -1,0 +1,26 @@
+/* Reading layout for the evidence worksheet companion; shared brand styles stay in site.css. */
+.buying-article { max-width: 920px; margin: 64px auto 100px; }
+.buying-article h1 { font-size: clamp(42px, 7vw, 80px); line-height: 1.04; letter-spacing: -.045em; }
+.buying-article h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -.025em; }
+.buying-article h3 { font-size: 23px; line-height: 1.3; }
+.buying-article p, .buying-article li { line-height: 1.65; }
+.buying-article section { margin-top: 56px; }
+.buying-article li + li { margin-top: 8px; }
+.buying-article .resource-lede { font-size: 24px; max-width: 760px; }
+.resource-meta { color: var(--muted); font-size: 15px; }
+.buying-article .hero-actions { margin: 24px 0; }
+.resource-table { overflow-x: auto; margin: 24px 0; border: 1px solid #ddd; }
+.resource-table table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
+.resource-table caption { text-align: left; padding: 16px; font-weight: 700; }
+.resource-table th, .resource-table td { padding: 14px; text-align: left; vertical-align: top; border-top: 1px solid #ddd; }
+.resource-table thead { background: #f5f5f3; }
+.resource-table tbody th { min-width: 140px; }
+.vendor-links { columns: 2; column-gap: 32px; padding-left: 24px; }
+.vendor-links li { break-inside: avoid; }
+@media (max-width: 600px) {
+  .buying-article { margin-top: 36px; }
+  .buying-article .resource-lede { font-size: 21px; }
+  .vendor-links { columns: 1; }
+  .buying-article .hero-actions a { width: 100%; }
+}
+
