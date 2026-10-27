@@ -195,7 +195,7 @@ A Study with this exact name is named back and nothing is created, unless allowD
 
 Any request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.
 
-Creation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.
+Creation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It does not change or replace an existing Study.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -436,6 +436,48 @@ Resumes an existing plan-limited Study run in place after explicit user approval
 | `runId` | Yes | string | Existing plan-limited run to resume in place. |
 | `confirmed` | Yes | true | The user explicitly approved continuing this stopped run. |
 
+## Stop Standalone Study Question
+
+Tool: `cancel_study_question`
+
+Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. An answered or failed question errors unchanged. Not for multi-question runs.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `runId` | No | string | runId that ask_study or ask_audience returned for the question to stop. Without it, pass studyId and questionId. |
+| `studyId` | No | string | Study of the question to stop, with questionId, when the runId is not known. |
+| `questionId` | No | string | questionId that ask_study or ask_audience returned for the question to stop, with studyId. |
+
+## Rename or Move Study or Audience
+
+Tool: `update_item`
+
+Renames a Study or Audience or moves it into a folder.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `type` | Yes | "study", "audience" | Kind of item: "study" or "audience". |
+| `study` | No | object | The Study, when type is "study". |
+| `audience` | No | object | The Audience, when type is "audience". |
+| `name` | No | string | New name, 1 to 200 characters. Renaming does not change who can open the item. The person must be able to edit the item. |
+| `folder` | No | string | Only when the person asks to file or move the item: the name (any case) or id of one of their folders. The item moves there and leaves their other personal folders; with no folder of that name, a personal folder is created. |
+| `removeFromFolders` | No | boolean | true takes the item out of all the person's folders, only when they ask. Not with folder. |
+| `confirmSharedFolder` | No | boolean | true only after the person confirmed in this conversation filing the item in a shared folder or taking it out of one, which changes who can open it. |
+
+## Change Study or Audience Sharing
+
+Tool: `set_sharing`
+
+Turns a Study's or Audience's public link or team sharing on or off.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `type` | Yes | "study", "audience" | Kind of item: "study" or "audience". |
+| `study` | No | object | The Study, when type is "study". |
+| `audience` | No | object | The Audience, when type is "audience". |
+| `link` | No | boolean | true turns the public view-only link on: anyone with it can view the item, and a Study link also opens its Audiences and Minds. false turns it off and an earlier link stops working. Send link, team or both. |
+| `team` | No | boolean | true shares with everyone in the owner's team (no invitation is sent), false stops it. Only the owner changes this. Marketplace listing of an Audience is not changed here. |
+
 ## List Research Methods
 
 Tool: `list_research_methods`
@@ -527,7 +569,7 @@ Creates an independent editable Study draft from a readable template at use.expe
 
 Tool: `delete_study_template`
 
-Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template owned by the authenticated user. Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.
+Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template the authenticated user owns; Studies and drafts already created from it are unaffected.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
