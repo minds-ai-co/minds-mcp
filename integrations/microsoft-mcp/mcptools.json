@@ -206,6 +206,9 @@
               }
             ]
           },
+          "questionnaire": {
+            "description": "For planning_required when the uploaded files hold a questionnaire: its verbatim questions with their answer formats, the document's skip rules, changed answer labels, pictures and set-aside parts, saved as the exact draft draftPlanId at revision. Nothing ran yet: after the person's explicit confirmation, start that draft with start_study_run."
+          },
           "executionStarted": {
             "description": "False when nothing was submitted.",
             "type": [
@@ -731,6 +734,9 @@
               }
             ]
           },
+          "questionnaire": {
+            "description": "For planning_required when the uploaded files hold a questionnaire: its verbatim questions with their answer formats, the document's skip rules, changed answer labels, pictures and set-aside parts, saved as the exact draft draftPlanId at revision. Nothing ran yet: after the person's explicit confirmation, start that draft with start_study_run."
+          },
           "executionStarted": {
             "description": "False when nothing was submitted.",
             "type": [
@@ -1016,6 +1022,86 @@
       }
     },
     {
+      "name": "cancel_study_question",
+      "title": "Stop Standalone Study Question",
+      "description": "Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. An answered or failed question errors unchanged. Not for multi-question runs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "description": "runId that ask_study or ask_audience returned for the question to stop. Without it, pass studyId and questionId.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "studyId": {
+            "description": "Study of the question to stop, with questionId, when the runId is not known.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "questionId": {
+            "description": "questionId that ask_study or ask_audience returned for the question to stop, with studyId.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "description": "The question run the cancellation was requested for.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "description": "cancelled (no further answers are generated), cancelling (the Minds answering it stop at their next step), preparing (not submitted yet; call again to stop it) or planning_required (waits for a confirmed plan, nothing is being asked). An already answered or failed question returns an error instead.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "studyId": {
+            "description": "Study of the question; read its state with get_study_status and questionId.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "questionId": {
+            "description": "The question's request id, the questionId get_study_status takes.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stopped": {
+            "description": "True while the question is cancelled or stopping, also on a repeated call; false when nothing was asked yet.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Stop Standalone Study Question",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
       "name": "create_audience_from_brief",
       "title": "Create a Grounded Audience from a Brief",
       "description": "Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. A change to a draft under review is a draft.rework of that draft, never a new brief, which leaves another open draft. Recalibrate an existing Audience by its id. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.",
@@ -1087,7 +1173,7 @@
                 }
               },
               "files": {
-                "description": "Optional already-uploaded research files. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance. Every file shapes the grounding, but only one classified as supporting material (not a spreadsheet) enters the members' own knowledge; the result's withheldFromMemberKnowledge names each other file with its reason (respondent_dataset, study_report, questionnaire, screener, distribution_source, tabular, or unclassified: not classified as supporting material, also when the reading failed or ran out of time).",
+                "description": "Optional already-uploaded research files. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance. Every file shapes the grounding, but only one classified as supporting material (not a spreadsheet) enters the members' own knowledge; the result's withheldFromMemberKnowledge names each other file with its reason (respondent_dataset, study_report, questionnaire, screener, distribution_source, tabular; or, when it was not classified as supporting material: unreadable when its text could not be read, not_covered when the reading of the material did not include it, not_read when no reading of the material was available).",
                 "maxItems": 20,
                 "type": "array",
                 "items": {
@@ -1550,7 +1636,7 @@
     {
       "name": "create_study",
       "title": "Create a Study",
-      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nA Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It cannot publish, share or replace an existing Study: that sharing changes only in the workspace.",
+      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nA Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It does not change or replace an existing Study.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2257,7 +2343,7 @@
     {
       "name": "delete_study_template",
       "title": "Delete Study Template",
-      "description": "Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template owned by the authenticated user. Studies and drafts already created from it are unaffected. Teammates with shared access cannot delete a template they do not own.",
+      "description": "Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. Permanently deletes one template the authenticated user owns; Studies and drafts already created from it are unaffected.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3343,7 +3429,7 @@
             ]
           },
           "requestPreparations": {
-            "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
+            "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation, and an uploaded questionnaire's questionnaire with the exact draft (draftPlanId, revision) that start_study_run starts after confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
             "anyOf": [
               {
                 "type": "array",
@@ -5101,7 +5187,7 @@
             ]
           },
           "requestPreparations": {
-            "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
+            "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation, and an uploaded questionnaire's questionnaire with the exact draft (draftPlanId, revision) that start_study_run starts after confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
             "anyOf": [
               {
                 "type": "array",
@@ -7108,6 +7194,136 @@
       }
     },
     {
+      "name": "set_sharing",
+      "title": "Change Study or Audience Sharing",
+      "description": "Turns a Study's or Audience's public link or team sharing on or off.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "study",
+              "audience"
+            ],
+            "description": "Kind of item: \"study\" or \"audience\"."
+          },
+          "study": {
+            "description": "The Study, when type is \"study\".",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Study ID (UUID).",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+              },
+              "name": {
+                "description": "Study name, when the ID is not known.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "audience": {
+            "description": "The Audience, when type is \"audience\".",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Audience ID (UUID).",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+              },
+              "name": {
+                "description": "Audience name, when the ID is not known.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "link": {
+            "description": "true turns the public view-only link on: anyone with it can view the item, and a Study link also opens its Audiences and Minds. false turns it off and an earlier link stops working. Send link, team or both.",
+            "type": "boolean"
+          },
+          "team": {
+            "description": "true shares with everyone in the owner's team (no invitation is sent), false stops it. Only the owner changes this. Marketplace listing of an Audience is not changed here.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "study or audience.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "description": "ID of the Study or Audience.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "link": {
+            "description": "Whether the public view-only link is on now.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "team": {
+            "description": "Whether everyone in the owner's team can open it now.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "listedPublicly": {
+            "description": "Whether the Audience is listed in the Minds marketplace (unchanged by this tool).",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "shareUrl": {
+            "description": "Public view-only link while link sharing is on, else null.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "description": "Minds workspace link for the item.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Change Study or Audience Sharing",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
       "name": "start_study_heatmap",
       "title": "Start Study Asset Heatmap",
       "description": "Starts attention analysis of an assigned image, video or website. Uses one response per Mind and needs a paid plan. assetKey reuses completed analysis of that asset; omitting it may replace earlier derived results. Websites are visited publicly. Explicit approval is required; question answers are preserved.",
@@ -7485,6 +7701,149 @@
           ]
         },
         "openai/widgetAccessible": true
+      }
+    },
+    {
+      "name": "update_item",
+      "title": "Rename or Move Study or Audience",
+      "description": "Renames a Study or Audience or moves it into a folder.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "study",
+              "audience"
+            ],
+            "description": "Kind of item: \"study\" or \"audience\"."
+          },
+          "study": {
+            "description": "The Study, when type is \"study\".",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Study ID (UUID).",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+              },
+              "name": {
+                "description": "Study name, when the ID is not known.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "audience": {
+            "description": "The Audience, when type is \"audience\".",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Audience ID (UUID).",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+              },
+              "name": {
+                "description": "Audience name, when the ID is not known.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "name": {
+            "description": "New name, 1 to 200 characters. Renaming does not change who can open the item. The person must be able to edit the item.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "folder": {
+            "description": "Only when the person asks to file or move the item: the name (any case) or id of one of their folders. The item moves there and leaves their other personal folders; with no folder of that name, a personal folder is created.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "removeFromFolders": {
+            "description": "true takes the item out of all the person's folders, only when they ask. Not with folder.",
+            "type": "boolean"
+          },
+          "confirmSharedFolder": {
+            "description": "true only after the person confirmed in this conversation filing the item in a shared folder or taking it out of one, which changes who can open it.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "study or audience.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "description": "ID of the Study or Audience.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "description": "The name now saved, when it was renamed.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "description": "Minds workspace link for the item.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "folder": {
+            "description": "When folder was sent: the folder the item was filed in { id, name, created, otherMembers, pendingInvitations }; null after removeFromFolders."
+          },
+          "confirmationRequired": {
+            "description": "True when nothing changed because filing the item in a shared folder, or taking it out of one, needs the person's confirmation.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "sharedFolders": {
+            "description": "With confirmationRequired: the shared folders concerned { id, name, otherMembers, pendingInvitations }. After a move: the shared folders that still hold the item { id, name }.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Rename or Move Study or Audience",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
       }
     },
     {
