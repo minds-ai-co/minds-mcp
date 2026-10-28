@@ -151,7 +151,7 @@ discovery response. Registry listings must not describe them as discovered.
 | `run_study_heatmap` | The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. |
 | `share_study_template` | Shares one saved Study template the user owns with specific people by email, lists who has that access, cancels a pending invitation, or removes an accepted member. |
 | `start_billing_checkout` | Start a subscription, response-credit purchase, or auto-recharge consent checkout using the same Stripe billing rules as Minds. |
-| `validate_audience` | Starts a validation of an Audience against real published surveys or your own survey files, or cancels one. |
+| `validate_audience` | Starts a validation of an Audience against real published surveys, your own survey files or your own survey results, or cancels one. |
 
 ## Discovery metadata
 
