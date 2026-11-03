@@ -448,17 +448,18 @@ Stops one standalone Study question by runId, or studyId and questionId: queued 
 | `studyId` | No | string | Study of the question to stop, with questionId, when the runId is not known. |
 | `questionId` | No | string | questionId that ask_study or ask_audience returned for the question to stop, with studyId. |
 
-## Rename or Move Study or Audience
+## Update Study, Audience or Mind
 
 Tool: `update_item`
 
-Renames a Study or Audience or moves it into a folder.
+Renames a Study or Audience or moves it into a folder. Renames a Mind, or records whether its facts come from real research data (mind.factsSource).
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `type` | Yes | "study", "audience" | Kind of item: "study" or "audience". |
+| `type` | Yes | "study", "audience", "mind" | Kind of item: "study", "audience" or "mind". |
 | `study` | No | object | The Study, when type is "study". |
 | `audience` | No | object | The Audience, when type is "audience". |
+| `mind` | No | object | The Mind, when type is "mind", and where its facts come from (factsSource). |
 | `name` | No | string | New name, 1 to 200 characters. Renaming does not change who can open the item. The person must be able to edit the item. |
 | `folder` | No | string | Only when the person asks to file or move the item: the name (any case) or id of one of their folders. The item moves there and leaves their other personal folders; with no folder of that name, a personal folder is created. |
 | `removeFromFolders` | No | boolean | true takes the item out of all the person's folders, only when they ask. Not with folder. |
