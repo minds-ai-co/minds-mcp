@@ -63,7 +63,7 @@ Researches a free-text population brief and builds a new Audience of Minds with 
 
 Tool: `get_audience_creation_progress`
 
-Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error. Validation needs 10 ready members; for a final score wait until all are trained and research is done.
+Read-only; never starts or retries work. operationId: creation and member training. audienceId: training, background research, validation.ready (validation's 10-ready-Mind rule), validation.reason MINDS_TRAINING (poll later) or AUDIENCE_TOO_SMALL (add Minds). recalibrationId: its status, retained result or terminal error. Final score needs all members trained and research done.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

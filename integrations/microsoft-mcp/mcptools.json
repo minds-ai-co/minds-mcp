@@ -2940,7 +2940,7 @@
     {
       "name": "get_audience_creation_progress",
       "title": "Audience creation progress",
-      "description": "Reads progress and never starts or retries anything: an Audience creation by operationId, with its members\u2019 training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration\u2019s status, retained result or terminal error. Validation needs 10 ready members; for a final score wait until all are trained and research is done.",
+      "description": "Read-only; never starts or retries work. operationId: creation and member training. audienceId: training, background research, validation.ready (validation's 10-ready-Mind rule), validation.reason MINDS_TRAINING (poll later) or AUDIENCE_TOO_SMALL (add Minds). recalibrationId: its status, retained result or terminal error. Final score needs all members trained and research done.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2982,7 +2982,7 @@
             "description": "One recalibration receipt: id, status, progress, retained result or terminal error."
           },
           "audienceProgress": {
-            "description": "Existing Audience member readiness, background research and coverage."
+            "description": "Existing Audience member readiness, background research, coverage, and validation: the default new unscoped training check (validation.ready, with validation.reason MINDS_TRAINING or AUDIENCE_TOO_SMALL when not)."
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -4967,17 +4967,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.3b0858e2670e.html",
+          "resourceUri": "ui://widget/audience.2c5ce3127d81.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.3b0858e2670e.html",
+        "openai/outputTemplate": "ui://widget/audience.2c5ce3127d81.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.3b0858e2670e.html"
+        "ui/resourceUri": "ui://widget/audience.2c5ce3127d81.html"
       }
     },
     {
@@ -5055,17 +5055,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.827c3b90b179.html",
+          "resourceUri": "ui://widget/plan.8333a6553835.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.827c3b90b179.html",
+        "openai/outputTemplate": "ui://widget/plan.8333a6553835.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.827c3b90b179.html"
+        "ui/resourceUri": "ui://widget/plan.8333a6553835.html"
       }
     },
     {
@@ -5420,17 +5420,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.20346bc4f0b4.html",
+          "resourceUri": "ui://widget/response.29412b3b0693.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.20346bc4f0b4.html",
+        "openai/outputTemplate": "ui://widget/response.29412b3b0693.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.20346bc4f0b4.html"
+        "ui/resourceUri": "ui://widget/response.29412b3b0693.html"
       }
     },
     {
