@@ -137,7 +137,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `list_audiences` | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. |
 | `import_audience_sources` | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. |
 | `create_audience_from_brief` | Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. |
-| `get_audience_creation_progress` | Reads progress and never starts or retries anything: an Audience creation by operationId, with its members’ training; or an existing Audience by audienceId, with its member training and background research, or with recalibrationId one recalibration’s status, retained result or terminal error. |
+| `get_audience_creation_progress` | Read-only; never starts or retries work. |
 | `render_audience_review` | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. |
 | `get_audience_limits` | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. |
 | `ask_audience` | Asks exactly one standalone question of one existing Audience. |
