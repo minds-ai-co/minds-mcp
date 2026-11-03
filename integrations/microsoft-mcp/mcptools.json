@@ -4967,17 +4967,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.2c5ce3127d81.html",
+          "resourceUri": "ui://widget/audience.035ce2f7d308.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.2c5ce3127d81.html",
+        "openai/outputTemplate": "ui://widget/audience.035ce2f7d308.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.2c5ce3127d81.html"
+        "ui/resourceUri": "ui://widget/audience.035ce2f7d308.html"
       }
     },
     {
@@ -5055,17 +5055,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.8333a6553835.html",
+          "resourceUri": "ui://widget/plan.39553dfa1d5d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.8333a6553835.html",
+        "openai/outputTemplate": "ui://widget/plan.39553dfa1d5d.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.8333a6553835.html"
+        "ui/resourceUri": "ui://widget/plan.39553dfa1d5d.html"
       }
     },
     {
@@ -5420,17 +5420,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.6a45142914f8.html",
+          "resourceUri": "ui://widget/response.edcb43e87918.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.6a45142914f8.html",
+        "openai/outputTemplate": "ui://widget/response.edcb43e87918.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.6a45142914f8.html"
+        "ui/resourceUri": "ui://widget/response.edcb43e87918.html"
       }
     },
     {
@@ -7705,8 +7705,8 @@
     },
     {
       "name": "update_item",
-      "title": "Rename or Move Study or Audience",
-      "description": "Renames a Study or Audience or moves it into a folder.",
+      "title": "Update Study, Audience or Mind",
+      "description": "Renames a Study or Audience or moves it into a folder. Renames a Mind, or records whether its facts come from real research data (mind.factsSource).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -7714,9 +7714,10 @@
             "type": "string",
             "enum": [
               "study",
-              "audience"
+              "audience",
+              "mind"
             ],
-            "description": "Kind of item: \"study\" or \"audience\"."
+            "description": "Kind of item: \"study\", \"audience\" or \"mind\"."
           },
           "study": {
             "description": "The Study, when type is \"study\".",
@@ -7752,6 +7753,31 @@
               }
             }
           },
+          "mind": {
+            "description": "The Mind, when type is \"mind\", and where its facts come from (factsSource).",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Mind ID (UUID).",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$"
+              },
+              "name": {
+                "description": "Mind name, when the ID is not known.",
+                "type": "string",
+                "minLength": 1
+              },
+              "factsSource": {
+                "description": "Only for a Mind, only when the person says where its facts come from. \"source_record\": its facts were read from real research data (a survey respondent, an interview, a customer record); Minds then uses its saved instructions exactly as written and never checks, corrects or rewrites its facts or instructions on its own. \"generated\": Minds drafted the person and keeps its instructions consistent with its facts again. Only the Mind's owner or a workspace Owner or Admin can change it.",
+                "type": "string",
+                "enum": [
+                  "generated",
+                  "source_record"
+                ]
+              }
+            }
+          },
           "name": {
             "description": "New name, 1 to 200 characters. Renaming does not change who can open the item. The person must be able to edit the item.",
             "type": "string",
@@ -7782,14 +7808,14 @@
         "type": "object",
         "properties": {
           "type": {
-            "description": "study or audience.",
+            "description": "study, audience or mind.",
             "type": [
               "string",
               "null"
             ]
           },
           "id": {
-            "description": "ID of the Study or Audience.",
+            "description": "ID of the Study, Audience or Mind.",
             "type": [
               "string",
               "null"
@@ -7797,6 +7823,13 @@
           },
           "name": {
             "description": "The name now saved, when it was renamed.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "factsSource": {
+            "description": "For a Mind, when factsSource was sent: where its facts now come from, generated or source_record.",
             "type": [
               "string",
               "null"
@@ -7836,7 +7869,7 @@
         "additionalProperties": {}
       },
       "annotations": {
-        "title": "Rename or Move Study or Audience",
+        "title": "Update Study, Audience or Mind",
         "readOnlyHint": false,
         "destructiveHint": false,
         "idempotentHint": true,
