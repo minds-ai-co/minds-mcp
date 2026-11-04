@@ -5055,17 +5055,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.1dea910c1eca.html",
+          "resourceUri": "ui://widget/plan.a4ba1cc5633c.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.1dea910c1eca.html",
+        "openai/outputTemplate": "ui://widget/plan.a4ba1cc5633c.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.1dea910c1eca.html"
+        "ui/resourceUri": "ui://widget/plan.a4ba1cc5633c.html"
       }
     },
     {
@@ -5420,17 +5420,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.db656abf524d.html",
+          "resourceUri": "ui://widget/response.2f966598a46d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.db656abf524d.html",
+        "openai/outputTemplate": "ui://widget/response.2f966598a46d.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.db656abf524d.html"
+        "ui/resourceUri": "ui://widget/response.2f966598a46d.html"
       }
     },
     {
