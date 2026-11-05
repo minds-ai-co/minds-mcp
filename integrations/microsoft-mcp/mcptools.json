@@ -399,13 +399,16 @@
       "_meta": {
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
     {
       "name": "ask_study",
       "title": "Ask One Standalone Question in a Study",
-      "description": "Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions. These require one confirmed block, submitted once rather than question by question.\n\nDurably accepts before interpretation or execution. Review-required requests return planning_required for explicit confirmation. Question text can reach the Minds: respondent-facing only, never planner or client orchestration notes. Pasted reaction material verbatim in evidence.textAttachments. Returns IDs and links.\n\nAccepts files shared in the conversation (uploaded or generated images, PDFs).",
+      "description": "Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -918,7 +921,7 @@
         "title": "Ask One Standalone Question in a Study",
         "readOnlyHint": false,
         "destructiveHint": true,
-        "idempotentHint": true,
+        "idempotentHint": false,
         "openWorldHint": true
       },
       "execution": {
@@ -927,6 +930,9 @@
       "_meta": {
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -1019,6 +1025,11 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -1099,12 +1110,17 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
       "name": "create_audience_from_brief",
       "title": "Create a Grounded Audience from a Brief",
-      "description": "Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. A change to a draft under review is a draft.rework of that draft, never a new brief, which leaves another open draft. Recalibrate an existing Audience by its id. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.",
+      "description": "Builds grounded Audience/Mind profiles with exact segment allocation. Returns an asynchronous draft/operation for review; create only after the user accepts its roster/quota snapshot and checksum. Rework the same draft.id/sha256 in place, overwriting its saved request, roster and grounding; never start a new brief for that edit. Supports reviewed datasets and public research/files. Existing Audiences use recalibration. Private unless link sharing is enabled.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1607,7 +1623,7 @@
       "annotations": {
         "title": "Create a Grounded Audience from a Brief",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": true
       },
@@ -1803,6 +1819,9 @@
         "openai/toolInvocation/invoked": "Study created!",
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -2337,6 +2356,9 @@
         "openai/toolInvocation/invoked": "Study planning updated",
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -2378,12 +2400,17 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
       "name": "duplicate_audience",
       "title": "Duplicate Audience",
-      "description": "Permanently copy an Audience with independent copies of its Minds and all they know.",
+      "description": "Adds an independent copy of an Audience, its Minds and retained knowledge. Unready copies can queue retraining with public web research when retained evidence cannot seed them. Ready copies avoid retraining.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2440,10 +2467,15 @@
         "readOnlyHint": false,
         "destructiveHint": false,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "sparks:write"
+        ]
       }
     },
     {
@@ -2510,12 +2542,17 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
       "name": "export_audience",
       "title": "Export Audience Brief",
-      "description": "Exports an Audience brief, or with kind \"validation_report\" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. Brief: Markdown, PDF, DOCX, PPTX. Validation report: Markdown, PDF, DOCX, XLSX. Binary artifacts are returned as base64.",
+      "description": "Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. Brief PDF/PPTX can fetch public HTTPS member portraits. Starts artifact work; force can replace it. Slow exports may irreversibly email the requesting account.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2612,9 +2649,9 @@
       "annotations": {
         "title": "Export Audience Brief",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
@@ -2623,14 +2660,15 @@
         "openai/toolInvocation/invoking": "Exporting Audience brief...",
         "openai/toolInvocation/invoked": "Audience brief ready!",
         "openai/scopes": [
-          "sparks:read"
+          "sparks:read",
+          "sparks:write"
         ]
       }
     },
     {
       "name": "export_heatmap",
       "title": "Export Website Heatmap",
-      "description": "Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. Returns the same ZIP archive as the web app, including its unified-renderer PDF report, Markdown, images, and metadata.",
+      "description": "Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. Does not recapture the website. force starts fresh archive work and replaces its saved artifact status/reference.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2699,7 +2737,7 @@
       "annotations": {
         "title": "Export Website Heatmap",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
       },
@@ -2710,14 +2748,15 @@
         "openai/toolInvocation/invoking": "Exporting website heatmap...",
         "openai/toolInvocation/invoked": "Heatmap archive ready!",
         "openai/scopes": [
-          "flows:read"
+          "flows:read",
+          "flows:write"
         ]
       }
     },
     {
       "name": "export_mind",
       "title": "Export Mind Persona Profile",
-      "description": "Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.",
+      "description": "Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. PDF/PPTX can fetch public HTTPS portraits. Starts artifact work; force can replace an artifact. Slow exports may irreversibly email the requesting account when ready.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2808,22 +2847,26 @@
       "annotations": {
         "title": "Export Mind Persona Profile",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
       },
       "_meta": {
         "openai/toolInvocation/invoking": "Exporting Mind profile...",
-        "openai/toolInvocation/invoked": "Profile ready!"
+        "openai/toolInvocation/invoked": "Profile ready!",
+        "openai/scopes": [
+          "sparks:read",
+          "sparks:write"
+        ]
       }
     },
     {
       "name": "export_study",
       "title": "Export Study Results",
-      "description": "Starts an asynchronous export of Study results and returns an export job ID. Supports executive briefs and full reports in PDF, DOCX, PPTX, or Markdown, plus raw data in CSV, XLS, or SPSS SAV.",
+      "description": "Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. Returns job/artifact status. Full reports can fetch public HTTPS portraits. force can replace artifacts. Completed exports can irreversibly email the requesting account.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2930,16 +2973,20 @@
       "annotations": {
         "title": "Export Study Results",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
       },
       "_meta": {
         "openai/toolInvocation/invoking": "Exporting Study results...",
-        "openai/toolInvocation/invoked": "Export request processed"
+        "openai/toolInvocation/invoked": "Export request processed",
+        "openai/scopes": [
+          "flows:read",
+          "flows:write"
+        ]
       }
     },
     {
@@ -3075,7 +3122,7 @@
     {
       "name": "get_shared_mind_knowledge",
       "title": "Read Shared Mind Sources",
-      "description": "Read shared Mind sources and assessments.",
+      "description": "Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. Does not fetch source websites or modify knowledge.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3106,10 +3153,15 @@
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "sparks:read"
+        ]
       }
     },
     {
@@ -3266,13 +3318,16 @@
             "app"
           ]
         },
-        "openai/widgetAccessible": true
+        "openai/widgetAccessible": true,
+        "openai/scopes": [
+          "flows:read"
+        ]
       }
     },
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English.\n\nrequestPreparations tracks durable interpretation, plan review and run admission separately from answers. clientRequestId selects that preparation as questionId.",
+      "description": "Returns Study progress, Audience results, Mind responses and export status in the Study display locale. questionId selects a question or durable request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. requestPreparations separates interpretation/review/admission from answers. Result reads can queue recovery and overwrite stale derived analysis from accepted answers, without rerunning respondents. Export-only polling reads its job.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3657,8 +3712,8 @@
       },
       "annotations": {
         "title": "Get Study Status",
-        "readOnlyHint": true,
-        "destructiveHint": false,
+        "readOnlyHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -3668,7 +3723,8 @@
       "_meta": {
         "openai/visibility": "public",
         "openai/scopes": [
-          "flows:read"
+          "flows:read",
+          "flows:write"
         ],
         "ui": {
           "visibility": [
@@ -3985,6 +4041,11 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:read"
+        ]
       }
     },
     {
@@ -4191,12 +4252,17 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:read"
+        ]
       }
     },
     {
       "name": "list_study_templates",
       "title": "List Study Templates",
-      "description": "Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. configuration.questions is a fixed, pre-registered instrument and configuration.methodId the research method it runs with; both can be planned as they are.",
+      "description": "Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Listing provisions starters or overwrites eligible untouched older starters. Exact-template reads skip provisioning.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4281,13 +4347,19 @@
       },
       "annotations": {
         "title": "List Study Templates",
-        "readOnlyHint": true,
-        "destructiveHint": false,
+        "readOnlyHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:read",
+          "flows:write"
+        ]
       }
     },
     {
@@ -4475,13 +4547,16 @@
         "openai/toolInvocation/invoked": "Study planning updated",
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
     {
       "name": "read_study_summary",
       "title": "Read Study Summary",
-      "description": "Reads saved whole-Study Markdown, evidence blocks and metadata. Does not regenerate or replace the summary.",
+      "description": "Returns saved whole-Study Markdown, evidence and metadata. Can queue recovery and overwrite stale/missing derived summaries from accepted answers; does not rerun respondents.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4531,13 +4606,19 @@
       },
       "annotations": {
         "title": "Read Study Summary",
-        "readOnlyHint": true,
-        "destructiveHint": false,
+        "readOnlyHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:read",
+          "flows:write"
+        ]
       }
     },
     {
@@ -4909,6 +4990,11 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -4972,17 +5058,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.9d7bfa807b0b.html",
+          "resourceUri": "ui://widget/audience.98f9b538da8f.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.9d7bfa807b0b.html",
+        "openai/outputTemplate": "ui://widget/audience.98f9b538da8f.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.9d7bfa807b0b.html"
+        "ui/resourceUri": "ui://widget/audience.98f9b538da8f.html"
       }
     },
     {
@@ -5060,23 +5146,23 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.fcc068142314.html",
+          "resourceUri": "ui://widget/plan.fcec38408a83.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.fcc068142314.html",
+        "openai/outputTemplate": "ui://widget/plan.fcec38408a83.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.fcc068142314.html"
+        "ui/resourceUri": "ui://widget/plan.fcec38408a83.html"
       }
     },
     {
       "name": "render_study_results",
       "title": "Show Final Study Results",
-      "description": "Shows the results of finished questions (summary, key findings, Audience breakdowns, Mind responses): one question, or a run's finished questions while the rest still run. Use it whenever the user asks about results. Requires exactly one of questionId or runId.",
+      "description": "Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. Can queue recovery and overwrite stale derived results from accepted answers; does not rerun respondents.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5415,8 +5501,8 @@
       },
       "annotations": {
         "title": "Show Final Study Results",
-        "readOnlyHint": true,
-        "destructiveHint": false,
+        "readOnlyHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -5425,17 +5511,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.db656abf524d.html",
+          "resourceUri": "ui://widget/response.404aafb9dc84.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.db656abf524d.html",
+        "openai/outputTemplate": "ui://widget/response.404aafb9dc84.html",
         "openai/scopes": [
-          "flows:read"
+          "flows:read",
+          "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.db656abf524d.html"
+        "ui/resourceUri": "ui://widget/response.404aafb9dc84.html"
       }
     },
     {
@@ -5691,7 +5778,10 @@
             "app"
           ]
         },
-        "openai/widgetAccessible": true
+        "openai/widgetAccessible": true,
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -6648,6 +6738,9 @@
         "openai/toolInvocation/invoked": "Study planning updated",
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -6713,7 +6806,10 @@
             "app"
           ]
         },
-        "openai/widgetAccessible": true
+        "openai/widgetAccessible": true,
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -6899,6 +6995,9 @@
       "_meta": {
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -7195,6 +7294,9 @@
       "_meta": {
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -7326,6 +7428,12 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write",
+          "sparks:write"
+        ]
       }
     },
     {
@@ -7705,7 +7813,10 @@
             "app"
           ]
         },
-        "openai/widgetAccessible": true
+        "openai/widgetAccessible": true,
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -7882,6 +7993,12 @@
       },
       "execution": {
         "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write",
+          "sparks:write"
+        ]
       }
     },
     {
@@ -8185,6 +8302,9 @@
       "_meta": {
         "openai/fileParams": [
           "conversationFiles"
+        ],
+        "openai/scopes": [
+          "flows:write"
         ]
       }
     },
@@ -8249,7 +8369,11 @@
       "execution": {
         "taskSupport": "forbidden"
       },
-      "_meta": {}
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
+      }
     }
   ]
 }

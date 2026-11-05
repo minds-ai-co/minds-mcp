@@ -45,7 +45,7 @@ Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-
 
 Tool: `create_audience_from_brief`
 
-Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. A new brief returns an evidence-backed draft for review; creation requires the user-accepted draft or quota snapshot and its checksum. A change to a draft under review is a draft.rework of that draft, never a new brief, which leaves another open draft. Recalibrate an existing Audience by its id. Supports reviewed respondent datasets. Creation is asynchronous and returns an operation ID. Audiences are private unless link sharing is enabled.
+Builds grounded Audience/Mind profiles with exact segment allocation. Returns an asynchronous draft/operation for review; create only after the user accepts its roster/quota snapshot and checksum. Rework the same draft.id/sha256 in place, overwriting its saved request, roster and grounding; never start a new brief for that edit. Supports reviewed datasets and public research/files. Existing Audiences use recalibration. Private unless link sharing is enabled.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -119,7 +119,7 @@ Attachments can be URLs, Minds uploads or files shared in the conversation (uplo
 
 Tool: `export_audience`
 
-Exports an Audience brief, or with kind "validation_report" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. Brief: Markdown, PDF, DOCX, PPTX. Validation report: Markdown, PDF, DOCX, XLSX. Binary artifacts are returned as base64.
+Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. Brief PDF/PPTX can fetch public HTTPS member portraits. Starts artifact work; force can replace it. Slow exports may irreversibly email the requesting account.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -132,7 +132,7 @@ Exports an Audience brief, or with kind "validation_report" the report of its va
 
 Tool: `duplicate_audience`
 
-Permanently copy an Audience with independent copies of its Minds and all they know.
+Adds an independent copy of an Audience, its Minds and retained knowledge. Unready copies can queue retraining with public web research when retained evidence cannot seed them. Ready copies avoid retraining.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -210,11 +210,7 @@ Creation is atomic and rolls back partial Audience failures. Studies are private
 
 Tool: `ask_study`
 
-Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions. These require one confirmed block, submitted once rather than question by question.
-
-Durably accepts before interpretation or execution. Review-required requests return planning_required for explicit confirmation. Question text can reach the Minds: respondent-facing only, never planner or client orchestration notes. Pasted reaction material verbatim in evidence.textAttachments. Returns IDs and links.
-
-Accepts files shared in the conversation (uploaded or generated images, PDFs).
+Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -230,9 +226,7 @@ Accepts files shared in the conversation (uploaded or generated images, PDFs).
 
 Tool: `get_study_status`
 
-Returns Study progress, per-Audience results, original Mind responses, links and export status. In-flight questions report zero Minds answered until completion; partial per-Mind progress is not persisted. questionId selects one question; runId selects a confirmed run with question-level counters. Without either, results cover the entire Study. Values and labels are written in the Study display locale, returned as locale: the language of its confirmed plan, else the stored Study locale, else English.
-
-requestPreparations tracks durable interpretation, plan review and run admission separately from answers. clientRequestId selects that preparation as questionId.
+Returns Study progress, Audience results, Mind responses and export status in the Study display locale. questionId selects a question or durable request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. requestPreparations separates interpretation/review/admission from answers. Result reads can queue recovery and overwrite stale derived analysis from accepted answers, without rerunning respondents. Export-only polling reads its job.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -245,7 +239,7 @@ requestPreparations tracks durable interpretation, plan review and run admission
 
 Tool: `render_study_results`
 
-Shows the results of finished questions (summary, key findings, Audience breakdowns, Mind responses): one question, or a run's finished questions while the rest still run. Use it whenever the user asks about results. Requires exactly one of questionId or runId.
+Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. Can queue recovery and overwrite stale derived results from accepted answers; does not rerun respondents.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -257,7 +251,7 @@ Shows the results of finished questions (summary, key findings, Audience breakdo
 
 Tool: `export_study`
 
-Starts an asynchronous export of Study results and returns an export job ID. Supports executive briefs and full reports in PDF, DOCX, PPTX, or Markdown, plus raw data in CSV, XLS, or SPSS SAV.
+Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. Returns job/artifact status. Full reports can fetch public HTTPS portraits. force can replace artifacts. Completed exports can irreversibly email the requesting account.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -285,7 +279,7 @@ Permanently copy a Study with its questions and results over the same Audiences.
 
 Tool: `export_heatmap`
 
-Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. Returns the same ZIP archive as the web app, including its unified-renderer PDF report, Markdown, images, and metadata.
+Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. Does not recapture the website. force starts fresh archive work and replaces its saved artifact status/reference.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -323,7 +317,7 @@ Starts attention analysis of an assigned image, video or website. Uses one respo
 
 Tool: `export_mind`
 
-Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.
+Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. PDF/PPTX can fetch public HTTPS portraits. Starts artifact work; force can replace an artifact. Slow exports may irreversibly email the requesting account when ready.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -336,7 +330,7 @@ Generates a branded profile for one existing Mind, identified by exact ID or nam
 
 Tool: `get_shared_mind_knowledge`
 
-Read shared Mind sources and assessments.
+Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. Does not fetch source websites or modify knowledge.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -507,7 +501,7 @@ Lists a page of unfinished Study draft summaries, newest first, or returns the c
 
 Tool: `list_study_templates`
 
-Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. configuration.questions is a fixed, pre-registered instrument and configuration.methodId the research method it runs with; both can be planned as they are.
+Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Listing provisions starters or overwrites eligible untouched older starters. Exact-template reads skip provisioning.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -581,7 +575,7 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 
 Tool: `read_study_summary`
 
-Reads saved whole-Study Markdown, evidence blocks and metadata. Does not regenerate or replace the summary.
+Returns saved whole-Study Markdown, evidence and metadata. Can queue recovery and overwrite stale/missing derived summaries from accepted answers; does not rerun respondents.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

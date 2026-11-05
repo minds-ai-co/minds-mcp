@@ -136,27 +136,27 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | --- | --- |
 | `list_audiences` | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. |
 | `import_audience_sources` | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. |
-| `create_audience_from_brief` | Researches a free-text population brief and builds a new Audience of Minds with explicit profiles and exact segment allocation. |
+| `create_audience_from_brief` | Builds grounded Audience/Mind profiles with exact segment allocation. |
 | `get_audience_creation_progress` | Read-only; never starts or retries work. |
 | `render_audience_review` | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. |
 | `get_audience_limits` | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. |
 | `ask_audience` | Asks exactly one standalone question of one existing Audience. |
-| `export_audience` | Exports an Audience brief, or with kind "validation_report" the report of its validations (overall score calculation, every KPI, per-question answer shares, provenance), through the same renderer used by the web app. |
-| `duplicate_audience` | Permanently copy an Audience with independent copies of its Minds and all they know. |
+| `export_audience` | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. |
+| `duplicate_audience` | Adds an independent copy of an Audience, its Minds and retained knowledge. |
 | `recalibrate_audience` | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. |
 | `manage_audience_support` | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. |
 | `list_studies` | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. |
 | `create_study` | Creates a Study workspace from existing Audiences or inline Audience configurations. |
 | `ask_study` | Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. |
-| `get_study_status` | Returns Study progress, per-Audience results, original Mind responses, links and export status. |
-| `render_study_results` | Shows the results of finished questions (summary, key findings, Audience breakdowns, Mind responses): one question, or a run's finished questions while the rest still run. |
-| `export_study` | Starts an asynchronous export of Study results and returns an export job ID. |
+| `get_study_status` | Returns Study progress, Audience results, Mind responses and export status in the Study display locale. |
+| `render_study_results` | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. |
+| `export_study` | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. |
 | `duplicate_study` | Permanently copy a Study with its questions and results over the same Audiences. |
-| `export_heatmap` | Exports a completed website heatmap from a Study result, identified by the message ID reported with the completed result. |
+| `export_heatmap` | Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. |
 | `get_study_heatmap` | Reads saved heatmaps of an assigned question asset. |
 | `start_study_heatmap` | Starts attention analysis of an assigned image, video or website. |
-| `export_mind` | Generates a branded profile for one existing Mind, identified by exact ID or name (partial names and typos resolve to the closest). |
-| `get_shared_mind_knowledge` | Read shared Mind sources and assessments. |
+| `export_mind` | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. |
+| `get_shared_mind_knowledge` | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. |
 | `create_study_plan` | Creates a non-executing draft in an existing Study with its Audiences already attached. |
 | `revise_study_plan` | Revises one saved draft at its current draft.id and draft.revision without starting research. |
 | `get_study_plan` | Reads the latest saved revision and full review of one draft. |
@@ -169,13 +169,13 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `set_sharing` | Turns a Study's or Audience's public link or team sharing on or off. |
 | `list_research_methods` | Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. |
 | `list_study_drafts` | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. |
-| `list_study_templates` | Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. |
+| `list_study_templates` | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. |
 | `save_study_draft` | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. |
 | `save_study_template` | Creates a private Custom template with its questions, response settings, attachments and method. |
 | `update_study_template` | Updates one owned Custom template at update.expectedRevision. |
 | `use_study_template` | Creates an independent editable Study draft from a readable template at use.expectedRevision. |
 | `delete_study_template` | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. |
-| `read_study_summary` | Reads saved whole-Study Markdown, evidence blocks and metadata. |
+| `read_study_summary` | Returns saved whole-Study Markdown, evidence and metadata. |
 | `refresh_study_summary` | Generates and saves a whole-Study summary after explicit approval. |
 | `plan_study_questions` | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. |
 | `run_study_questions` | Deprecated alias of start_study_run; identical behaviour. |
