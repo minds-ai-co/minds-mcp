@@ -266,6 +266,7 @@ Starts an asynchronous export of Study results and returns an export job ID. Sup
 | `length` | No | "brief", "standard", "detailed" | Requested report detail for executive_brief and full_report exports. |
 | `force` | No | boolean | Regenerate instead of returning a cached artifact. |
 | `scheduledRunId` | No | string | Export only the messages produced by one scheduled run of this Study, instead of the whole timeline. Use the run ID from the Study schedule history. |
+| `researchResultId` | No | string | Export only the selected Research Result. Use its saved user-origin message ID from this Study. Omit for a whole-Study export. |
 | `study` | No | object | Which Study to export. Omit entirely to use the active Study from this MCP session. |
 
 ## Duplicate Study

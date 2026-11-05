@@ -2867,6 +2867,11 @@
             "description": "Export only the messages produced by one scheduled run of this Study, instead of the whole timeline. Use the run ID from the Study schedule history.",
             "type": "string"
           },
+          "researchResultId": {
+            "description": "Export only the selected Research Result. Use its saved user-origin message ID from this Study. Omit for a whole-Study export.",
+            "type": "string",
+            "minLength": 1
+          },
           "study": {
             "description": "Which Study to export. Omit entirely to use the active Study from this MCP session.",
             "type": "object",
@@ -3790,7 +3795,7 @@
         "readOnlyHint": false,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
@@ -5055,17 +5060,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.a4ba1cc5633c.html",
+          "resourceUri": "ui://widget/plan.fcc068142314.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.a4ba1cc5633c.html",
+        "openai/outputTemplate": "ui://widget/plan.fcc068142314.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.a4ba1cc5633c.html"
+        "ui/resourceUri": "ui://widget/plan.fcc068142314.html"
       }
     },
     {
@@ -5420,17 +5425,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.2f966598a46d.html",
+          "resourceUri": "ui://widget/response.db656abf524d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.2f966598a46d.html",
+        "openai/outputTemplate": "ui://widget/response.db656abf524d.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.2f966598a46d.html"
+        "ui/resourceUri": "ui://widget/response.db656abf524d.html"
       }
     },
     {
@@ -6886,7 +6891,7 @@
         "readOnlyHint": false,
         "destructiveHint": true,
         "idempotentHint": false,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
@@ -7315,7 +7320,7 @@
       "annotations": {
         "title": "Change Study or Audience Sharing",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": true
       },
@@ -7871,9 +7876,9 @@
       "annotations": {
         "title": "Update Study, Audience or Mind",
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       },
       "execution": {
         "taskSupport": "forbidden"
