@@ -46,8 +46,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `start_study_run` | Start Confirmed Study Run | Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. | destructive | flows:write |
 | `resume_study_run` | Resume Study Run | Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. | destructive | flows:write |
 | `cancel_study_question` | Stop Standalone Study Question | Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. | destructive | flows:write |
-| `update_item` | Update Study, Audience or Mind | Renames a Study or Audience or moves it into a folder. | writes | flows:write, sparks:write |
-| `set_sharing` | Change Study or Audience Sharing | Turns a Study's or Audience's public link or team sharing on or off. | writes | flows:write, sparks:write |
+| `update_item` | Update Study, Audience or Mind | Renames a Study or Audience or moves it into a folder. | destructive | flows:write, sparks:write |
+| `set_sharing` | Change Study or Audience Sharing | Turns a Study's or Audience's public link or team sharing on or off. | destructive | flows:write, sparks:write |
 | `list_research_methods` | List Research Methods | Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
 | `list_study_templates` | List Study Templates | Lists your own and team-shared Study templates, most used first, as a page of summaries (templateId, name, revision, method, question count), or returns one exact templateId with its revision, research method, questions, response settings and question attachments. | read-only | flows:read |
