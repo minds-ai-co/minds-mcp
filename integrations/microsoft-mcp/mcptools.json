@@ -5058,17 +5058,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.98f9b538da8f.html",
+          "resourceUri": "ui://widget/audience.b8edf436ac18.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.98f9b538da8f.html",
+        "openai/outputTemplate": "ui://widget/audience.b8edf436ac18.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.98f9b538da8f.html"
+        "ui/resourceUri": "ui://widget/audience.b8edf436ac18.html"
       }
     },
     {
@@ -5146,17 +5146,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.fcec38408a83.html",
+          "resourceUri": "ui://widget/plan.7f4506e9043a.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.fcec38408a83.html",
+        "openai/outputTemplate": "ui://widget/plan.7f4506e9043a.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.fcec38408a83.html"
+        "ui/resourceUri": "ui://widget/plan.7f4506e9043a.html"
       }
     },
     {
@@ -5511,18 +5511,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.404aafb9dc84.html",
+          "resourceUri": "ui://widget/response.7268efc6dab1.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.404aafb9dc84.html",
+        "openai/outputTemplate": "ui://widget/response.7268efc6dab1.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.404aafb9dc84.html"
+        "ui/resourceUri": "ui://widget/response.7268efc6dab1.html"
       }
     },
     {
