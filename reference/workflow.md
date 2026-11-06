@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim, including query strings and trailing slashes. Item links do not replace the list-level link. Lists the authenticated user's Audiences, updated newest first, with Mind counts, sharing and links. Pagination: limit (default 20), offset; continue with nextOffset. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links and commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.
+For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists the authenticated user's Audiences newest first, with Mind counts, sharing and links. limit defaults to 20; offset and nextOffset paginate. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links/commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -230,7 +230,7 @@ Returns Study progress, Audience results, Mind responses and export status in th
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `questionId` | No | string | Return only this question: the questionId from ask_study or ask_audience, or from an activeQuestions/recentResults entry. Keeps the response small. Omit to cover every question the Study has run. |
+| `questionId` | No | string | Return only this request or question: use the questionId returned by ask_study or ask_audience, including a preparing receipt, on the first progress check for that request. The same logical ID follows preparation and any admitted question; operationId is a separate preparation identifier, not a questionId. An activeQuestions/recentResults questionId also selects that question. Omit only for a Study-wide progress request. |
 | `runId` | No | string | Multi-question run ID from start_study_run. Supplying it returns that run: its confirmed plan, question-level progress and response artifacts, instead of the Study-wide view. |
 | `study` | No | object | Which Study to inspect. Omit entirely to use the active Study from this MCP session. |
 | `export` | No | object | Poll one asynchronous export job created by the export operation. |

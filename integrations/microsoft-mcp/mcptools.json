@@ -146,14 +146,14 @@
             ]
           },
           "operationId": {
-            "description": "Opaque durable preparation operation identifier, present while the request is being interpreted.",
+            "description": "Opaque durable preparation operation identifier, present while the request is being interpreted. This is separate from questionId and must not be passed as a question filter.",
             "type": [
               "string",
               "null"
             ]
           },
           "clientRequestId": {
-            "description": "The accepted request identifier; pass it as questionId to get_study_status to follow preparation and any admitted question.",
+            "description": "The accepted logical request identifier. A preparing receipt also returns this exact value as questionId for progress reads.",
             "type": [
               "string",
               "null"
@@ -167,7 +167,7 @@
             ]
           },
           "questionId": {
-            "description": "Identifier of this question; pass it to get_study_status to follow only this question.",
+            "description": "Logical request or question identifier. Present during preparation as the exact clientRequestId; use this returned questionId with studyId on the first get_study_status check for the current request. It follows preparation and any admitted question, independently of operationId.",
             "type": [
               "string",
               "null"
@@ -677,14 +677,14 @@
             ]
           },
           "operationId": {
-            "description": "Opaque durable preparation operation identifier, present while the request is being interpreted.",
+            "description": "Opaque durable preparation operation identifier, present while the request is being interpreted. This is separate from questionId and must not be passed as a question filter.",
             "type": [
               "string",
               "null"
             ]
           },
           "clientRequestId": {
-            "description": "The accepted request identifier; pass it as questionId to get_study_status to follow preparation and any admitted question.",
+            "description": "The accepted logical request identifier. A preparing receipt also returns this exact value as questionId for progress reads.",
             "type": [
               "string",
               "null"
@@ -698,7 +698,7 @@
             ]
           },
           "questionId": {
-            "description": "Identifier of this question; pass it to get_study_status to follow only this question.",
+            "description": "Logical request or question identifier. Present during preparation as the exact clientRequestId; use this returned questionId with studyId on the first get_study_status check for the current request. It follows preparation and any admitted question, independently of operationId.",
             "type": [
               "string",
               "null"
@@ -3332,7 +3332,7 @@
         "type": "object",
         "properties": {
           "questionId": {
-            "description": "Return only this question: the questionId from ask_study or ask_audience, or from an activeQuestions/recentResults entry. Keeps the response small. Omit to cover every question the Study has run.",
+            "description": "Return only this request or question: use the questionId returned by ask_study or ask_audience, including a preparing receipt, on the first progress check for that request. The same logical ID follows preparation and any admitted question; operationId is a separate preparation identifier, not a questionId. An activeQuestions/recentResults questionId also selects that question. Omit only for a Study-wide progress request.",
             "type": "string",
             "minLength": 1,
             "maxLength": 200
@@ -3869,7 +3869,7 @@
     {
       "name": "list_audiences",
       "title": "List Audiences",
-      "description": "For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim, including query strings and trailing slashes. Item links do not replace the list-level link. Lists the authenticated user's Audiences, updated newest first, with Mind counts, sharing and links. Pagination: limit (default 20), offset; continue with nextOffset. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links and commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.",
+      "description": "For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists the authenticated user's Audiences newest first, with Mind counts, sharing and links. limit defaults to 20; offset and nextOffset paginate. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links/commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.",
       "inputSchema": {
         "type": "object",
         "properties": {
