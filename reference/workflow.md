@@ -575,7 +575,7 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 
 Tool: `read_study_summary`
 
-Returns saved whole-Study Markdown, evidence and metadata. Can queue recovery and overwrite stale/missing derived summaries from accepted answers; does not rerun respondents.
+Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. Pending reads retain previous saved content. Can queue recovery and overwrite stale/missing derived summaries; never reruns respondents.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -585,7 +585,7 @@ Returns saved whole-Study Markdown, evidence and metadata. Can queue recovery an
 
 Tool: `refresh_study_summary`
 
-Generates and saves a whole-Study summary after explicit approval. Replaces the prior summary without restore history; answers and questions are preserved. force regenerates unchanged coverage. Returns Markdown and evidence blocks.
+Accepts a background whole-Study summary refresh after explicit approval. Replaces the saved summary without restore history; questions and answers remain. force regenerates unchanged coverage. Returns a pending receipt and last saved content until completion.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

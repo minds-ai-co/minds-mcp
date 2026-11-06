@@ -175,8 +175,8 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `update_study_template` | Updates one owned Custom template at update.expectedRevision. |
 | `use_study_template` | Creates an independent editable Study draft from a readable template at use.expectedRevision. |
 | `delete_study_template` | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. |
-| `read_study_summary` | Returns saved whole-Study Markdown, evidence and metadata. |
-| `refresh_study_summary` | Generates and saves a whole-Study summary after explicit approval. |
+| `read_study_summary` | Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. |
+| `refresh_study_summary` | Accepts a background whole-Study summary refresh after explicit approval. |
 | `plan_study_questions` | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. |
 | `run_study_questions` | Deprecated alias of start_study_run; identical behaviour. |
 
