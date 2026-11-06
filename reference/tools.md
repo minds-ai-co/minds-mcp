@@ -56,8 +56,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |
 | `use_study_template` | Create Draft From Study Template | Creates an independent editable Study draft from a readable template at use.expectedRevision. | writes | flows:write |
 | `delete_study_template` | Delete Study Template | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. | destructive | flows:write |
-| `read_study_summary` | Read Study Summary | Returns saved whole-Study Markdown, evidence and metadata. | destructive | flows:read, flows:write |
-| `refresh_study_summary` | Refresh Study Summary | Generates and saves a whole-Study summary after explicit approval. | destructive | flows:write |
+| `read_study_summary` | Read Study Summary | Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. | destructive | flows:read, flows:write |
+| `refresh_study_summary` | Refresh Study Summary | Accepts a background whole-Study summary refresh after explicit approval. | destructive | flows:write |
 | `plan_study_questions` | Plan a Multi-Question Block in a Study | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. | destructive | flows:write |
 | `run_study_questions` | Run a Confirmed Multi-Question Block | Deprecated alias of start_study_run; identical behaviour. | destructive | flows:write |
 
@@ -135,7 +135,7 @@ discovery response. Registry listings must not describe them as discovered.
 | `get_mind_status` | Reports the training progress of a Mind, persona, digital twin, or expert that is still training. |
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
 | `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
-| `get_study_summary` | Returns the saved semantic summary of a Study as Markdown plus evidence blocks (website, image and video analyses keep heatmap-compatible metadata). |
+| `get_study_summary` | Returns saved whole-Study Markdown, evidence blocks and metadata. |
 | `list_formations` | Lists the saved segmentations visible to the authenticated account on an Audience it can view: shared segmentations and the caller's own private ones. |
 | `list_minds` | Lists the Minds the authenticated account can open, with name search: its own Minds and Minds shared with it directly, with its team, or through an Audience or Study it owns or can open. |
 | `list_model_connections` | Lists the authenticated team’s model connections with IDs, current revisions, endpoints, and verified text, structured-output, streaming, and tool capabilities. |
