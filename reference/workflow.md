@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. includeMinds adds each Audience's member Minds. searchQuery filters by name (case-insensitive, all matches, paged). workspaceUrl, when present, is the authenticated workspace link, valid verbatim; sharedAudienceUrl, when present, is the public share link for recipients. addOnRequired marks an Audience unavailable under the connected account's existing entitlement; its links and commercial details are omitted. Use an available Audience instead. The first page also lists open drafts (openDrafts): before a new brief, rework the matching draft or recalibrate the matching Audience.
+For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim, including query strings and trailing slashes. Item links do not replace the list-level link. Lists the authenticated user's Audiences, updated newest first, with Mind counts, sharing and links. Pagination: limit (default 20), offset; continue with nextOffset. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links and commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

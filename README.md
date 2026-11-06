@@ -134,7 +134,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 
 | Tool | What it does |
 | --- | --- |
-| `list_audiences` | Lists the authenticated user's Audiences, most recently updated first, one page at a time (limit, default 20, and offset; nextOffset continues), with Mind counts, sharing state, and links. |
+| `list_audiences` | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim, including query strings and trailing slashes. |
 | `import_audience_sources` | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. |
 | `create_audience_from_brief` | Builds grounded Audience/Mind profiles with exact segment allocation. |
 | `get_audience_creation_progress` | Read-only; never starts or retries work. |
