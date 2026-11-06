@@ -15,7 +15,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 
 | Tool | Title | Purpose | Access | Scopes |
 | --- | --- | --- | --- | --- |
-| `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim, including query strings and trailing slashes. | read-only | sparks:read |
+| `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. | read-only | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
 | `create_audience_from_brief` | Create a Grounded Audience from a Brief | Builds grounded Audience/Mind profiles with exact segment allocation. | destructive | sparks:write |
 | `get_audience_creation_progress` | Audience creation progress | Read-only; never starts or retries work. | read-only | sparks:read |
