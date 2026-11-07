@@ -21,14 +21,14 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `get_audience_creation_progress` | Audience creation progress | Read-only; never starts or retries work. | read-only | sparks:read |
 | `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. | read-only | sparks:read |
 | `get_audience_limits` | Get Audience Limits | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. | read-only | sparks:read |
-| `ask_audience` | Ask One Standalone Audience Question | Asks exactly one standalone question of one existing Audience. | destructive | flows:write |
+| `ask_audience` | Ask One Standalone Audience Question | Accepts one standalone question request for an existing Audience and creates a private Study. | destructive | flows:write |
 | `export_audience` | Export Audience Brief | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
 | `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
 | `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
-| `ask_study` | Ask One Standalone Question in a Study | Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
+| `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
 | `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study display locale. | destructive | flows:read, flows:write |
 | `render_study_results` | Show Final Study Results | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. | destructive | flows:read, flows:write |
 | `export_study` | Export Study Results | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. | destructive | flows:read, flows:write |

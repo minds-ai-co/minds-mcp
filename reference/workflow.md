@@ -98,7 +98,7 @@ Returns the authenticated account's current plan (`planName`, as the app names i
 
 Tool: `ask_audience`
 
-Asks exactly one standalone question of one existing Audience. It creates a private Study for that Audience, starts asynchronous answers from its Minds, and returns the Study identifier and its links.
+Accepts one standalone question request for an existing Audience and creates a private Study. Returns IDs and links; preparing is not question admission. Report the current phase from the receipt and progress.
 
 The server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.
 
@@ -210,7 +210,7 @@ Creation is atomic and rolls back partial Audience failures. Studies are private
 
 Tool: `ask_study`
 
-Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.
+Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

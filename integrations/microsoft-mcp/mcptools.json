@@ -3,7 +3,7 @@
     {
       "name": "ask_audience",
       "title": "Ask One Standalone Audience Question",
-      "description": "Asks exactly one standalone question of one existing Audience. It creates a private Study for that Audience, starts asynchronous answers from its Minds, and returns the Study identifier and its links.\n\nThe server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments can be URLs, Minds uploads or files shared in the conversation (uploaded or generated images, PDFs).",
+      "description": "Accepts one standalone question request for an existing Audience and creates a private Study. Returns IDs and links; preparing is not question admission. Report the current phase from the receipt and progress.\n\nThe server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments can be URLs, Minds uploads or files shared in the conversation (uploaded or generated images, PDFs).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -160,7 +160,7 @@
             ]
           },
           "studyId": {
-            "description": "Study the question was asked in.",
+            "description": "Study containing this request and, once admitted, its question.",
             "type": [
               "string",
               "null"
@@ -181,7 +181,7 @@
             ]
           },
           "question": {
-            "description": "The submitted question.",
+            "description": "The verified respondent question, when returned. Its text alone does not report whether the request is queued, the Minds are answering or answers are complete; use the current request's receipt and progress.",
             "type": [
               "string",
               "null"
@@ -210,7 +210,7 @@
             "description": "For planning_required when the uploaded files hold a questionnaire: its verbatim questions with their answer formats, the document's skip rules, changed answer labels, pictures and set-aside parts, saved as the exact draft draftPlanId at revision. Nothing ran yet: after the person's explicit confirmation, start that draft with start_study_run."
           },
           "executionStarted": {
-            "description": "False when nothing was submitted.",
+            "description": "False when no respondent question was submitted, including accepted preparation and planning_required. Submission or queueing does not establish that Minds are answering; use the current request's progress to report answering or completion.",
             "type": [
               "boolean",
               "null"
@@ -408,7 +408,7 @@
     {
       "name": "ask_study",
       "title": "Ask One Standalone Question in a Study",
-      "description": "Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.",
+      "description": "Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. Out of scope: questionnaires, batteries, sections or two or more known questions; use one confirmed block, submitted once rather than question by question. Durably accepts before execution. planning_required requires confirmation. Question text can reach the Minds; exclude planner/client notes. Pasted material: verbatim in evidence.textAttachments. Accepts files shared in the conversation (uploaded or generated images, PDFs). Returns IDs/links. Fixed time-bucket retries can submit again; check status before repeating uncertain writes.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -691,7 +691,7 @@
             ]
           },
           "studyId": {
-            "description": "Study the question was asked in.",
+            "description": "Study containing this request and, once admitted, its question.",
             "type": [
               "string",
               "null"
@@ -712,7 +712,7 @@
             ]
           },
           "question": {
-            "description": "The submitted question.",
+            "description": "The verified respondent question, when returned. Its text alone does not report whether the request is queued, the Minds are answering or answers are complete; use the current request's receipt and progress.",
             "type": [
               "string",
               "null"
@@ -741,7 +741,7 @@
             "description": "For planning_required when the uploaded files hold a questionnaire: its verbatim questions with their answer formats, the document's skip rules, changed answer labels, pictures and set-aside parts, saved as the exact draft draftPlanId at revision. Nothing ran yet: after the person's explicit confirmation, start that draft with start_study_run."
           },
           "executionStarted": {
-            "description": "False when nothing was submitted.",
+            "description": "False when no respondent question was submitted, including accepted preparation and planning_required. Submission or queueing does not establish that Minds are answering; use the current request's progress to report answering or completion.",
             "type": [
               "boolean",
               "null"
