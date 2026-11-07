@@ -140,14 +140,14 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `get_audience_creation_progress` | Read-only; never starts or retries work. |
 | `render_audience_review` | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. |
 | `get_audience_limits` | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. |
-| `ask_audience` | Asks exactly one standalone question of one existing Audience. |
+| `ask_audience` | Accepts one standalone question request for an existing Audience and creates a private Study. |
 | `export_audience` | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. |
 | `duplicate_audience` | Adds an independent copy of an Audience, its Minds and retained knowledge. |
 | `recalibrate_audience` | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. |
 | `manage_audience_support` | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. |
 | `list_studies` | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. |
 | `create_study` | Creates a Study workspace from existing Audiences or inline Audience configurations. |
-| `ask_study` | Submits exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. |
+| `ask_study` | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. |
 | `get_study_status` | Returns Study progress, Audience results, Mind responses and export status in the Study display locale. |
 | `render_study_results` | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. |
 | `export_study` | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. |
