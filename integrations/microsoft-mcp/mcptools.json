@@ -2304,6 +2304,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the plan belongs to.",
             "type": [
@@ -3271,6 +3278,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the plan belongs to.",
             "type": [
@@ -4508,6 +4522,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the plan belongs to.",
             "type": [
@@ -5104,6 +5125,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the plan belongs to.",
             "type": [
@@ -6686,6 +6714,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the plan belongs to.",
             "type": [
@@ -6765,6 +6800,13 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "workspaceUrl": {
+            "description": "Authenticated Minds workspace link for the Study.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "studyId": {
             "description": "Study the block runs in.",
             "type": [
