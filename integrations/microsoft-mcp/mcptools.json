@@ -5174,17 +5174,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.7f4506e9043a.html",
+          "resourceUri": "ui://widget/plan.7391d9228422.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.7f4506e9043a.html",
+        "openai/outputTemplate": "ui://widget/plan.7391d9228422.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.7f4506e9043a.html"
+        "ui/resourceUri": "ui://widget/plan.7391d9228422.html"
       }
     },
     {
