@@ -496,11 +496,11 @@ Turns a Study's or Audience's public link or team sharing on or off.
 
 Tool: `list_research_methods`
 
-Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. includePlanned only filters the returned catalog. It does not create, configure or execute a method, and the catalog cannot be edited through this tool.
+Lists the research-method catalog without changing or running methods. For availability, report every label and the exact count in each availabilitySummary group. Use methods for complexity and fallbacks; advanced methods can require opt-in.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `includePlanned` | No | boolean | Include experimental and planned methods that cannot run yet. Availability is dynamic; only entries with executable:true can run. Default: true. |
+| `includePlanned` | No | boolean | Set to false to exclude planned methods. Experimental methods are still listed and cannot run. Only entries with executable: true can run. Default: true. |
 
 ## List Study Drafts
 

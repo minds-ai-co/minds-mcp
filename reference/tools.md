@@ -49,7 +49,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `cancel_study_question` | Stop Standalone Study Question | Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. | destructive | flows:write |
 | `update_item` | Update Study, Audience or Mind | Renames a Study or Audience or moves it into a folder. | destructive | flows:write, sparks:write |
 | `set_sharing` | Change Study or Audience Sharing | Turns a Study's or Audience's public link or team sharing on or off. | destructive | flows:write, sparks:write |
-| `list_research_methods` | List Research Methods | Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. | read-only | flows:read |
+| `list_research_methods` | List Research Methods | Lists the research-method catalog without changing or running methods. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
 | `list_study_templates` | List Study Templates | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. | destructive | flows:read, flows:write |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |

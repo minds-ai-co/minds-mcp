@@ -4215,13 +4215,13 @@
     {
       "name": "list_research_methods",
       "title": "List Research Methods",
-      "description": "Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. includePlanned only filters the returned catalog. It does not create, configure or execute a method, and the catalog cannot be edited through this tool.",
+      "description": "Lists the research-method catalog without changing or running methods. For availability, report every label and the exact count in each availabilitySummary group. Use methods for complexity and fallbacks; advanced methods can require opt-in.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "includePlanned": {
             "default": true,
-            "description": "Include experimental and planned methods that cannot run yet. Availability is dynamic; only entries with executable:true can run.",
+            "description": "Set to false to exclude planned methods. Experimental methods are still listed and cannot run. Only entries with executable: true can run.",
             "type": "boolean"
           }
         },
@@ -4230,6 +4230,90 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "availabilitySummary": {
+            "description": "Complete answer-ready availability groups for the returned catalog. Use the supplied counts and include every label when reporting which methods can run.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "executable": {
+                    "description": "All returned methods with executable set to true, including advanced methods that require explicit opt-in.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "count": {
+                            "description": "Exact number of returned methods in this group, including zero. Use this count directly.",
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "labels": {
+                            "description": "Complete list of exact catalog labels in this group. Preserve every label in an availability overview.",
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "notExecutable": {
+                    "description": "All returned methods that cannot run. This group can be empty.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "count": {
+                            "description": "Exact number of returned methods in this group, including zero. Use this count directly.",
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "labels": {
+                            "description": "Complete list of exact catalog labels in this group. Preserve every label in an availability overview.",
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "methods": {
             "description": "Research methods and whether each can run.",
             "anyOf": [

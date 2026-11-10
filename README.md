@@ -168,7 +168,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `cancel_study_question` | Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. |
 | `update_item` | Renames a Study or Audience or moves it into a folder. |
 | `set_sharing` | Turns a Study's or Audience's public link or team sharing on or off. |
-| `list_research_methods` | Reads the fixed Minds research-method catalog in one operation, including availability, complexity and fallback method. |
+| `list_research_methods` | Lists the research-method catalog without changing or running methods. |
 | `list_study_drafts` | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. |
 | `list_study_templates` | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. |
 | `save_study_draft` | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. |
