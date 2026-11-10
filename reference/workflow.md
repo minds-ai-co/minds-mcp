@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists the authenticated user's Audiences newest first, with Mind counts, sharing and links. limit defaults to 20; offset and nextOffset paginate. includeMinds adds members; searchQuery matches names case-insensitively. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired means unavailable under current entitlement: links/commercial details are omitted; use an available Audience. First-page openDrafts: before a new brief, rework the matching draft or recalibrate the matching Audience.
+For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists owned Audiences newest first with counts and sharing. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired omits links/commercial details; use an available Audience. First-page openDrafts: rework matching drafts or recalibrate matching Audiences before a new brief.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -27,6 +27,21 @@ For a listing or search reply, include both the returned top-level workspaceUrl 
 | `limit` | No | integer | Audiences per page, most recently updated first (default 20, max 100). |
 | `offset` | No | integer | Number of Audiences to skip; pass nextOffset from the previous page to continue. |
 | `includeMinds` | No | boolean | Also return each Audience's member Minds (id, name, discipline). Default false: Audiences carry a Mind count only. |
+
+## List Audience Segmentations
+
+Tool: `list_formations`
+
+Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. Ready counts are final. Paged (limit 1–100, default 100); pagination.nextOffset continues while hasMore.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `audienceId` | No | string | Audience ID (UUID). Preferred when known. |
+| `audienceName` | No | string | Audience name: exact or partial (case-insensitive), with a fuzzy fallback for typos. |
+| `groupId` | No | string | Legacy alias for audienceId. Accepted for compatibility. |
+| `groupName` | No | string | Legacy alias for audienceName. Accepted for compatibility. |
+| `limit` | No | integer |  |
+| `offset` | No | integer |  |
 
 ## Import Audience Research Sources
 
@@ -98,7 +113,7 @@ Returns the authenticated account's current plan (`planName`, as the app names i
 
 Tool: `ask_audience`
 
-Accepts one standalone question request for an existing Audience and creates a private Study. Returns IDs and links; preparing is not question admission. Report the current phase from the receipt and progress.
+Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. Returns IDs/links; preparing is not question admission. Report the phase from receipt and progress.
 
 The server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.
 
@@ -109,6 +124,7 @@ Attachments can be URLs, Minds uploads or files shared in the conversation (uplo
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `audience` | No | object | Which Audience to ask. Give the id when known, otherwise the name. |
+| `segments` | No | array |  |
 | `question` | Yes | string | Exactly one respondent-visible standalone question for every Mind in the Audience. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the question and the instructions the Minds should receive. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution. |
 | `name` | No | string | Optional name for the Study created to ask this question. Defaults to the Audience name. |
 | `attachments` | No | array | Files/images processed once and given to every Audience member as context. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. |
@@ -202,6 +218,7 @@ Creation is atomic and rolls back partial Audience failures. Studies are private
 | `name` | Yes | string | Name for the Study workspace (e.g., "Brand Perception Study", "Q4 Market Research") |
 | `audienceConfigs` | No | array | Preferred field for new Audiences to create and attach atomically. |
 | `audienceIds` | No | array | Preferred field for existing Audience IDs to attach — use list_audiences to find IDs. |
+| `segmentSelections` | No | array | Optional list of {audienceId, segments}, where segments contains up to three {formationId, subgroupId} pairs from that Audience's segment catalogue (use list_formations to obtain their IDs). Choose at most one segment per dimension. Different dimensions intersect; only the matching Minds participate. The accepted participant set is retained for later questions and retries. Omit an Audience to use all its Minds. |
 | `isLinkSharingEnabled` | No | boolean | Set true ONLY when the user explicitly asked for a public/shareable Study link. Defaults to false: the Study is private to its owner and no share URL is generated. Enabling this ALSO publishes every attached Audience and every Mind inside them at world-readable URLs — including pre-existing Audiences passed via audienceIds. Do not enable it to "be helpful". Default: false. |
 | `allowDuplicateName` | No | boolean | Create even though a Study with exactly this name exists. Only when the user asked for a separate Study with the same name. |
 | `conversationFiles` | No | array | Stimulus for the new Study, stored in Minds and returned as attachments (url, path) to pass with its questions. Respondents see a file only once a question carries it. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
@@ -384,10 +401,11 @@ Reads the latest saved revision and full review of one draft. Creates or changes
 
 Tool: `attach_study_audiences`
 
-Adds existing accessible Audiences without removing others, planning or starting research. Returns attached and alreadyAttached IDs; retries are safe. With link sharing on, the Audiences and their Minds become publicly readable. Access and plan eligibility are validated first.
+Attaches existing accessible Audiences without removing others, planning or running research. Optional segmentSelections retain exact matches. Returns attached/alreadyAttached IDs; retries are safe. Link sharing makes these Audiences and Minds public. Validates access and plan eligibility.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
+| `segmentSelections` | No | array | Optional list of {audienceId, segments}, where segments contains up to three {formationId, subgroupId} pairs from that Audience's segment catalogue (use list_formations to obtain their IDs). Choose at most one segment per dimension. Different dimensions intersect; only the matching Minds participate. The accepted participant set is retained for later questions and retries. Omit an Audience to use all its Minds. |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
 | `audienceIds` | Yes | array | One to 50 existing Audiences to attach to this Study. |
 

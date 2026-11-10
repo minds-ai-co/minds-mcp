@@ -6,7 +6,7 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **45 tools** through ordinary `tools/list` discovery.
+The server advertises **46 tools** through ordinary `tools/list` discovery.
 There are **73 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
@@ -16,12 +16,13 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | Tool | Title | Purpose | Access | Scopes |
 | --- | --- | --- | --- | --- |
 | `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. | read-only | sparks:read |
+| `list_formations` | List Audience Segmentations | Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. | read-only | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
 | `create_audience_from_brief` | Create a Grounded Audience from a Brief | Builds grounded Audience/Mind profiles with exact segment allocation. | destructive | sparks:write |
 | `get_audience_creation_progress` | Audience creation progress | Read-only; never starts or retries work. | read-only | sparks:read |
 | `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. | read-only | sparks:read |
 | `get_audience_limits` | Get Audience Limits | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. | read-only | sparks:read |
-| `ask_audience` | Ask One Standalone Audience Question | Accepts one standalone question request for an existing Audience and creates a private Study. | destructive | flows:write |
+| `ask_audience` | Ask One Standalone Audience Question | Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. | destructive | flows:write |
 | `export_audience` | Export Audience Brief | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
@@ -41,7 +42,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `create_study_plan` | Create Study Plan | Creates a non-executing draft in an existing Study with its Audiences already attached. | destructive | flows:write |
 | `revise_study_plan` | Revise Study Plan | Revises one saved draft at its current draft.id and draft.revision without starting research. | destructive | flows:write |
 | `get_study_plan` | Read Study Plan | Reads the latest saved revision and full review of one draft. | read-only | flows:read |
-| `attach_study_audiences` | Attach Audiences to Study | Adds existing accessible Audiences without removing others, planning or starting research. | writes | flows:write |
+| `attach_study_audiences` | Attach Audiences to Study | Attaches existing accessible Audiences without removing others, planning or running research. | writes | flows:write |
 | `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |
 | `start_study_run` | Start Confirmed Study Run | Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. | destructive | flows:write |
 | `resume_study_run` | Resume Study Run | Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. | destructive | flows:write |
@@ -136,7 +137,6 @@ discovery response. Registry listings must not describe them as discovered.
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
 | `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
 | `get_study_summary` | Returns saved whole-Study Markdown, evidence blocks and metadata. |
-| `list_formations` | Lists the saved segmentations visible to the authenticated account on an Audience it can view: shared segmentations and the caller's own private ones. |
 | `list_minds` | Lists the Minds the authenticated account can open, with name search: its own Minds and Minds shared with it directly, with its team, or through an Audience or Study it owns or can open. |
 | `list_model_connections` | Lists the authenticated team’s model connections with IDs, current revisions, endpoints, and verified text, structured-output, streaming, and tool capabilities. |
 | `manage_audience` | Read or follow an Audience, inspect build progress, update, delete, change its Minds (add_member/remove_member), list or remove the people who accepted an invitation (list_collaborators; remove_collaborator with userId revokes their invitations, without email), or regenerate member images through /api/v1/ endpoints. |
