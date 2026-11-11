@@ -149,7 +149,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `list_studies` | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. |
 | `create_study` | Creates a Study workspace from existing Audiences or inline Audience configurations. |
 | `ask_study` | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. |
-| `get_study_status` | Returns Study progress, Audience results, Mind responses and export status in the Study display locale. |
+| `get_study_status` | Returns Study progress, Audience results, Mind responses and export status in the Study locale. |
 | `render_study_results` | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. |
 | `export_study` | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. |
 | `duplicate_study` | Permanently copy a Study with its questions and results over the same Audiences. |
@@ -158,7 +158,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `start_study_heatmap` | Starts attention analysis of an assigned image, video or website. |
 | `export_mind` | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. |
 | `get_shared_mind_knowledge` | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. |
-| `create_study_plan` | Creates a non-executing draft in an existing Study with its Audiences already attached. |
+| `create_study_plan` | Creates a non-executing draft in a Study with attached Audiences. |
 | `revise_study_plan` | Revises one saved draft at its current draft.id and draft.revision without starting research. |
 | `get_study_plan` | Reads the latest saved revision and full review of one draft. |
 | `attach_study_audiences` | Attaches existing accessible Audiences without removing others, planning or running research. |
