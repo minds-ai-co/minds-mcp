@@ -6213,18 +6213,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.b39732a5309d.html",
+          "resourceUri": "ui://widget/response.8029a0feae20.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.b39732a5309d.html",
+        "openai/outputTemplate": "ui://widget/response.8029a0feae20.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.b39732a5309d.html"
+        "ui/resourceUri": "ui://widget/response.8029a0feae20.html"
       }
     },
     {
@@ -6489,7 +6489,7 @@
     {
       "name": "revise_study_plan",
       "title": "Revise Study Plan",
-      "description": "Revises one saved draft at its current draft.id and draft.revision without starting research. Accepts edits, refinement, clarification answers or response-format corrections. Stale revisions fail. Fixed questions stay verbatim when only clarification answers change. Bounded history may prune older revisions; the changed draft requires review again.",
+      "description": "Revises the saved draft at current draft.id and draft.revision without starting research. Nest changes in draft.refinement, answers in draft.answers, formats in draft.questionResponses, or exact edits in draft.edits. Replacement questions are top-level questions. Stale revisions fail; answers alone preserve fixed wording. Review the new revision. History is bounded.",
       "inputSchema": {
         "type": "object",
         "properties": {

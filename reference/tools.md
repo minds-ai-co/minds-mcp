@@ -40,7 +40,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. | read-only | sparks:read |
 | `create_study_plan` | Create Study Plan | Creates a non-executing draft in a Study with attached Audiences. | destructive | flows:write |
-| `revise_study_plan` | Revise Study Plan | Revises one saved draft at its current draft.id and draft.revision without starting research. | destructive | flows:write |
+| `revise_study_plan` | Revise Study Plan | Revises the saved draft at current draft.id and draft.revision without starting research. | destructive | flows:write |
 | `get_study_plan` | Read Study Plan | Reads the latest saved revision and full review of one draft. | read-only | flows:read |
 | `attach_study_audiences` | Attach Audiences to Study | Attaches existing accessible Audiences without removing others, planning or running research. | writes | flows:write |
 | `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |

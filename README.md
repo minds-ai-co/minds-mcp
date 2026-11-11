@@ -159,7 +159,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `export_mind` | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. |
 | `get_shared_mind_knowledge` | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. |
 | `create_study_plan` | Creates a non-executing draft in a Study with attached Audiences. |
-| `revise_study_plan` | Revises one saved draft at its current draft.id and draft.revision without starting research. |
+| `revise_study_plan` | Revises the saved draft at current draft.id and draft.revision without starting research. |
 | `get_study_plan` | Reads the latest saved revision and full review of one draft. |
 | `attach_study_audiences` | Attaches existing accessible Audiences without removing others, planning or running research. |
 | `render_study_plan` | Shows a saved Study draft at its current revision for interactive review and confirmation. |
