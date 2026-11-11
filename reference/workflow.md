@@ -376,7 +376,7 @@ Also previews monadic allocations.
 
 Tool: `revise_study_plan`
 
-Revises one saved draft at its current draft.id and draft.revision without starting research. Accepts edits, refinement, clarification answers or response-format corrections. Stale revisions fail. Fixed questions stay verbatim when only clarification answers change. Bounded history may prune older revisions; the changed draft requires review again.
+Revises the saved draft at current draft.id and draft.revision without starting research. Nest changes in draft.refinement, answers in draft.answers, formats in draft.questionResponses, or exact edits in draft.edits. Replacement questions are top-level questions. Stale revisions fail; answers alone preserve fixed wording. Review the new revision. History is bounded.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
