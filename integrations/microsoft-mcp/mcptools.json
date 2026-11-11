@@ -2785,7 +2785,8 @@
                   "tr",
                   "ar",
                   "ja",
-                  "ko"
+                  "ko",
+                  "it"
                 ]
               }
             },
@@ -5752,17 +5753,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.3136be2aba18.html",
+          "resourceUri": "ui://widget/audience.d819a60347e2.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.3136be2aba18.html",
+        "openai/outputTemplate": "ui://widget/audience.d819a60347e2.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.3136be2aba18.html"
+        "ui/resourceUri": "ui://widget/audience.d819a60347e2.html"
       }
     },
     {
@@ -5847,17 +5848,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.589279bba338.html",
+          "resourceUri": "ui://widget/plan.00efa931eca3.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.589279bba338.html",
+        "openai/outputTemplate": "ui://widget/plan.00efa931eca3.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.589279bba338.html"
+        "ui/resourceUri": "ui://widget/plan.00efa931eca3.html"
       }
     },
     {
@@ -6212,18 +6213,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.5ddb0402dce0.html",
+          "resourceUri": "ui://widget/response.b39732a5309d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.5ddb0402dce0.html",
+        "openai/outputTemplate": "ui://widget/response.b39732a5309d.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.5ddb0402dce0.html"
+        "ui/resourceUri": "ui://widget/response.b39732a5309d.html"
       }
     },
     {
@@ -6951,7 +6952,8 @@
                   "tr",
                   "ar",
                   "ja",
-                  "ko"
+                  "ko",
+                  "it"
                 ]
               }
             },
@@ -7757,15 +7759,16 @@
                   "studyLocale": {
                     "type": "string",
                     "enum": [
-                      "ar",
-                      "de",
                       "en",
                       "es",
                       "fr",
+                      "de",
+                      "zh",
+                      "tr",
+                      "ar",
                       "ja",
                       "ko",
-                      "tr",
-                      "zh"
+                      "it"
                     ]
                   },
                   "questions": {
@@ -8763,15 +8766,16 @@
                   "studyLocale": {
                     "type": "string",
                     "enum": [
-                      "ar",
-                      "de",
                       "en",
                       "es",
                       "fr",
+                      "de",
+                      "zh",
+                      "tr",
+                      "ar",
                       "ja",
                       "ko",
-                      "tr",
-                      "zh"
+                      "it"
                     ]
                   },
                   "questions": {
