@@ -113,7 +113,7 @@ Returns the authenticated account's current plan (`planName`, as the app names i
 
 Tool: `ask_audience`
 
-Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. Returns IDs/links; preparing is not question admission. Report the phase from receipt and progress.
+Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. Returns IDs/links. For preparing, lead with userFacingStatus and call it a request throughout.
 
 The server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.
 
@@ -243,7 +243,7 @@ Requests exactly one respondent-visible question: one standalone question, or on
 
 Tool: `get_study_status`
 
-Returns Study progress, Audience results, Mind responses and export status in the Study display locale. questionId selects a question or durable request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. requestPreparations separates interpretation/review/admission from answers. Result reads can queue recovery and overwrite stale derived analysis from accepted answers, without rerunning respondents. Export-only polling reads its job.
+Returns Study progress, Audience results, Mind responses and export status in the Study locale. Open with the current request's userFacingStatus if present. While preparing, call it a request throughout; no question was sent, queued or answered. questionId selects a question or request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. Result reads can queue recovery and overwrite stale derived analysis without rerunning Minds. Export-only polling reads its job.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -357,10 +357,13 @@ Returns stored public Mind sources/assessments by share ID, including shares out
 
 Tool: `create_study_plan`
 
-Creates a non-executing draft in an existing Study with its Audiences already attached. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. Saving bounded history may prune older revisions. Research has not started; the returned draft revision needs review and later explicit confirmation.
+Creates a non-executing draft in a Study with attached Audiences. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.
+
+Also previews monadic allocations.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
+| `monadic` | No | object | Explicit monadic concept test configuration. Select one attached source Audience, a total sample, stored Formation IDs for balancing, at least two named variants, role-scoped uploaded materials and one exact questionnaire. Each question maps common and variant materials explicitly; use empty lists for no exposure. Researcher documents are never participant material. This previews a frozen disjoint assignment and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method. |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
 | `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. Write only the user's research brief and context relevant to the research question. Never tool errors, status or retry messages, Minds or other internal links, or your own process notes. |
 | `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers or questionResponses in the same call (refused); suggestQuestionStimuli has no effect here, place files with questionAttachments; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
@@ -390,12 +393,15 @@ Revises one saved draft at its current draft.id and draft.revision without start
 
 Tool: `get_study_plan`
 
-Reads the latest saved revision and full review of one draft. Creates or changes nothing and starts no research.
+Reads the latest saved revision and full review of one draft. Read-only; starts no research.
+
+Also reads monadic previews.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
+| `monadicPreviewId` | No | string |  |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
-| `draftPlanId` | Yes | string | Existing draft plan to read at its latest revision. |
+| `draftPlanId` | No | string | Existing draft plan to read at its latest revision. |
 
 ## Attach Audiences to Study
 
@@ -427,10 +433,13 @@ Tool: `start_study_run`
 
 Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. One execution submits the whole draft as a single durable run. It is refused as a whole before using Minds or quota if the revision, capabilities, method or source-readability checks fail. Advanced methods need explicit opt-in. Each Mind answers in order seeing its own earlier answers; askIf gates items. Contradictions are flagged, never rewritten.
 
+Also runs confirmed monadic allocations.
+
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
+| `monadicPreviewId` | No | string | The owned monadic previewId returned by create_study_plan with monadic configuration. An alternative to draft for starting one reviewed experiment; do not combine both. Confirm the exact allocation, questionnaire, materials and advanced method before launch. Retries reuse the same preview and accepted assignments. |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
-| `draft` | Yes | object | Exact saved draft and revision the user reviewed and confirmed in a later turn. |
+| `draft` | No | object | Exact saved draft and revision the user reviewed and confirmed in a later turn. |
 | `confirmed` | Yes | true | True only after the user explicitly confirms this exact displayed draft revision in a later turn. |
 | `advancedMethodOptIn` | No | boolean | Explicit opt-in for an advanced method. Omit or false to keep simple methods. |
 | `audienceIds` | No | array | Optional subset of the Study's Audiences to include. |

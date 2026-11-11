@@ -30,7 +30,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
-| `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study display locale. | destructive | flows:read, flows:write |
+| `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study locale. | destructive | flows:read, flows:write |
 | `render_study_results` | Show Final Study Results | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. | destructive | flows:read, flows:write |
 | `export_study` | Export Study Results | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. | destructive | flows:read, flows:write |
 | `duplicate_study` | Duplicate Study | Permanently copy a Study with its questions and results over the same Audiences. | writes | flows:write |
@@ -39,7 +39,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `start_study_heatmap` | Start Study Asset Heatmap | Starts attention analysis of an assigned image, video or website. | destructive | flows:write |
 | `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. | read-only | sparks:read |
-| `create_study_plan` | Create Study Plan | Creates a non-executing draft in an existing Study with its Audiences already attached. | destructive | flows:write |
+| `create_study_plan` | Create Study Plan | Creates a non-executing draft in a Study with attached Audiences. | destructive | flows:write |
 | `revise_study_plan` | Revise Study Plan | Revises one saved draft at its current draft.id and draft.revision without starting research. | destructive | flows:write |
 | `get_study_plan` | Read Study Plan | Reads the latest saved revision and full review of one draft. | read-only | flows:read |
 | `attach_study_audiences` | Attach Audiences to Study | Attaches existing accessible Audiences without removing others, planning or running research. | writes | flows:write |

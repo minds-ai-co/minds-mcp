@@ -3,7 +3,7 @@
     {
       "name": "ask_audience",
       "title": "Ask One Standalone Audience Question",
-      "description": "Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. Returns IDs/links; preparing is not question admission. Report the phase from receipt and progress.\n\nThe server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments can be URLs, Minds uploads or files shared in the conversation (uploaded or generated images, PDFs).",
+      "description": "Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. Returns IDs/links. For preparing, lead with userFacingStatus and call it a request throughout.\n\nThe server may reword a context-dependent question. The accepted task and its answer contract are returned with the original request. Ambiguous requests or generated questions return planning_required before execution.\n\nOut of scope: a questionnaire, battery, section or any request with two or more known questions. That complete set runs as one planned multi-question block inside a Study.\n\nAttachments can be URLs, Minds uploads or files shared in the conversation (uploaded or generated images, PDFs).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -156,6 +156,13 @@
         "properties": {
           "status": {
             "description": "preparing when the request was accepted for durable interpretation but no question was submitted; queued once a question was submitted; or planning_required when the request needs a reviewed plan and explicit confirmation before execution.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "userFacingStatus": {
+            "description": "Opening status for the current request when supplied.",
             "type": [
               "string",
               "null"
@@ -687,6 +694,13 @@
         "properties": {
           "status": {
             "description": "preparing when the request was accepted for durable interpretation but no question was submitted; queued once a question was submitted; or planning_required when the request needs a reviewed plan and explicit confirmation before execution.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "userFacingStatus": {
+            "description": "Opening status for the current request when supplied.",
             "type": [
               "string",
               "null"
@@ -1935,10 +1949,383 @@
     {
       "name": "create_study_plan",
       "title": "Create Study Plan",
-      "description": "Creates a non-executing draft in an existing Study with its Audiences already attached. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. Saving bounded history may prune older revisions. Research has not started; the returned draft revision needs review and later explicit confirmation.",
+      "description": "Creates a non-executing draft in a Study with attached Audiences. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.\n\nAlso previews monadic allocations.",
       "inputSchema": {
         "type": "object",
         "properties": {
+          "monadic": {
+            "description": "Explicit monadic concept test configuration. Select one attached source Audience, a total sample, stored Formation IDs for balancing, at least two named variants, role-scoped uploaded materials and one exact questionnaire. Each question maps common and variant materials explicitly; use empty lists for no exposure. Researcher documents are never participant material. This previews a frozen disjoint assignment and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method.",
+            "type": "object",
+            "properties": {
+              "audienceId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "segments": {
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "formationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "subgroupId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    }
+                  },
+                  "required": [
+                    "formationId",
+                    "subgroupId"
+                  ]
+                }
+              },
+              "requestedSample": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "balanceDimensions": {
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
+              },
+              "variants": {
+                "minItems": 2,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "materials": {
+                "maxItems": 1000,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "researcher",
+                        "common",
+                        "variant"
+                      ]
+                    },
+                    "variantId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "file": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "mimeType": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "url": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sizeBytes": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "mimeType",
+                        "url"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "file"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "questions": {
+                "minItems": 1,
+                "maxItems": 1000,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "scaleExceptions": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "exclusiveOptions": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "optionSets": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "condition": {
+                                "type": "object",
+                                "properties": {
+                                  "assignmentId": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "levelIds": {
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "assignmentId",
+                                  "levelIds"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "label": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "options": {
+                                "minItems": 2,
+                                "maxItems": 100,
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": [
+                              "condition",
+                              "label",
+                              "options"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "qualitative",
+                            "categorical",
+                            "multiselect",
+                            "ranking",
+                            "scale"
+                          ]
+                        },
+                        "unit": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "currency",
+                                "percentage",
+                                "duration",
+                                "length",
+                                "mass",
+                                "volume",
+                                "custom"
+                              ]
+                            },
+                            "code": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "code"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "scalePoints": {
+                          "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
+                          "minItems": 2,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "label",
+                              "value"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "scaleRange": {
+                          "description": "Inclusive finite numeric response bounds as [minimum, maximum], only when specified. Numeric responses may be unbounded. Fractional and wide ranges retain their authored values.",
+                          "minItems": 2,
+                          "maxItems": 2,
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "categoricalOptions": {
+                          "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
+                          "minItems": 2,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "maxSelections": {
+                          "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 100
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "task": {
+                      "type": "string",
+                      "enum": [
+                        "response",
+                        "timed-human-response"
+                      ]
+                    },
+                    "commonMaterialIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "variantMaterialIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "variantId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "materialIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            }
+                          }
+                        },
+                        "required": [
+                          "variantId",
+                          "materialIds"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "text",
+                    "response",
+                    "task",
+                    "commonMaterialIds",
+                    "variantMaterialIds"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "audienceId",
+              "requestedSample",
+              "balanceDimensions",
+              "variants",
+              "materials",
+              "questions"
+            ]
+          },
           "study": {
             "description": "Study id or name. Omit to use the active Study of this MCP session.",
             "type": "object",
@@ -3348,10 +3735,15 @@
     {
       "name": "get_study_plan",
       "title": "Read Study Plan",
-      "description": "Reads the latest saved revision and full review of one draft. Creates or changes nothing and starts no research.",
+      "description": "Reads the latest saved revision and full review of one draft. Read-only; starts no research.\n\nAlso reads monadic previews.",
       "inputSchema": {
         "type": "object",
         "properties": {
+          "monadicPreviewId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "study": {
             "description": "Study id or name. Omit to use the active Study of this MCP session.",
             "type": "object",
@@ -3370,15 +3762,12 @@
             "additionalProperties": false
           },
           "draftPlanId": {
+            "description": "Existing draft plan to read at its latest revision.",
             "type": "string",
             "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-            "description": "Existing draft plan to read at its latest revision."
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "draftPlanId"
-        ],
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false
       },
@@ -3448,7 +3837,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns Study progress, Audience results, Mind responses and export status in the Study display locale. questionId selects a question or durable request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. requestPreparations separates interpretation/review/admission from answers. Result reads can queue recovery and overwrite stale derived analysis from accepted answers, without rerunning respondents. Export-only polling reads its job.",
+      "description": "Returns Study progress, Audience results, Mind responses and export status in the Study locale. Open with the current request's userFacingStatus if present. While preparing, call it a request throughout; no question was sent, queued or answered. questionId selects a question or request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. Result reads can queue recovery and overwrite stale derived analysis without rerunning Minds. Export-only polling reads its job.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5363,17 +5752,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.45c3205863a1.html",
+          "resourceUri": "ui://widget/audience.39d98ff3a3f5.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.45c3205863a1.html",
+        "openai/outputTemplate": "ui://widget/audience.39d98ff3a3f5.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.45c3205863a1.html"
+        "ui/resourceUri": "ui://widget/audience.39d98ff3a3f5.html"
       }
     },
     {
@@ -5458,17 +5847,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.006b2782d12d.html",
+          "resourceUri": "ui://widget/plan.a29e3f918b16.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.006b2782d12d.html",
+        "openai/outputTemplate": "ui://widget/plan.a29e3f918b16.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.006b2782d12d.html"
+        "ui/resourceUri": "ui://widget/plan.a29e3f918b16.html"
       }
     },
     {
@@ -5823,18 +6212,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.3f414c93f9bb.html",
+          "resourceUri": "ui://widget/response.e214056ca7e2.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.3f414c93f9bb.html",
+        "openai/outputTemplate": "ui://widget/response.e214056ca7e2.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.3f414c93f9bb.html"
+        "ui/resourceUri": "ui://widget/response.e214056ca7e2.html"
       }
     },
     {
@@ -7524,6 +7913,7 @@
                     "enum": [
                       "guided-research",
                       "single-question",
+                      "monadic-concept-test",
                       "questionnaire",
                       "guided-qualitative-exploration",
                       "ranked-preferences",
@@ -7832,10 +8222,16 @@
     {
       "name": "start_study_run",
       "title": "Start Confirmed Study Run",
-      "description": "Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. One execution submits the whole draft as a single durable run. It is refused as a whole before using Minds or quota if the revision, capabilities, method or source-readability checks fail. Advanced methods need explicit opt-in. Each Mind answers in order seeing its own earlier answers; askIf gates items. Contradictions are flagged, never rewritten.",
+      "description": "Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. One execution submits the whole draft as a single durable run. It is refused as a whole before using Minds or quota if the revision, capabilities, method or source-readability checks fail. Advanced methods need explicit opt-in. Each Mind answers in order seeing its own earlier answers; askIf gates items. Contradictions are flagged, never rewritten.\n\nAlso runs confirmed monadic allocations.",
       "inputSchema": {
         "type": "object",
         "properties": {
+          "monadicPreviewId": {
+            "description": "The owned monadic previewId returned by create_study_plan with monadic configuration. An alternative to draft for starting one reviewed experiment; do not combine both. Confirm the exact allocation, questionnaire, materials and advanced method before launch. Retries reuse the same preview and accepted assignments.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
           "study": {
             "description": "Study id or name. Omit to use the active Study of this MCP session.",
             "type": "object",
@@ -7854,6 +8250,7 @@
             "additionalProperties": false
           },
           "draft": {
+            "description": "Exact saved draft and revision the user reviewed and confirmed in a later turn.",
             "type": "object",
             "properties": {
               "id": {
@@ -7873,8 +8270,7 @@
               "id",
               "revision"
             ],
-            "additionalProperties": false,
-            "description": "Exact saved draft and revision the user reviewed and confirmed in a later turn."
+            "additionalProperties": false
           },
           "confirmed": {
             "type": "boolean",
@@ -7923,7 +8319,6 @@
           }
         },
         "required": [
-          "draft",
           "confirmed"
         ],
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -8524,6 +8919,7 @@
                     "enum": [
                       "guided-research",
                       "single-question",
+                      "monadic-concept-test",
                       "questionnaire",
                       "guided-qualitative-exploration",
                       "ranked-preferences",
