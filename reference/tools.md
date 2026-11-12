@@ -15,7 +15,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 
 | Tool | Title | Purpose | Access | Scopes |
 | --- | --- | --- | --- | --- |
-| `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. | read-only | sparks:read |
+| `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim in inline code: scheme, query and trailing slash. | read-only | sparks:read |
 | `list_formations` | List Audience Segmentations | Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. | read-only | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
 | `create_audience_from_brief` | Create a Grounded Audience from a Brief | Builds grounded Audience/Mind profiles with exact segment allocation. | destructive | sparks:write |
@@ -28,7 +28,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
 | `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
 | `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
-| `create_study` | Create a Study | Creates a Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
+| `create_study` | Create a Study | Creates a new Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
 | `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study locale. | destructive | flows:read, flows:write |
 | `render_study_results` | Show Final Study Results | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. | destructive | flows:read, flows:write |
@@ -39,7 +39,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `start_study_heatmap` | Start Study Asset Heatmap | Starts attention analysis of an assigned image, video or website. | destructive | flows:write |
 | `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. | read-only | sparks:read |
-| `create_study_plan` | Create Study Plan | Creates a non-executing draft in a Study with attached Audiences. | destructive | flows:write |
+| `create_study_plan` | Create Study Plan | Creates a non-executing draft in an existing Study with attached Audiences. | destructive | flows:write |
 | `revise_study_plan` | Revise Study Plan | Revises the saved draft at current draft.id and draft.revision without starting research. | destructive | flows:write |
 | `get_study_plan` | Read Study Plan | Reads the latest saved revision and full review of one draft. | read-only | flows:read |
 | `attach_study_audiences` | Attach Audiences to Study | Attaches existing accessible Audiences without removing others, planning or running research. | writes | flows:write |

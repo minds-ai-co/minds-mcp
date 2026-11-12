@@ -19,7 +19,7 @@ in each input's guidance and the complete schema.
 
 Tool: `list_audiences`
 
-For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists owned Audiences newest first with counts and sharing. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired omits links/commercial details; use an available Audience. First-page openDrafts: rework matching drafts or recalibrate matching Audiences before a new brief.
+For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim in inline code: scheme, query and trailing slash. Item links do not replace the list-level link. Lists owned Audiences newest first with counts and sharing. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired omits links/commercial details; use an available Audience. First-page openDrafts: rework matching drafts or recalibrate matching Audiences before a new brief.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -205,13 +205,13 @@ Lists the authenticated user's Studies, most recently updated first, one page at
 
 Tool: `create_study`
 
-Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.
+Creates a new Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research. This creates a workspace, not a Study lookup; planning in an existing Study needs no new workspace.
 
-A Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.
+Exact-name duplicates return the existing Study unless allowDuplicateName is true. Extra Studies cannot be deleted.
 
-Any request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.
+Two or more known questions belong in one planned and confirmed multi-question block, submitted once.
 
-Creation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It does not change or replace an existing Study.
+Creation is atomic; partial Audience failures roll back. Studies are private. Link sharing also publishes attached Audiences and their Minds. Existing Studies stay unchanged.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -357,7 +357,9 @@ Returns stored public Mind sources/assessments by share ID, including shares out
 
 Tool: `create_study_plan`
 
-Creates a non-executing draft in a Study with attached Audiences. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.
+Creates a non-executing draft in an existing Study with attached Audiences. study.name resolves it directly without an ID lookup or workspace creation. study.id selects an ID; omission uses the session's active Study.
+
+The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.
 
 Also previews monadic allocations.
 
