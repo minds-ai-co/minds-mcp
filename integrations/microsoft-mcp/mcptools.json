@@ -1731,7 +1731,7 @@
     {
       "name": "create_study",
       "title": "Create a Study",
-      "description": "Creates a Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research, and follow-up research inside an existing Study needs no new Study.\n\nA Study with this exact name is named back and nothing is created, unless allowDuplicateName is true; work in that Study instead. Studies cannot be deleted here, so any extra Study is permanent.\n\nAny request with two or more known questions belongs in one planned and confirmed multi-question block inside the Study, submitted once rather than as separate direct questions.\n\nCreation is atomic and rolls back partial Audience failures. Studies are private; enabling link sharing also publishes the attached Audiences and their Minds. It does not change or replace an existing Study.",
+      "description": "Creates a new Study workspace from existing Audiences or inline Audience configurations. It does not ask questions or run research. This creates a workspace, not a Study lookup; planning in an existing Study needs no new workspace.\n\nExact-name duplicates return the existing Study unless allowDuplicateName is true. Extra Studies cannot be deleted.\n\nTwo or more known questions belong in one planned and confirmed multi-question block, submitted once.\n\nCreation is atomic; partial Audience failures roll back. Studies are private. Link sharing also publishes attached Audiences and their Minds. Existing Studies stay unchanged.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1949,7 +1949,7 @@
     {
       "name": "create_study_plan",
       "title": "Create Study Plan",
-      "description": "Creates a non-executing draft in a Study with attached Audiences. The setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.\n\nAlso previews monadic allocations.",
+      "description": "Creates a non-executing draft in an existing Study with attached Audiences. study.name resolves it directly without an ID lookup or workspace creation. study.id selects an ID; omission uses the session's active Study.\n\nThe setup operation for two or more known questions: every question known now belongs in this one draft, in cohesive named modules. A one-question draft is only for genuinely standalone research or an adaptive follow-up. request designs questions; questions preserves a fixed instrument verbatim. Each Mind sees only its own earlier answers; askIf applies respondent-level skip logic. With multiple attachments, stimulus.questionAttachments assigns each question; [] means none. The saved revision needs review and later explicit confirmation.\n\nAlso previews monadic allocations.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2774,7 +2774,7 @@
                 "maxLength": 80
               },
               "studyLocale": {
-                "description": "Language for the plan, questions, responses, labels, and summary. Set this explicitly when the user requests a language.",
+                "description": "Supported language for the plan, questions, responses, labels, and summary. Only the declared enum values are accepted; omission uses the saved or default language. Set explicitly when the user requests a supported language.",
                 "type": "string",
                 "enum": [
                   "en",
@@ -4380,7 +4380,7 @@
     {
       "name": "list_audiences",
       "title": "List Audiences",
-      "description": "For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim as full visible link text: scheme, query and trailing slash. Item links do not replace the list-level link. Lists owned Audiences newest first with counts and sharing. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired omits links/commercial details; use an available Audience. First-page openDrafts: rework matching drafts or recalibrate matching Audiences before a new brief.",
+      "description": "For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim in inline code: scheme, query and trailing slash. Item links do not replace the list-level link. Lists owned Audiences newest first with counts and sharing. workspaceUrl opens the owner's workspace; sharedAudienceUrl is public. addOnRequired omits links/commercial details; use an available Audience. First-page openDrafts: rework matching drafts or recalibrate matching Audiences before a new brief.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6213,18 +6213,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.8029a0feae20.html",
+          "resourceUri": "ui://widget/response.b39732a5309d.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.8029a0feae20.html",
+        "openai/outputTemplate": "ui://widget/response.b39732a5309d.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.8029a0feae20.html"
+        "ui/resourceUri": "ui://widget/response.b39732a5309d.html"
       }
     },
     {
@@ -6941,7 +6941,7 @@
                 "maxLength": 80
               },
               "studyLocale": {
-                "description": "Language for the plan, questions, responses, labels, and summary. Set this explicitly when the user requests a language.",
+                "description": "Supported language for the plan, questions, responses, labels, and summary. Only the declared enum values are accepted; omission uses the saved or default language. Set explicitly when the user requests a supported language.",
                 "type": "string",
                 "enum": [
                   "en",
