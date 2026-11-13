@@ -6,8 +6,8 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **46 tools** through ordinary `tools/list` discovery.
-There are **73 canonical callable tools**, excluding aliases.
+The server advertises **48 tools** through ordinary `tools/list` discovery.
+There are **75 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
 
@@ -27,7 +27,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
 | `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
-| `list_studies` | List Studies | Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. | read-only | flows:read |
+| `list_studies` | List Studies | List or search saved Studies, or read an authorized team catalog, result feed or tracker snapshot with source identities, full-filter totals and page continuation. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a new Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
 | `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study locale. | destructive | flows:read, flows:write |
@@ -52,6 +52,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_research_methods` | List Research Methods | Lists the research-method catalog without changing or running methods. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
 | `list_study_templates` | List Study Templates | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. | destructive | flows:read, flows:write |
+| `enterprise_use_cases` | Enterprise use cases | Read paged team business use cases and role-scoped counts of attributed drafts, Studies and completed runs. | read-only | flows:read |
+| `save_enterprise_use_case` | Save enterprise use case | Save a revision-checked team business use case with objectives, template revisions, planned targets and lifecycle state. | destructive | flows:write |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |
 | `save_study_template` | Save Study Template | Creates a private Custom template with its questions, response settings, attachments and method. | writes | flows:write |
 | `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |

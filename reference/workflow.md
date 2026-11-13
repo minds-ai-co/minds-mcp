@@ -193,10 +193,11 @@ Manage owner-issued, expiring staff access to one Audience’s composition and r
 
 Tool: `list_studies`
 
-Lists the authenticated user's Studies, most recently updated first, one page at a time: limit (default 20) and offset, with nextOffset to continue. Each row carries the Study's Audiences with their Mind counts, stored message count, sharing state and links. searchQuery filters by name (case-insensitive, all matches, paged). Minds and per-question results come from the Study status.
+List or search saved Studies, or read an authorized team catalog, result feed or tracker snapshot with source identities, full-filter totals and page continuation.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
+| `reporting` | No | object | Optional explicit team reporting scope. teamId is required; query defaults to the saved-result feed when omitted. Use exact IDs and the canonical query fields for dates, template, owner, recorded author, Audience or tracker run. Check reporting.capabilities before requesting current evidence. Supplemental source/validation permissions are independent of team aggregate access. Top-level limit/offset page the requested projection. Activity and template inventory offsets are separate optional windows. Omit searchQuery in this mode. |
 | `searchQuery` | No | string | Filters by name (case-insensitive, all matches, paged with limit/offset); the closest name when nothing matches. Omit to browse. |
 | `limit` | No | integer | Studies per page, newest first (default 20, max 100). |
 | `offset` | No | integer | Number of Studies to skip; pass nextOffset from the previous page to continue. |
@@ -538,6 +539,33 @@ Lists owned/team-shared template summaries, most used first; templateId returns 
 | `searchQuery` | No | string | Case-insensitive part of the template name; returns every match, paged. |
 | `limit` | No | integer | Templates per page, most used first (default 20, max 50). |
 | `offset` | No | integer | Number of templates to skip; pass nextOffset from the previous page to continue. |
+
+## Enterprise use cases
+
+Tool: `enterprise_use_cases`
+
+Read paged team business use cases and role-scoped counts of attributed drafts, Studies and completed runs.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `action` | Yes | "list", "adoption" |  |
+| `teamId` | Yes | string |  |
+| `useCaseId` | No | string |  |
+| `period` | No | object |  |
+| `limit` | No | integer |  |
+| `offset` | No | integer |  |
+
+## Save enterprise use case
+
+Tool: `save_enterprise_use_case`
+
+Save a revision-checked team business use case with objectives, template revisions, planned targets and lifecycle state.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `teamId` | Yes | string |  |
+| `useCaseId` | Yes | string |  |
+| `save` | Yes | object |  |
 
 ## Save Study Draft
 
