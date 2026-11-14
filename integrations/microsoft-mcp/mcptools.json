@@ -1114,7 +1114,7 @@
     {
       "name": "cancel_study_question",
       "title": "Stop Standalone Study Question",
-      "description": "Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. An answered or failed question errors unchanged. Not for multi-question runs.",
+      "description": "Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. A delivered forecast keeps its completed run history while remaining replies and Reactions can still be stopped. An answered question with no pending work, or a failed question with no work stopped, errors unchanged. Not for multi-question runs.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1149,7 +1149,7 @@
             ]
           },
           "status": {
-            "description": "cancelled (no further answers are generated), cancelling (the Minds answering it stop at their next step), preparing (not submitted yet; call again to stop it) or planning_required (waits for a confirmed plan, nothing is being asked). An already answered or failed question returns an error instead.",
+            "description": "The original run status, including completed when Stop applies to remaining replies or Reactions while preserving the delivered forecast. cancelled means the run was stopped before starting; cancelling means its worker stops at the next step. preparing means no run exists yet; planning_required waits for a confirmed plan. An already settled question with no remaining work stopped returns an error.",
             "type": [
               "string",
               "null"
@@ -1170,11 +1170,17 @@
             ]
           },
           "stopped": {
-            "description": "True while the question is cancelled or stopping, also on a repeated call; false when nothing was asked yet.",
+            "description": "True when the run is cancelled or stopping, its progressive replies are cancelled, or reactions.stopped is positive. A repeated cancelled acknowledgement remains true. False when nothing was asked yet.",
             "type": [
               "boolean",
               "null"
             ]
+          },
+          "progressive": {
+            "description": "The exact executionId and progressive reply status acknowledged by the canonical run cancellation API. A cancelled reply collection can coexist with a completed original run."
+          },
+          "reactions": {
+            "description": "stopped counts Reaction artifacts whose remaining analysis or explanations were durably fenced. Completed findings and saved replies remain available; remote cancellation recovery can still be pending."
           }
         },
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -1191,6 +1197,59 @@
         "taskSupport": "forbidden"
       },
       "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
+      }
+    },
+    {
+      "name": "cancel_study_run",
+      "title": "Cancel Study Run",
+      "description": "Stop pending Study work; keep saved replies. Returns run/collection status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "The durable Study run UUID returned when starting the Study or by get_study_status. This is runId, not the response collection executionId or an assistant messageId."
+          }
+        },
+        "required": [
+          "runId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "The actual durable run cancellation acknowledgement from the v1 API, including runId, run status, and progressive response-collection state when present. Already completed collections remain completed. Cancelled collections can contain saved replies while remaining incomplete."
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Cancel Study Run",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "openai/widgetAccessible": true,
         "openai/scopes": [
           "flows:write"
         ]
@@ -3755,7 +3814,7 @@
     {
       "name": "get_study_heatmap",
       "title": "Read Study Asset Heatmap",
-      "description": "Reads saved heatmaps of an assigned question asset. Optional assetKey selects its saved upload path or normalized URL. Returns assetHeatmaps without starting analysis, spending responses or visiting websites.",
+      "description": "Read saved attention by assetKey and, for monadic Studies, variantId. No new analysis, website visits, or response charges.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -3772,8 +3831,50 @@
             "minLength": 1
           },
           "assetKey": {
+            "description": "Saved upload path or normalized URL of an assigned asset. On start, this reuses completed analysis for that asset. Omitting it may replace derived results. Omit for a monadic website selected by variantId alone.",
             "type": "string",
             "minLength": 1
+          },
+          "variantId": {
+            "description": "For monadic Studies, the selected variant. Only that variant's assigned stimuli and frozen Minds are used. Variants can have separate results for the same asset.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "explanation": {
+            "type": "object",
+            "properties": {
+              "memberKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "generation": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "requestedAt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "requestedAt"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "memberKey",
+              "generation"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -3924,7 +4025,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Returns Study progress, Audience results, Mind responses and export status in the Study locale. Open with the current request's userFacingStatus if present. While preparing, call it a request throughout; no question was sent, queued or answered. questionId selects a question or request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. Result reads can queue recovery and overwrite stale derived analysis without rerunning Minds. Export-only polling reads its job.",
+      "description": "Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A preparing request has userFacingStatus and no submitted question.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4079,6 +4180,35 @@
               {
                 "type": "array",
                 "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forecasts": {
+            "description": "Experimental, uncalibrated aggregate predictions. Separate from completed research results. Each carries a messageId for request_study_answers, durable status, saved-response counts and the predicted output. Ordinary status reads never materialize replies.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "requestedPrefixCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "pendingCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": {}
+                }
               },
               {
                 "type": "null"
@@ -4598,7 +4728,7 @@
     {
       "name": "list_formations",
       "title": "List Audience Segmentations",
-      "description": "Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. Ready counts are final. Paged (limit 1\u2013100, default 100); pagination.nextOffset continues while hasMore.",
+      "description": "Lists Audience segmentations for filters; may save defaults and recover builds, replacing subgroup memberships. Ready counts are final. Paged (limit 1\u2013100, default 100); follow pagination.nextOffset.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4673,10 +4803,10 @@
       },
       "annotations": {
         "title": "List Audience Segmentations",
-        "readOnlyHint": true,
-        "destructiveHint": false,
+        "readOnlyHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
-        "openWorldHint": true
+        "openWorldHint": false
       },
       "execution": {
         "taskSupport": "forbidden"
@@ -5472,7 +5602,7 @@
     {
       "name": "read_study_summary",
       "title": "Read Study Summary",
-      "description": "Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. Pending reads retain previous saved content. Can queue recovery and overwrite stale/missing derived summaries; never reruns respondents.",
+      "description": "Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. May recover/replace stale or missing summaries; never reruns respondents.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5827,7 +5957,7 @@
     {
       "name": "refresh_study_summary",
       "title": "Refresh Study Summary",
-      "description": "Accepts a background whole-Study summary refresh after explicit approval. Replaces the saved summary without restore history; questions and answers remain. force regenerates unchanged coverage. Returns a pending receipt and last saved content until completion.",
+      "description": "Queues a whole-Study summary refresh after explicit approval. Replaces it without restore history; preserves questions/answers. force regenerates unchanged coverage. Pending returns a receipt and prior content.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5974,17 +6104,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.be1fc22b42f5.html",
+          "resourceUri": "ui://widget/audience.ee59140a261e.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.be1fc22b42f5.html",
+        "openai/outputTemplate": "ui://widget/audience.ee59140a261e.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.be1fc22b42f5.html"
+        "ui/resourceUri": "ui://widget/audience.ee59140a261e.html"
       }
     },
     {
@@ -6069,23 +6199,23 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.d6792e0e9f6a.html",
+          "resourceUri": "ui://widget/plan.f760291c3cff.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.d6792e0e9f6a.html",
+        "openai/outputTemplate": "ui://widget/plan.f760291c3cff.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.d6792e0e9f6a.html"
+        "ui/resourceUri": "ui://widget/plan.f760291c3cff.html"
       }
     },
     {
       "name": "render_study_results",
-      "title": "Show Final Study Results",
-      "description": "Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. Can queue recovery and overwrite stale derived results from accepted answers; does not rerun respondents.",
+      "title": "Show Study Results",
+      "description": "Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. May recover and replace derived results from accepted answers without rerunning Minds.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6194,6 +6324,35 @@
               {
                 "type": "array",
                 "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forecasts": {
+            "description": "Experimental, uncalibrated aggregate predictions. Separate from completed research results. Each carries a messageId for request_study_answers, durable status, saved-response counts and the predicted output. Ordinary status reads never materialize replies.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "requestedPrefixCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "pendingCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": {}
+                }
               },
               {
                 "type": "null"
@@ -6423,7 +6582,7 @@
         "additionalProperties": {}
       },
       "annotations": {
-        "title": "Show Final Study Results",
+        "title": "Show Study Results",
         "readOnlyHint": false,
         "destructiveHint": true,
         "idempotentHint": true,
@@ -6434,18 +6593,105 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.f415e0a45471.html",
+          "resourceUri": "ui://widget/response.9f671b0e67b6.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.f415e0a45471.html",
+        "openai/outputTemplate": "ui://widget/response.9f671b0e67b6.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.f415e0a45471.html"
+        "ui/resourceUri": "ui://widget/response.9f671b0e67b6.html"
+      }
+    },
+    {
+      "name": "request_study_answers",
+      "title": "Request Study Replies",
+      "description": "Request actual replies (default 8; all=true for all). May spend response allowance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "studyId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "description": "The Study UUID returned by create_study or get_study_status."
+          },
+          "messageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "description": "The assistant result messageId returned by get_study_status for the forecast whose individual replies are requested."
+          },
+          "offset": {
+            "description": "Zero-based page offset in the frozen response roster, from 0 to 100000. Defaults to 0. Repeating the same offset and limit reuses the original request. Omitted when all is true.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "limit": {
+            "description": "Maximum replies in the requested page, from 1 to 50. Defaults to 8. Omitted when all is true.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "all": {
+            "description": "Explicitly requests all remaining eligible individual replies. Defaults to false. This may take time and consume the existing Study response allowance. Cannot be combined with offset or limit.",
+            "type": "boolean"
+          },
+          "lookaheadOffsets": {
+            "description": "Optional up to two distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies.",
+            "maxItems": 2,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000
+            }
+          }
+        },
+        "required": [
+          "studyId",
+          "messageId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "The Study and assistant message identifiers, saved replies, and durable response-collection state returned by the v1 API. Queued or pending work is not a completed response. Additional fields may include executionId, status, expectedCount, acceptedCount, skippedCount, requestedCount, pendingCount, requestComplete, focused selection membership identities, offset-mapped admittedMemberships and settledMemberships. Pending lookahead replies do not mean the focused selection is pending."
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Request Study Replies",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "openai/widgetAccessible": true,
+        "openai/scopes": [
+          "flows:write"
+        ]
       }
     },
     {
@@ -8559,7 +8805,7 @@
     {
       "name": "start_study_heatmap",
       "title": "Start Study Asset Heatmap",
-      "description": "Starts attention analysis of an assigned image, video or website. Uses one response per Mind and needs a paid plan. assetKey reuses completed analysis of that asset; omitting it may replace earlier derived results. Websites are visited publicly. Explicit approval is required; question answers are preserved.",
+      "description": "Start or retry analysis of an assigned original file, image, video or public website, including a monadic variantId. Mosaic prepares original files internally and retains saved material findings and visual groups. Eligible Mosaic Reactions start automatically with the Study and use no additional response credits. Other paid or legacy analysis requires approval, a paid plan and one response per Mind. Preserves question answers.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -8576,8 +8822,50 @@
             "minLength": 1
           },
           "assetKey": {
+            "description": "Saved upload path or normalized URL of an assigned asset. On start, this reuses completed analysis for that asset. Omitting it may replace derived results. Omit for a monadic website selected by variantId alone.",
             "type": "string",
             "minLength": 1
+          },
+          "variantId": {
+            "description": "For monadic Studies, the selected variant. Only that variant's assigned stimuli and frozen Minds are used. Variants can have separate results for the same asset.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "explanation": {
+            "type": "object",
+            "properties": {
+              "memberKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "generation": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "requestedAt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "requestedAt"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "memberKey",
+              "generation"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [

@@ -6,8 +6,8 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **48 tools** through ordinary `tools/list` discovery.
-There are **75 canonical callable tools**, excluding aliases.
+The server advertises **50 tools** through ordinary `tools/list` discovery.
+There are **77 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
 
@@ -16,7 +16,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | Tool | Title | Purpose | Access | Scopes |
 | --- | --- | --- | --- | --- |
 | `list_audiences` | List Audiences | For a listing or search reply, include both the returned top-level workspaceUrl and each listed Audience's workspaceUrl verbatim in inline code: scheme, query and trailing slash. | read-only | sparks:read |
-| `list_formations` | List Audience Segmentations | Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. | read-only | sparks:read |
+| `list_formations` | List Audience Segmentations | Lists Audience segmentations for filters; may save defaults and recover builds, replacing subgroup memberships. | destructive | sparks:read |
 | `import_audience_sources` | Import Audience Research Sources | Imports supplied UTF-8 text, Markdown, CSV and JSON research files into account-owned storage. | writes | sparks:write |
 | `create_audience_from_brief` | Create a Grounded Audience from a Brief | Builds grounded Audience/Mind profiles with exact segment allocation. | destructive | sparks:write |
 | `get_audience_creation_progress` | Audience creation progress | Read-only; never starts or retries work. | read-only | sparks:read |
@@ -30,13 +30,15 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_studies` | List Studies | List or search saved Studies, or read an authorized team catalog, result feed or tracker snapshot with source identities, full-filter totals and page continuation. | read-only | flows:read |
 | `create_study` | Create a Study | Creates a new Study workspace from existing Audiences or inline Audience configurations. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
-| `get_study_status` | Get Study Status | Returns Study progress, Audience results, Mind responses and export status in the Study locale. | destructive | flows:read, flows:write |
-| `render_study_results` | Show Final Study Results | Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. | destructive | flows:read, flows:write |
+| `get_study_status` | Get Study Status | Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. | destructive | flows:read, flows:write |
+| `request_study_answers` | Request Study Replies | Request actual replies (default 8; all=true for all). | destructive | flows:write |
+| `cancel_study_run` | Cancel Study Run | Stop pending Study work; keep saved replies. | destructive | flows:write |
+| `render_study_results` | Show Study Results | Completed Study results or labeled experimental, uncalibrated forecasts. | destructive | flows:read, flows:write |
 | `export_study` | Export Study Results | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. | destructive | flows:read, flows:write |
 | `duplicate_study` | Duplicate Study | Permanently copy a Study with its questions and results over the same Audiences. | writes | flows:write |
 | `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. | destructive | flows:read, flows:write |
-| `get_study_heatmap` | Read Study Asset Heatmap | Reads saved heatmaps of an assigned question asset. | read-only | flows:read |
-| `start_study_heatmap` | Start Study Asset Heatmap | Starts attention analysis of an assigned image, video or website. | destructive | flows:write |
+| `get_study_heatmap` | Read Study Asset Heatmap | Read saved attention by assetKey and, for monadic Studies, variantId. | read-only | flows:read |
+| `start_study_heatmap` | Start Study Asset Heatmap | Start or retry analysis of an assigned original file, image, video or public website, including a monadic variantId. | destructive | flows:write |
 | `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. | read-only | sparks:read |
 | `create_study_plan` | Create Study Plan | Creates a non-executing draft in an existing Study with attached Audiences. | destructive | flows:write |
@@ -59,8 +61,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |
 | `use_study_template` | Create Draft From Study Template | Creates an independent editable Study draft from a readable template at use.expectedRevision. | writes | flows:write |
 | `delete_study_template` | Delete Study Template | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. | destructive | flows:write |
-| `read_study_summary` | Read Study Summary | Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. | destructive | flows:read, flows:write |
-| `refresh_study_summary` | Refresh Study Summary | Accepts a background whole-Study summary refresh after explicit approval. | destructive | flows:write |
+| `read_study_summary` | Read Study Summary | Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. | destructive | flows:read, flows:write |
+| `refresh_study_summary` | Refresh Study Summary | Queues a whole-Study summary refresh after explicit approval. | destructive | flows:write |
 | `plan_study_questions` | Plan a Multi-Question Block in a Study | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. | destructive | flows:write |
 | `run_study_questions` | Run a Confirmed Multi-Question Block | Deprecated alias of start_study_run; identical behaviour. | destructive | flows:write |
 
@@ -137,7 +139,7 @@ discovery response. Registry listings must not describe them as discovered.
 | `get_billing_catalog` | Read the authenticated user’s existing Stripe subscription prices, response-credit packs and purchase eligibility. |
 | `get_mind_status` | Reports the training progress of a Mind, persona, digital twin, or expert that is still training. |
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
-| `get_study_run` | Returns durable progress or results for one confirmed multi-question run inside a Study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness. |
+| `get_study_run` | Read a confirmed multi-question run: immutable plan, execution plan, respondent-visible question audit, settled/total progress, answers, method calculations and stage readiness. |
 | `get_study_summary` | Returns saved whole-Study Markdown, evidence blocks and metadata. |
 | `list_minds` | Lists the Minds the authenticated account can open, with name search: its own Minds and Minds shared with it directly, with its team, or through an Audience or Study it owns or can open. |
 | `list_model_connections` | Lists the authenticated team’s model connections with IDs, current revisions, endpoints, and verified text, structured-output, streaming, and tool capabilities. |
@@ -150,7 +152,7 @@ discovery response. Registry listings must not describe them as discovered.
 | `manage_study_draft` | Delete, consume, or reread the original source of a durable Study draft through /api/v1/. |
 | `manage_study_template` | Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. |
 | `preview_audience_dataset_segmentation` | Enterprise review step for spreadsheet-grounded Audiences. |
-| `run_study_heatmap` | The attention heatmap of one asset (image, video or website) on a Study question, as in the Minds web app: action "get" reads it, "start" analyses it. |
+| `run_study_heatmap` | Read or start saved analysis of an assigned image, video, website or supported original file on a Study question. |
 | `share_study_template` | Shares one saved Study template the user owns with specific people by email, lists who has that access, cancels a pending invitation, or removes an accepted member. |
 | `start_billing_checkout` | Start a subscription, response-credit purchase, or auto-recharge consent checkout using the same Stripe billing rules as Minds. |
 | `validate_audience` | Starts a validation of an Audience against real published surveys, your own survey files or your own survey results, or cancels one. |

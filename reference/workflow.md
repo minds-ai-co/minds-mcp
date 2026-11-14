@@ -32,7 +32,7 @@ For a listing or search reply, include both the returned top-level workspaceUrl 
 
 Tool: `list_formations`
 
-Lists visible Audience segmentations with Formation/subgroup IDs and counts for respondent filters. Ready counts are final. Paged (limit 1–100, default 100); pagination.nextOffset continues while hasMore.
+Lists Audience segmentations for filters; may save defaults and recover builds, replacing subgroup memberships. Ready counts are final. Paged (limit 1–100, default 100); follow pagination.nextOffset.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -244,7 +244,7 @@ Requests exactly one respondent-visible question: one standalone question, or on
 
 Tool: `get_study_status`
 
-Returns Study progress, Audience results, Mind responses and export status in the Study locale. Open with the current request's userFacingStatus if present. While preparing, call it a request throughout; no question was sent, queued or answered. questionId selects a question or request preparation; runId selects a confirmed run; otherwise covers the Study. In-flight questions show zero answered until complete. Result reads can queue recovery and overwrite stale derived analysis without rerunning Minds. Export-only polling reads its job.
+Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A preparing request has userFacingStatus and no submitted question.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -253,11 +253,36 @@ Returns Study progress, Audience results, Mind responses and export status in th
 | `study` | No | object | Which Study to inspect. Omit entirely to use the active Study from this MCP session. |
 | `export` | No | object | Poll one asynchronous export job created by the export operation. |
 
-## Show Final Study Results
+## Request Study Replies
+
+Tool: `request_study_answers`
+
+Request actual replies (default 8; all=true for all). May spend response allowance.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `studyId` | Yes | string | The Study UUID returned by create_study or get_study_status. |
+| `messageId` | Yes | string | The assistant result messageId returned by get_study_status for the forecast whose individual replies are requested. |
+| `offset` | No | integer | Zero-based page offset in the frozen response roster, from 0 to 100000. Defaults to 0. Repeating the same offset and limit reuses the original request. Omitted when all is true. |
+| `limit` | No | integer | Maximum replies in the requested page, from 1 to 50. Defaults to 8. Omitted when all is true. |
+| `all` | No | boolean | Explicitly requests all remaining eligible individual replies. Defaults to false. This may take time and consume the existing Study response allowance. Cannot be combined with offset or limit. |
+| `lookaheadOffsets` | No | array | Optional up to two distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies. |
+
+## Cancel Study Run
+
+Tool: `cancel_study_run`
+
+Stop pending Study work; keep saved replies. Returns run/collection status.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `runId` | Yes | string | The durable Study run UUID returned when starting the Study or by get_study_status. This is runId, not the response collection executionId or an assistant messageId. |
+
+## Show Study Results
 
 Tool: `render_study_results`
 
-Shows finished question/run results, summaries, Audience breakdowns and Mind responses, including partial runs. Can queue recovery and overwrite stale derived results from accepted answers; does not rerun respondents.
+Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. May recover and replace derived results from accepted answers without rerunning Minds.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -309,27 +334,31 @@ Exports a completed website heatmap by Study/message ID as a ZIP of stored scree
 
 Tool: `get_study_heatmap`
 
-Reads saved heatmaps of an assigned question asset. Optional assetKey selects its saved upload path or normalized URL. Returns assetHeatmaps without starting analysis, spending responses or visiting websites.
+Read saved attention by assetKey and, for monadic Studies, variantId. No new analysis, website visits, or response charges.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `studyId` | No | string |  |
 | `studyName` | No | string |  |
 | `messageId` | Yes | string |  |
-| `assetKey` | No | string |  |
+| `assetKey` | No | string | Saved upload path or normalized URL of an assigned asset. On start, this reuses completed analysis for that asset. Omitting it may replace derived results. Omit for a monadic website selected by variantId alone. |
+| `variantId` | No | string | For monadic Studies, the selected variant. Only that variant's assigned stimuli and frozen Minds are used. Variants can have separate results for the same asset. |
+| `explanation` | No | object |  |
 
 ## Start Study Asset Heatmap
 
 Tool: `start_study_heatmap`
 
-Starts attention analysis of an assigned image, video or website. Uses one response per Mind and needs a paid plan. assetKey reuses completed analysis of that asset; omitting it may replace earlier derived results. Websites are visited publicly. Explicit approval is required; question answers are preserved.
+Start or retry analysis of an assigned original file, image, video or public website, including a monadic variantId. Mosaic prepares original files internally and retains saved material findings and visual groups. Eligible Mosaic Reactions start automatically with the Study and use no additional response credits. Other paid or legacy analysis requires approval, a paid plan and one response per Mind. Preserves question answers.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `studyId` | No | string |  |
 | `studyName` | No | string |  |
 | `messageId` | Yes | string |  |
-| `assetKey` | No | string |  |
+| `assetKey` | No | string | Saved upload path or normalized URL of an assigned asset. On start, this reuses completed analysis for that asset. Omitting it may replace derived results. Omit for a monadic website selected by variantId alone. |
+| `variantId` | No | string | For monadic Studies, the selected variant. Only that variant's assigned stimuli and frozen Minds are used. Variants can have separate results for the same asset. |
+| `explanation` | No | object |  |
 
 ## Export Mind Persona Profile
 
@@ -465,7 +494,7 @@ Resumes an existing plan-limited Study run in place after explicit user approval
 
 Tool: `cancel_study_question`
 
-Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. An answered or failed question errors unchanged. Not for multi-question runs.
+Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. Answers given are kept. A delivered forecast keeps its completed run history while remaining replies and Reactions can still be stopped. An answered question with no pending work, or a failed question with no work stopped, errors unchanged. Not for multi-question runs.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -632,7 +661,7 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 
 Tool: `read_study_summary`
 
-Returns saved whole-Study Markdown, evidence, generation state and the caller's refresh receipt. Pending reads retain previous saved content. Can queue recovery and overwrite stale/missing derived summaries; never reruns respondents.
+Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. May recover/replace stale or missing summaries; never reruns respondents.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -642,7 +671,7 @@ Returns saved whole-Study Markdown, evidence, generation state and the caller's 
 
 Tool: `refresh_study_summary`
 
-Accepts a background whole-Study summary refresh after explicit approval. Replaces the saved summary without restore history; questions and answers remain. force regenerates unchanged coverage. Returns a pending receipt and last saved content until completion.
+Queues a whole-Study summary refresh after explicit approval. Replaces it without restore history; preserves questions/answers. force regenerates unchanged coverage. Pending returns a receipt and prior content.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
