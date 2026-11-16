@@ -6222,17 +6222,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.c5a9be5ca4a6.html",
+          "resourceUri": "ui://widget/audience.f6c04fac7fb3.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.c5a9be5ca4a6.html",
+        "openai/outputTemplate": "ui://widget/audience.f6c04fac7fb3.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.c5a9be5ca4a6.html"
+        "ui/resourceUri": "ui://widget/audience.f6c04fac7fb3.html"
       }
     },
     {
@@ -6317,17 +6317,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.84f6d1c0de2b.html",
+          "resourceUri": "ui://widget/plan.23e30ca2493b.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.84f6d1c0de2b.html",
+        "openai/outputTemplate": "ui://widget/plan.23e30ca2493b.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.84f6d1c0de2b.html"
+        "ui/resourceUri": "ui://widget/plan.23e30ca2493b.html"
       }
     },
     {
@@ -6714,18 +6714,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.0892404cbeb5.html",
+          "resourceUri": "ui://widget/response.dd91e1476819.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.0892404cbeb5.html",
+        "openai/outputTemplate": "ui://widget/response.dd91e1476819.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.0892404cbeb5.html"
+        "ui/resourceUri": "ui://widget/response.dd91e1476819.html"
       }
     },
     {
@@ -6818,7 +6818,7 @@
     {
       "name": "resume_study_run",
       "title": "Resume Study Run",
-      "description": "Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). Never starts a new Study or changes the run design.",
+      "description": "Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents; also after the run was stopped, which keeps everything else stopped). Never starts a new Study or changes the run design.",
       "inputSchema": {
         "type": "object",
         "properties": {
