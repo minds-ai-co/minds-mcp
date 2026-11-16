@@ -189,6 +189,34 @@ Manage owner-issued, expiring staff access to one Audience’s composition and r
 | `requestKey` | No | string | For grant: stable UUID retry key; identical retries return the same grant. |
 | `cursor` | No | string | For lists/activity: nextCursor from the previous page. |
 
+## Validate an Audience Against Real Surveys
+
+Tool: `validate_audience`
+
+Starts or cancels a validation of an Audience against real survey results: the best-fitting published surveys it finds, listed surveys named in `surveys.benchmarkIds`, your own survey files (questionnaire and results, asked as given), or your own aggregated results passed as `benchmark`. It keeps only the questions whose published answers are a fair target for this Audience, asks the Audience's Minds those questions in one hidden run, without retrieved documents or web search, and scores how close their answers are to the real ones. It returns at once with the validation batch and its `batchId`; the work runs in the background, usually 10 to 60 minutes. It needs at least 10 ready Minds; a score of the finished Audience needs every member fully trained and research finished. Found surveys need at least 8 fitting questions. A `benchmark` that does not fit the survey schema is refused with BENCHMARK_INVALID, listing every problem as `path: problem`, before anything is reserved. It uses one of the plan's included validations when one is left, otherwise one synthetic response per ready Mind per question asked (50 Minds × 29 questions = 1,450), checked up front; with too few left it returns PLAN_LIMIT before anything starts. The result reports `responses` left this month and `included`. `cancel` stops a validation before any of its surveys is asked.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `audience` | No | object | The Audience to validate, by id (preferred) or name. |
+| `action` | No | "start", "cancel" | `start` a validation (default) or `cancel` one that has not asked any survey yet. Default: "start". |
+| `surveys` | No | object | Which surveys to validate against. Omit, with no benchmark or conversationFiles, to find and use the best-fitting published surveys. |
+| `conversationFiles` | No | array | Survey files shared in the chat, read together with files as one survey. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+| `benchmark` | No | object | Your own survey results as aggregated shares, to validate against your own numbers instead of files or published surveys. Pass it alone: not with benchmarkIds, files, conversationFiles or findSurveys. It is asked as given (no 8-question minimum, at most 60 questions asked), except questions that are distributions the Audience was built from. Every object is closed (an unknown field is an error), shares are fractions from 0 to 1, and option labels must match exactly between `response` and `targets`. A survey that does not fit is refused before anything is reserved, with every problem listed; fix those and send it again. |
+| `batchId` | No | string | The validation batch to cancel (action `cancel`). |
+| `idempotencyKey` | No | string | Stable UUID for a retried start: the same key returns the same validation instead of starting another. |
+
+## Get an Audience Validation
+
+Tool: `get_audience_validation`
+
+Reads how closely an Audience matches real surveys. Read-only: it never starts or scores anything. With `batchId`: one validation batch with its status, progress while it runs, the combined score and 95% range, each survey's score, who it asked relative to the Audience (`respondentScope`; `inCombined` says whether the combined score rests on it), its source, questions left out and why, and per scored survey `gaps`: questions whose error most exceeds sampling noise, with the option furthest off (real vs Minds' share) and, on ordered scales, the lean toward the first or last option. Without `batchId`: the Audience's overall validity across every survey it was checked against, its latest validation, per-survey KPIs in `validations` (including `distribution_overlap_pct`), the included validations and synthetic responses left this month (−1 = unlimited), and whether enough Minds are ready (`minds.ready` against `minds.minimum`, 10). `basis` says what a score rests on: `audience`; `subgroups`, surveys of parts of the Audience each answered only by the matching Minds; or `wider_population`, a lower-confidence comparison with the wider population named in `comparedWith`. A score is 100 minus the mean absolute gap in percentage points between the Minds' and the real share of each answer option: 88 means 12 points off per option on average, not 88% of answers right.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `audienceId` | No | string | Audience ID (UUID). Preferred. |
+| `audienceName` | No | string | Audience name (exact or partial, case-insensitive; fuzzy fallback for typos). |
+| `batchId` | No | string | One validation batch returned by validate_audience. Omit to get the Audience's overall validity and its latest validation. |
+
 ## List Studies
 
 Tool: `list_studies`
@@ -242,7 +270,7 @@ Requests exactly one respondent-visible question: one standalone question, or on
 
 Tool: `get_study_status`
 
-Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). For a scoped request, lead the reply with requestProgress.userFacingStatus. It distinguishes preparation, run admission, queueing, and answering.
+Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A scoped request returns requestProgress.userFacingStatus: open the reply with it.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -393,7 +421,7 @@ Also previews monadic allocations.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
-| `monadic` | No | object | Explicit monadic concept test configuration. Select one attached source Audience, a total sample, stored Formation IDs for balancing, at least two named variants, role-scoped uploaded materials and one exact questionnaire. Each question maps common and variant materials explicitly; use empty lists for no exposure. Researcher documents are never participant material. This previews a frozen disjoint assignment and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method. |
+| `monadic` | No | object | Explicit monadic concept test configuration. Select one attached source Audience, at least two named groups (variants), role-scoped uploaded materials and one exact questionnaire. Omit requestedSample to use every eligible Mind in the selected Audience after segment filters; explicit smaller samples remain supported. Omit balanceDimensions for an ordinary random even split. Each question maps shared and group-specific materials explicitly; use empty lists for no exposure. A common material may be shown to all groups or selected groups on a particular question. A variant-owned material must never be exposed to another group, even on a later question. Researcher documents are never participant material. This previews one frozen disjoint assignment for the entire Study and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method. |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
 | `request` | No | string | Planner input containing the research objective, questionnaire, survey, battery, section, cohesive question set, audit request, or analysis request. Required for a new draft. Include EVERY question already known in this one request so the planner can group the complete set into cohesive named modules for one confirmed multi-question run inside the Study; never create one planning request per known question. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review. Write only the user's research brief and context relevant to the research question. Never tool errors, status or retry messages, Minds or other internal links, or your own process notes. |
 | `questions` | No | array | Fixed instrument: use INSTEAD of request when the user supplies a pre-registered or fixed questionnaire whose wording, order, and response formats must not change. The planner is bypassed; every question is stored verbatim, in this order, with exactly this response contract. Cannot be combined with refinement, answers or questionResponses in the same call (refused); suggestQuestionStimuli has no effect here, place files with questionAttachments; answer the draft's confirmation questions afterwards with draft.id, draft.revision and draft.answers alone, which keeps these questions exactly. Repeated question texts or colliding ids are rejected. A saved Study template's configuration.questions can be passed here (each item's text and response); pass its configuration.methodId as policy.methodId so the template's method runs. Without it a fixed instrument runs as Custom research (guided-research). |
