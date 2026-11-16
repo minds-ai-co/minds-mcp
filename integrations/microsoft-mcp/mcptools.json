@@ -2013,7 +2013,7 @@
         "type": "object",
         "properties": {
           "monadic": {
-            "description": "Explicit monadic concept test configuration. Select one attached source Audience, a total sample, stored Formation IDs for balancing, at least two named variants, role-scoped uploaded materials and one exact questionnaire. Each question maps common and variant materials explicitly; use empty lists for no exposure. Researcher documents are never participant material. This previews a frozen disjoint assignment and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method.",
+            "description": "Explicit monadic concept test configuration. Select one attached source Audience, at least two named groups (variants), role-scoped uploaded materials and one exact questionnaire. Omit requestedSample to use every eligible Mind in the selected Audience after segment filters; explicit smaller samples remain supported. Omit balanceDimensions for an ordinary random even split. Each question maps shared and group-specific materials explicitly; use empty lists for no exposure. A common material may be shown to all groups or selected groups on a particular question. A variant-owned material must never be exposed to another group, even on a later question. Researcher documents are never participant material. This previews one frozen disjoint assignment for the entire Study and creates no respondent answers. Show actual counts, shortfalls, unsupported tasks and exposure mappings before asking for confirmation. A timed human-response task is unsupported. Use the returned previewId with start_study_run only after the person confirms this exact preview and advanced method.",
             "type": "object",
             "properties": {
               "audienceId": {
@@ -2050,6 +2050,7 @@
                 "maximum": 100000
               },
               "balanceDimensions": {
+                "default": [],
                 "maxItems": 10,
                 "type": "array",
                 "items": {
@@ -2378,8 +2379,6 @@
             },
             "required": [
               "audienceId",
-              "requestedSample",
-              "balanceDimensions",
               "variants",
               "materials",
               "questions"
@@ -3767,6 +3766,96 @@
       }
     },
     {
+      "name": "get_audience_validation",
+      "title": "Get an Audience Validation",
+      "description": "Reads how closely an Audience matches real surveys. Read-only: it never starts or scores anything. With `batchId`: one validation batch with its status, progress while it runs, the combined score and 95% range, each survey's score, who it asked relative to the Audience (`respondentScope`; `inCombined` says whether the combined score rests on it), its source, questions left out and why, and per scored survey `gaps`: questions whose error most exceeds sampling noise, with the option furthest off (real vs Minds' share) and, on ordered scales, the lean toward the first or last option. Without `batchId`: the Audience's overall validity across every survey it was checked against, its latest validation, per-survey KPIs in `validations` (including `distribution_overlap_pct`), the included validations and synthetic responses left this month (\u22121 = unlimited), and whether enough Minds are ready (`minds.ready` against `minds.minimum`, 10). `basis` says what a score rests on: `audience`; `subgroups`, surveys of parts of the Audience each answered only by the matching Minds; or `wider_population`, a lower-confidence comparison with the wider population named in `comparedWith`. A score is 100 minus the mean absolute gap in percentage points between the Minds' and the real share of each answer option: 88 means 12 points off per option on average, not 88% of answers right.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "audienceId": {
+            "description": "Audience ID (UUID). Preferred.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "audienceName": {
+            "description": "Audience name (exact or partial, case-insensitive; fuzzy fallback for typos).",
+            "type": "string"
+          },
+          "batchId": {
+            "description": "One validation batch returned by validate_audience. Omit to get the Audience's overall validity and its latest validation.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "audienceId": {
+            "description": "Audience whose validation is read.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "batch": {
+            "description": "With batchId: the validation batch with status, progress, combined score, surveys and gaps."
+          },
+          "overall": {
+            "description": "Without batchId: the Audience's overall validity across every survey it was checked against."
+          },
+          "overallIdentity": {
+            "description": "Whether distinct surveys could be identified for the overall score."
+          },
+          "latest": {
+            "description": "Without batchId: the Audience's latest validation batch."
+          },
+          "validations": {
+            "description": "Per-survey KPI scores, including distribution_overlap_pct.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "included": {
+            "description": "Included validations left this month."
+          },
+          "responses": {
+            "description": "Synthetic responses left this month (-1 = unlimited)."
+          },
+          "minds": {
+            "description": "Ready Minds against the minimum a validation needs."
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Get an Audience Validation",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/visibility": "public",
+        "openai/scopes": [
+          "sparks:read"
+        ]
+      }
+    },
+    {
       "name": "get_shared_mind_knowledge",
       "title": "Read Shared Mind Sources",
       "description": "Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. Does not fetch source websites or modify knowledge.",
@@ -4025,7 +4114,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). For a scoped request, lead the reply with requestProgress.userFacingStatus. It distinguishes preparation, run admission, queueing, and answering.",
+      "description": "Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A scoped request returns requestProgress.userFacingStatus: open the reply with it.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6133,17 +6222,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.dac5f27ba3fe.html",
+          "resourceUri": "ui://widget/audience.c5a9be5ca4a6.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.dac5f27ba3fe.html",
+        "openai/outputTemplate": "ui://widget/audience.c5a9be5ca4a6.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.dac5f27ba3fe.html"
+        "ui/resourceUri": "ui://widget/audience.c5a9be5ca4a6.html"
       }
     },
     {
@@ -6228,17 +6317,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.041f25227f3f.html",
+          "resourceUri": "ui://widget/plan.84f6d1c0de2b.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.041f25227f3f.html",
+        "openai/outputTemplate": "ui://widget/plan.84f6d1c0de2b.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.041f25227f3f.html"
+        "ui/resourceUri": "ui://widget/plan.84f6d1c0de2b.html"
       }
     },
     {
@@ -6625,18 +6714,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.b55966313083.html",
+          "resourceUri": "ui://widget/response.0892404cbeb5.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.b55966313083.html",
+        "openai/outputTemplate": "ui://widget/response.0892404cbeb5.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.b55966313083.html"
+        "ui/resourceUri": "ui://widget/response.0892404cbeb5.html"
       }
     },
     {
@@ -9830,6 +9919,827 @@
       "_meta": {
         "openai/scopes": [
           "flows:write"
+        ]
+      }
+    },
+    {
+      "name": "validate_audience",
+      "title": "Validate an Audience Against Real Surveys",
+      "description": "Starts or cancels a validation of an Audience against real survey results: the best-fitting published surveys it finds, listed surveys named in `surveys.benchmarkIds`, your own survey files (questionnaire and results, asked as given), or your own aggregated results passed as `benchmark`. It keeps only the questions whose published answers are a fair target for this Audience, asks the Audience's Minds those questions in one hidden run, without retrieved documents or web search, and scores how close their answers are to the real ones. It returns at once with the validation batch and its `batchId`; the work runs in the background, usually 10 to 60 minutes. It needs at least 10 ready Minds; a score of the finished Audience needs every member fully trained and research finished. Found surveys need at least 8 fitting questions. A `benchmark` that does not fit the survey schema is refused with BENCHMARK_INVALID, listing every problem as `path: problem`, before anything is reserved. It uses one of the plan's included validations when one is left, otherwise one synthetic response per ready Mind per question asked (50 Minds \u00d7 29 questions = 1,450), checked up front; with too few left it returns PLAN_LIMIT before anything starts. The result reports `responses` left this month and `included`. `cancel` stops a validation before any of its surveys is asked.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "audience": {
+            "description": "The Audience to validate, by id (preferred) or name.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Audience ID (UUID). Preferred.",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "name": {
+                "description": "Audience name (exact or partial, case-insensitive; fuzzy fallback for typos).",
+                "type": "string"
+              }
+            }
+          },
+          "action": {
+            "default": "start",
+            "description": "`start` a validation (default) or `cancel` one that has not asked any survey yet.",
+            "type": "string",
+            "enum": [
+              "start",
+              "cancel"
+            ]
+          },
+          "surveys": {
+            "description": "Which surveys to validate against. Omit, with no benchmark or conversationFiles, to find and use the best-fitting published surveys.",
+            "type": "object",
+            "properties": {
+              "benchmarkIds": {
+                "description": "Validate against exactly these listed surveys (listed ids such as `study:<id>` or `discovered:<id>`, or `saved:<validationId>`). Omit, with no files or benchmark, to let the best-fitting published surveys be found and chosen.",
+                "minItems": 1,
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "files": {
+                "description": "Your own survey files to validate against: questionnaire and published results in PDF, Excel, CSV, SPSS (.sav), Word, PowerPoint, TXT or ZIP. They are read together as one survey and asked as given; a file with questions but no results ends the validation with SURVEY_RESULTS_NOT_FOUND. Combine with benchmarkIds (together at most 5 surveys) or with findSurveys.",
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300,
+                      "description": "File name with its extension, e.g. \"results.xlsx\"."
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "URL of the survey file. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "population": {
+                "description": "With files: which reported group of respondents to validate against when the files report several (e.g. \"Detroit\"); the group with the most questions by default.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "findSurveys": {
+                "description": "With files: also find and use the best-fitting published surveys. Without files, benchmarkIds or benchmark a search always runs.",
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "conversationFiles": {
+            "description": "Survey files shared in the chat, read together with files as one survey. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "download_url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Download URL the chat host supplies for this file."
+                },
+                "file_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The chat host's ID for this file."
+                },
+                "mime_type": {
+                  "description": "MIME type when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "file_name": {
+                  "description": "File name when the host supplies it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "download_url",
+                "file_id"
+              ]
+            }
+          },
+          "benchmark": {
+            "description": "Your own survey results as aggregated shares, to validate against your own numbers instead of files or published surveys. Pass it alone: not with benchmarkIds, files, conversationFiles or findSurveys. It is asked as given (no 8-question minimum, at most 60 questions asked), except questions that are distributions the Audience was built from. Every object is closed (an unknown field is an error), shares are fractions from 0 to 1, and option labels must match exactly between `response` and `targets`. A survey that does not fit is refused before anything is reserved, with every problem listed; fix those and send it again.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300,
+                "description": "The survey's name, shown with the result."
+              },
+              "source": {
+                "description": "Where the results come from. Defaults to your own survey (`kind: uploaded`), private to you.",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "`uploaded` (default): your own survey, private to you. `public`: a published survey.",
+                    "type": "string",
+                    "enum": [
+                      "uploaded",
+                      "public"
+                    ]
+                  },
+                  "publisher": {
+                    "description": "Who ran or published the survey.",
+                    "type": "string",
+                    "maxLength": 300
+                  },
+                  "url": {
+                    "description": "Where the survey is published.",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "licence": {
+                    "description": "The licence the results are published under.",
+                    "type": "string",
+                    "maxLength": 500
+                  },
+                  "fieldPeriod": {
+                    "description": "When the survey was in the field, as the source states it (e.g. \"March 2026\").",
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "fieldPeriodKind": {
+                    "description": "`fieldwork` when fieldPeriod is the fieldwork period, `publication` when only the publication date is known.",
+                    "type": "string",
+                    "enum": [
+                      "fieldwork",
+                      "publication"
+                    ]
+                  },
+                  "notes": {
+                    "description": "How the results were derived (weighting, exclusions); shown with the result.",
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "population": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000,
+                    "description": "Who was surveyed, as respondents would recognise it (\"UK adults who do most of their household's grocery shopping\"). It is compared with the Audience before anything is asked; a survey of different people is reported under `notComparable`."
+                  },
+                  "sampleSize": {
+                    "description": "Respondents in the whole survey. Omit when unknown; every question then needs its own `n`.",
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "composition": {
+                    "description": "Who answered, by attribute. Used to check the Audience against the survey and to re-weight `bySegment` targets to the Audience's own mix.",
+                    "maxItems": 30,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 500,
+                          "description": "Your name for the attribute (\"Age group\"); `bySegment.composition` refers to it."
+                        },
+                        "dimension": {
+                          "description": "Optional: the standard attribute this is, so it can be matched with the Audience's: age, gender_identity, income, household_income, education, employment_status, occupation, industry, marital_status, household_size, life_stage, representation, nationality, geography or source_sex (a survey that recorded sex rather than asking gender identity). Omit it for anything else; the composition is then kept by its name only.",
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "segments": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 500,
+                                "description": "The group as the survey names it (\"18-34\")."
+                              },
+                              "share": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1,
+                                "description": "The group's share of respondents, a fraction from 0 to 1."
+                              }
+                            },
+                            "required": [
+                              "label",
+                              "share"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "description": "The groups of this attribute and their share of respondents."
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "segments"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "additionalProperties": false,
+                "description": "Who was surveyed."
+              },
+              "questions": {
+                "minItems": 1,
+                "maxItems": 200,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80,
+                      "description": "Unique within the survey."
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000,
+                      "description": "The question exactly as respondents saw it; the Minds are asked this wording."
+                    },
+                    "module": {
+                      "description": "The survey section the question belongs to.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "scaleExceptions": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "exclusiveOptions": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "optionSets": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "condition": {
+                                "type": "object",
+                                "properties": {
+                                  "assignmentId": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "levelIds": {
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "assignmentId",
+                                  "levelIds"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "label": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "options": {
+                                "minItems": 2,
+                                "maxItems": 100,
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": [
+                              "condition",
+                              "label",
+                              "options"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "qualitative",
+                            "categorical",
+                            "multiselect",
+                            "ranking",
+                            "scale"
+                          ]
+                        },
+                        "unit": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "currency",
+                                "percentage",
+                                "duration",
+                                "length",
+                                "mass",
+                                "volume",
+                                "custom"
+                              ]
+                            },
+                            "code": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "code"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "scalePoints": {
+                          "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
+                          "minItems": 2,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "label",
+                              "value"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "scaleRange": {
+                          "description": "Inclusive finite numeric response bounds as [minimum, maximum], only when specified. Numeric responses may be unbounded. Fractional and wide ranges retain their authored values.",
+                          "minItems": 2,
+                          "maxItems": 2,
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "categoricalOptions": {
+                          "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
+                          "minItems": 2,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "maxSelections": {
+                          "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 100
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false,
+                      "description": "The answer format. `categorical` (single choice), `multiselect` and `ranking` list `categoricalOptions`; `scale` lists every point in `scalePoints` with its label and numeric value. Minds see the options in the order given. `ranking` is scored on first places, so its targets are first-place shares."
+                    },
+                    "ordinal": {
+                      "description": "The options are ordered (a frequency or agreement scale written as categories). List `categoricalOptions` in scale order, never by popularity. `scale` questions are always ordered by point value.",
+                      "type": "boolean"
+                    },
+                    "exclusiveOptions": {
+                      "description": "`multiselect` options that must be chosen alone (\"None of these\"); an answer combining one with others counts as invalid.",
+                      "maxItems": 20,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                      }
+                    },
+                    "targets": {
+                      "minItems": 2,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "option": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 500,
+                            "description": "The answer label, exactly as in `response`."
+                          },
+                          "share": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "The share of respondents who gave this answer, a fraction from 0 to 1."
+                          }
+                        },
+                        "required": [
+                          "option",
+                          "share"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "description": "The human result: one entry per offered option, each exactly once (scale points by their label); a missing option is an error, not zero. Single-choice and scale shares sum to 1 (\u00b10.02 for rounding); `multiselect` shares are each option's selection rate."
+                    },
+                    "n": {
+                      "description": "Respondents who answered this question. Required when the population sampleSize is omitted.",
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "bySegment": {
+                      "description": "Results by population segment, to re-weight the targets to the Audience's own mix.",
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "composition": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 500,
+                            "description": "The `name` of a population composition entry."
+                          },
+                          "segments": {
+                            "minItems": 2,
+                            "maxItems": 100,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "label": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "The group, as labelled in the composition entry."
+                                },
+                                "targets": {
+                                  "minItems": 1,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "option": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 500,
+                                        "description": "The answer label, exactly as in `response`."
+                                      },
+                                      "share": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "The share of respondents who gave this answer, a fraction from 0 to 1."
+                                      }
+                                    },
+                                    "required": [
+                                      "option",
+                                      "share"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  "description": "This group's result, in the same form as the question's targets."
+                                },
+                                "n": {
+                                  "description": "Respondents in this group who answered the question.",
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                }
+                              },
+                              "required": [
+                                "label",
+                                "targets"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "description": "The results within each group of that attribute (at least two groups)."
+                          }
+                        },
+                        "required": [
+                          "composition",
+                          "segments"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "text",
+                    "response",
+                    "targets"
+                  ],
+                  "additionalProperties": false
+                },
+                "description": "The survey questions with their human results. At most 60 are asked. Each needs at least two answer options; open-ended (`qualitative`) questions cannot be scored and are refused."
+              }
+            },
+            "required": [
+              "name",
+              "population",
+              "questions"
+            ],
+            "additionalProperties": false
+          },
+          "batchId": {
+            "description": "The validation batch to cancel (action `cancel`).",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "idempotencyKey": {
+            "description": "Stable UUID for a retried start: the same key returns the same validation instead of starting another.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "audienceId": {
+            "description": "Audience being validated.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "batch": {
+            "description": "Validation batch: id, status and the surveys it will ask, or the cancelled batch."
+          },
+          "included": {
+            "description": "The plan's included validations this month, and whether this run used one."
+          },
+          "responses": {
+            "description": "Synthetic responses left this month."
+          },
+          "status": {
+            "description": "`benchmark_invalid` or `plan_limited` when nothing was started.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "description": "Refusal code, such as BENCHMARK_INVALID.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "issues": {
+            "description": "Every problem of a refused benchmark, as `path: problem`.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planLimit": {
+            "description": "Present when a plan limit refused, truncated or stopped Study work.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "billingMode": {
+                    "description": "prepaid (purchased response balance) or subscription (recurring allowance), when known.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "context": {
+                    "description": "sharedStudyUsage or sharedMindUsage when the owner pays for the refused work.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "kind": {
+                    "description": "study_answers (Free plan monthly Study answers) or response_credits (synthetic-response allowance).",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "outcome": {
+                    "description": "refused (nothing started or charged), partial (only the first questions run), stopped (a run stopped at the limit), or resume_refused.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "used": {
+                    "description": "Allowance used in the current period, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "limit": {
+                    "description": "Allowance of the current period, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "remaining": {
+                    "description": "Allowance left, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "requested": {
+                    "description": "Responses or answers the refused work needed, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "periodEnd": {
+                    "description": "When the allowance renews (ISO 8601), when known.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "totalQuestionCount": {
+                    "description": "Questions in the request or run, when known.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "skippedQuestionCount": {
+                    "description": "Questions the limit kept from running.",
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "skippedQuestions": {
+                    "description": "Questions not asked: { index (zero-based), text }.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "resumable": {
+                    "description": "True when the run can be continued in place with resume_study_run runId once the plan allows it.",
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "runId": {
+                    "description": "The run concerned, when one exists.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "executionStarted": {
+                    "description": "Whether any question of this request ran.",
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "plansUrl": {
+                    "description": "Absolute link to the public Minds plans page; absent when the shared owner must act.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "message": {
+                    "description": "One user-facing sentence with the plans link.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "executionStarted": {
+            "description": "Whether a validation was started.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "quotaUsed": {
+            "description": "Whether anything was reserved or spent.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Validate an Audience Against Real Surveys",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/visibility": "public",
+        "openai/scopes": [
+          "sparks:write"
+        ],
+        "openai/fileParams": [
+          "conversationFiles"
         ]
       }
     }

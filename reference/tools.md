@@ -6,7 +6,7 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **50 tools** through ordinary `tools/list` discovery.
+The server advertises **52 tools** through ordinary `tools/list` discovery.
 There are **77 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
@@ -27,6 +27,8 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
 | `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
+| `validate_audience` | Validate an Audience Against Real Surveys | Starts or cancels a validation of an Audience against real survey results: the best-fitting published surveys it finds, listed surveys named in `surveys.benchmarkIds`, your own survey files (questionnaire and results, asked as given), or your own aggregated results passed as `benchmark`. | destructive | sparks:write |
+| `get_audience_validation` | Get an Audience Validation | Reads how closely an Audience matches real surveys. | read-only | sparks:read |
 | `list_studies` | List Studies | List or search saved Studies, or read an authorized team catalog, result feed or tracker snapshot with source identities, full-filter totals and page continuation. | read-only | flows:read |
 | `create_study` | Create a Separate Study Workspace | Creates a separate, new Study workspace when the user requests a new workspace. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
@@ -135,7 +137,6 @@ discovery response. Registry listings must not describe them as discovered.
 | `export_figma_comments` | Preview completed Study run feedback or saved image heatmap reactions as native Figma comments. |
 | `filter_audience_minds` | Narrows an Audience the account can view to the Minds whose filter attributes match, and lists the attributes present with per-value counts. |
 | `get_audience` | Returns one Audience belonging to the authenticated account: its details, its members, and its research grounding. |
-| `get_audience_validation` | Returns how closely an Audience matches real surveys. |
 | `get_billing_catalog` | Read the authenticated user’s existing Stripe subscription prices, response-credit packs and purchase eligibility. |
 | `get_mind_status` | Reports the training progress of a Mind, persona, digital twin, or expert that is still training. |
 | `get_study_analytics` | Returns statistics, analytics, insights, and a quantitative overview across a Study's answered questions. |
@@ -155,7 +156,6 @@ discovery response. Registry listings must not describe them as discovered.
 | `run_study_heatmap` | Read or start saved analysis of an assigned image, video, website or supported original file on a Study question. |
 | `share_study_template` | Shares one saved Study template the user owns with specific people by email, lists who has that access, cancels a pending invitation, or removes an accepted member. |
 | `start_billing_checkout` | Start a subscription, response-credit purchase, or auto-recharge consent checkout using the same Stripe billing rules as Minds. |
-| `validate_audience` | Starts a validation of an Audience against real published surveys, your own survey files or your own survey results, or cancels one. |
 
 ## Discovery metadata
 
