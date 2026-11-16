@@ -508,7 +508,7 @@ Also runs confirmed monadic allocations.
 
 Tool: `resume_study_run`
 
-Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). Never starts a new Study or changes the run design.
+Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents; also after the run was stopped, which keeps everything else stopped). Never starts a new Study or changes the run design.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
