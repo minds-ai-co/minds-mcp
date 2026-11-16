@@ -47,7 +47,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `attach_study_audiences` | Attach Audiences to Study | Attaches existing accessible Audiences without removing others, planning or running research. | writes | flows:write |
 | `render_study_plan` | Show Study Plan | Shows a saved Study draft at its current revision for interactive review and confirmation. | read-only | flows:read |
 | `start_study_run` | Start Confirmed Study Run | Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. | destructive | flows:write |
-| `resume_study_run` | Resume Study Run | Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. | destructive | flows:write |
+| `resume_study_run` | Resume Study Run | Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). | destructive | flows:write |
 | `cancel_study_question` | Stop Standalone Study Question | Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. | destructive | flows:write |
 | `update_item` | Update Study, Audience or Mind | Renames a Study or Audience or moves it into a folder. | destructive | flows:write, sparks:write |
 | `set_sharing` | Change Study or Audience Sharing | Turns a Study's or Audience's public link or team sharing on or off. | destructive | flows:write, sparks:write |

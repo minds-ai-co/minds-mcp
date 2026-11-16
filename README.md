@@ -166,7 +166,7 @@ the full list with access levels is in [reference/tools.md](reference/tools.md).
 | `attach_study_audiences` | Attaches existing accessible Audiences without removing others, planning or running research. |
 | `render_study_plan` | Shows a saved Study draft at its current revision for interactive review and confirmation. |
 | `start_study_run` | Runs one reviewed draft revision after explicit confirmation in a later user turn; skipping review is not confirmation. |
-| `resume_study_run` | Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. |
+| `resume_study_run` | Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). |
 | `cancel_study_question` | Stops one standalone Study question by runId, or studyId and questionId: queued or preparing stops at once, being answered stops at its next step. |
 | `update_item` | Renames a Study or Audience or moves it into a folder. |
 | `set_sharing` | Turns a Study's or Audience's public link or team sharing on or off. |

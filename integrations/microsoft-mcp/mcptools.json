@@ -4025,7 +4025,7 @@
     {
       "name": "get_study_status",
       "title": "Get Study Status",
-      "description": "Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A preparing request has userFacingStatus and no submitted question.",
+      "description": "Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). For a scoped request, lead the reply with requestProgress.userFacingStatus. It distinguishes preparation, run admission, queueing, and answering.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -4175,7 +4175,7 @@
             ]
           },
           "activeQuestions": {
-            "description": "Questions still running: questionId, question, status, totalMinds, answeredCount.",
+            "description": "In-flight questions: questionId, question, compatibility status, totalMinds, answeredCount. The generic processing value does not prove execution started or respondents are answering. For scoped requests use requestProgress.",
             "anyOf": [
               {
                 "type": "array",
@@ -4214,6 +4214,9 @@
                 "type": "null"
               }
             ]
+          },
+          "requestProgress": {
+            "description": "Current stage of the exact scoped request. Use userFacingStatus to open the reply in the user's language. preparationStatus states what happened to preparation; stage reflects its progress and, after admission, the matching durable run. No other Study run or transcript placeholder can advance it."
           },
           "requestPreparations": {
             "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation, and an uploaded questionnaire's questionnaire with the exact draft (draftPlanId, revision) that start_study_run starts after confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
@@ -6225,17 +6228,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.67c526d3b496.html",
+          "resourceUri": "ui://widget/plan.041f25227f3f.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.67c526d3b496.html",
+        "openai/outputTemplate": "ui://widget/plan.041f25227f3f.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.67c526d3b496.html"
+        "ui/resourceUri": "ui://widget/plan.041f25227f3f.html"
       }
     },
     {
@@ -6345,7 +6348,7 @@
             ]
           },
           "activeQuestions": {
-            "description": "Questions still running: questionId, question, status, totalMinds, answeredCount.",
+            "description": "In-flight questions: questionId, question, compatibility status, totalMinds, answeredCount. The generic processing value does not prove execution started or respondents are answering. For scoped requests use requestProgress.",
             "anyOf": [
               {
                 "type": "array",
@@ -6384,6 +6387,9 @@
                 "type": "null"
               }
             ]
+          },
+          "requestProgress": {
+            "description": "Current stage of the exact scoped request. Use userFacingStatus to open the reply in the user's language. preparationStatus states what happened to preparation; stage reflects its progress and, after admission, the matching durable run. No other Study run or transcript placeholder can advance it."
           },
           "requestPreparations": {
             "description": "Accepted request preparation receipts, separate from questions and results. preparing has no submitted question; planning_required retains the original request and proposed plan awaiting explicit confirmation, and an uploaded questionnaire's questionnaire with the exact draft (draftPlanId, revision) that start_study_run starts after confirmation; admitted identifies a run whose own row supplies progress. clientRequestId selects the same request through get_study_status questionId.",
@@ -6723,7 +6729,7 @@
     {
       "name": "resume_study_run",
       "title": "Resume Study Run",
-      "description": "Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. Keeps the originally confirmed questions and response contracts and does not ask questions already answered. Does not start a new draft or change the run design.",
+      "description": "Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). Never starts a new Study or changes the run design.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6748,12 +6754,18 @@
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-            "description": "Existing plan-limited run to resume in place."
+            "description": "Existing Study run to resume after a plan limit or to retry a failed comparison question in place."
+          },
+          "retryQuestionIndex": {
+            "description": "Optional zero-based question index from the saved run. Use only when the person requests a retry of a failed comparison question. Omit for a plan-limited run.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           },
           "confirmed": {
             "type": "boolean",
             "const": true,
-            "description": "The user explicitly approved continuing this stopped run."
+            "description": "True only after the user explicitly approved resuming this run or retrying the specified comparison question."
           }
         },
         "required": [

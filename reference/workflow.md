@@ -242,7 +242,7 @@ Requests exactly one respondent-visible question: one standalone question, or on
 
 Tool: `get_study_status`
 
-Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). A preparing request has userFacingStatus and no submitted question.
+Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. Scope by runId or questionId (including a preparation clientRequestId). For a scoped request, lead the reply with requestProgress.userFacingStatus. It distinguishes preparation, run admission, queueing, and answering.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -480,13 +480,14 @@ Also runs confirmed monadic allocations.
 
 Tool: `resume_study_run`
 
-Resumes an existing plan-limited Study run in place after explicit user approval and the required paid-plan entitlement. Keeps the originally confirmed questions and response contracts and does not ask questions already answered. Does not start a new draft or change the run design.
+Resumes an existing Study run after explicit user approval: a plan-limited run after the required paid upgrade, or a failed comparison question via retryQuestionIndex (only its failed groups, with the original sources and respondents). Never starts a new Study or changes the run design.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
 | `study` | No | object | Study id or name. Omit to use the active Study of this MCP session. |
-| `runId` | Yes | string | Existing plan-limited run to resume in place. |
-| `confirmed` | Yes | true | The user explicitly approved continuing this stopped run. |
+| `runId` | Yes | string | Existing Study run to resume after a plan limit or to retry a failed comparison question in place. |
+| `retryQuestionIndex` | No | integer | Optional zero-based question index from the saved run. Use only when the person requests a retry of a failed comparison question. Omit for a plan-limited run. |
+| `confirmed` | Yes | true | True only after the user explicitly approved resuming this run or retrying the specified comparison question. |
 
 ## Stop Standalone Study Question
 
