@@ -1327,7 +1327,7 @@
                 }
               },
               "files": {
-                "description": "Optional already-uploaded research files. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance. Every file shapes the grounding, but only one classified as supporting material (not a spreadsheet) enters the members' own knowledge; the result's withheldFromMemberKnowledge names each other file with its reason (respondent_dataset, study_report, questionnaire, screener, distribution_source, tabular; or, when it was not classified as supporting material: unreadable when its text could not be read, not_covered when the reading of the material did not include it, not_read when no reading of the material was available).",
+                "description": "Optional already-uploaded research files. Accepts a public HTTP(S) URL or a file already in the user's Minds uploads under chat/<userId>/ (its storage path or its /api/uploads/chat/ URL). MCP cannot read a local path. Files shared in the conversation (uploaded or generated images, PDFs, documents) go in the tool's top-level conversationFiles field where the tool has one; elsewhere a PDF or image without a public URL has no MCP route and is uploaded in the Minds app first. Plain text contents (UTF-8 text, Markdown, CSV, JSON) can go to import_audience_sources. External URLs are copied into Minds storage before a Study is saved or run. temp/, portfolio/ and context/ paths and /api/uploads/file-access/ URLs belong to other owners and are not accepted. A Study does not start until Minds can read every file. The server analyzes these through the same extended screener/questionnaire path as the in-app New Audience uploader, including study roles, screening and quota rules, review distributions, and grounding provenance. Every file shapes the grounding. A file enters the members' own knowledge when the reading classifies it as supporting material, or when it is a summary/crosstab spreadsheet rather than respondent rows. The result's withheldFromMemberKnowledge names each other file with its reason (respondent_dataset, study_report, questionnaire, screener, distribution_source, tabular for a respondent-level spreadsheet; or, when it was not classified as supporting material: unreadable when its text could not be read, not_covered when the reading of the material did not include it, not_read when no reading of the material was available).",
                 "maxItems": 20,
                 "type": "array",
                 "items": {
@@ -6223,17 +6223,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.fc29d64d04e1.html",
+          "resourceUri": "ui://widget/audience.6f89b4918f1b.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.fc29d64d04e1.html",
+        "openai/outputTemplate": "ui://widget/audience.6f89b4918f1b.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.fc29d64d04e1.html"
+        "ui/resourceUri": "ui://widget/audience.6f89b4918f1b.html"
       }
     },
     {
@@ -6318,17 +6318,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.17b19f7680c9.html",
+          "resourceUri": "ui://widget/plan.62e56efc05c7.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.17b19f7680c9.html",
+        "openai/outputTemplate": "ui://widget/plan.62e56efc05c7.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.17b19f7680c9.html"
+        "ui/resourceUri": "ui://widget/plan.62e56efc05c7.html"
       }
     },
     {
@@ -6715,18 +6715,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.7ec05a08538e.html",
+          "resourceUri": "ui://widget/response.a5fc31c43afc.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.7ec05a08538e.html",
+        "openai/outputTemplate": "ui://widget/response.a5fc31c43afc.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.7ec05a08538e.html"
+        "ui/resourceUri": "ui://widget/response.a5fc31c43afc.html"
       }
     },
     {
@@ -6887,6 +6887,12 @@
           },
           "executionStarted": {
             "description": "False when nothing started."
+          },
+          "failedSource": {
+            "description": "With stimulus_unavailable: the first source that could not be read (kind, url, httpStatus) and its supported fallback (upload_screenshots for a website, upload_file otherwise); failedSources lists every one."
+          },
+          "failedSources": {
+            "description": "With stimulus_unavailable: every source that could not be read, one entry per URL, each with its fallback."
           },
           "resumed": {
             "description": "With resume: true when the stopped run was queued again.",
@@ -9168,6 +9174,12 @@
           },
           "executionStarted": {
             "description": "False when nothing started."
+          },
+          "failedSource": {
+            "description": "With stimulus_unavailable: the first source that could not be read (kind, url, httpStatus) and its supported fallback (upload_screenshots for a website, upload_file otherwise); failedSources lists every one."
+          },
+          "failedSources": {
+            "description": "With stimulus_unavailable: every source that could not be read, one entry per URL, each with its fallback."
           },
           "resumed": {
             "description": "With resume: true when the stopped run was queued again.",
