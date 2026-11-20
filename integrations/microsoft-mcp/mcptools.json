@@ -4532,8 +4532,8 @@
       },
       "annotations": {
         "title": "Get Study Status",
-        "readOnlyHint": false,
-        "destructiveHint": true,
+        "readOnlyHint": true,
+        "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -4543,8 +4543,7 @@
       "_meta": {
         "openai/visibility": "public",
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ],
         "ui": {
           "visibility": [
@@ -6223,17 +6222,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.9ea04524bbb7.html",
+          "resourceUri": "ui://widget/audience.050540f466c1.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.9ea04524bbb7.html",
+        "openai/outputTemplate": "ui://widget/audience.050540f466c1.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.9ea04524bbb7.html"
+        "ui/resourceUri": "ui://widget/audience.050540f466c1.html"
       }
     },
     {
@@ -6318,17 +6317,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.59cf8c68bfe6.html",
+          "resourceUri": "ui://widget/plan.d053e1372cac.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.59cf8c68bfe6.html",
+        "openai/outputTemplate": "ui://widget/plan.d053e1372cac.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.59cf8c68bfe6.html"
+        "ui/resourceUri": "ui://widget/plan.d053e1372cac.html"
       }
     },
     {
@@ -6715,18 +6714,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.2fa5e6d4edf5.html",
+          "resourceUri": "ui://widget/response.562eaed091e7.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.2fa5e6d4edf5.html",
+        "openai/outputTemplate": "ui://widget/response.562eaed091e7.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.2fa5e6d4edf5.html"
+        "ui/resourceUri": "ui://widget/response.562eaed091e7.html"
       }
     },
     {
@@ -6766,8 +6765,8 @@
             "type": "boolean"
           },
           "lookaheadOffsets": {
-            "description": "Optional up to two distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies.",
-            "maxItems": 2,
+            "description": "Optional up to five distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies.",
+            "maxItems": 5,
             "type": "array",
             "items": {
               "type": "integer",

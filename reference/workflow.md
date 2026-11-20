@@ -292,7 +292,7 @@ Request actual replies (default 8; all=true for all). May spend response allowan
 | `offset` | No | integer | Zero-based page offset in the frozen response roster, from 0 to 100000. Defaults to 0. Repeating the same offset and limit reuses the original request. Omitted when all is true. |
 | `limit` | No | integer | Maximum replies in the requested page, from 1 to 50. Defaults to 8. Omitted when all is true. |
 | `all` | No | boolean | Explicitly requests all remaining eligible individual replies. Defaults to false. This may take time and consume the existing Study response allowance. Cannot be combined with offset or limit. |
-| `lookaheadOffsets` | No | array | Optional up to two distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies. |
+| `lookaheadOffsets` | No | array | Optional up to five distinct exact frozen roster offsets to prepare with a focused limit=1 reply. Cannot include the focused offset or be combined with all. Only explicitly supplied positions are admitted. The focused selection completes independently of these replies. |
 
 ## Cancel Study Run
 
