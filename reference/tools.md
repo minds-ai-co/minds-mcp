@@ -32,7 +32,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `list_studies` | List Studies | List or search saved Studies, or read an authorized team catalog, result feed or tracker snapshot with source identities, full-filter totals and page continuation. | read-only | flows:read |
 | `create_study` | Create a Separate Study Workspace | Creates a separate, new Study workspace when the user requests a new workspace. | writes | flows:write |
 | `ask_study` | Ask One Standalone Question in a Study | Requests exactly one respondent-visible question: one standalone question, or one adaptive follow-up whose wording could not be known before earlier results. | destructive | flows:write |
-| `get_study_status` | Get Study Status | Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. | destructive | flows:read, flows:write |
+| `get_study_status` | Get Study Status | Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. | read-only | flows:read |
 | `request_study_answers` | Request Study Replies | Request actual replies (default 8; all=true for all). | destructive | flows:write |
 | `cancel_study_run` | Cancel Study Run | Stop pending Study work; keep saved replies. | destructive | flows:write |
 | `render_study_results` | Show Study Results | Completed Study results or labeled experimental, uncalibrated forecasts. | destructive | flows:read, flows:write |
