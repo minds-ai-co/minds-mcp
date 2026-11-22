@@ -508,7 +508,7 @@
             "type": "object",
             "properties": {
               "sourcePolicy": {
-                "description": "Defaults to auto. User-supplied materials shown to respondents (including pasted concepts, text attachments, files, or links) require auto or omission. knowledge_only is for an explicit request to rely only on stored Mind knowledge, with no supplied materials, links or keywords. Without relevant stored knowledge, subjective answers use the trained profile and factual answers state the evidence limitation.",
+                "description": "Defaults to auto. knowledge_only is for an explicit request that Minds answer only from their stored knowledge, with no web search. Under every policy, user-supplied materials shown to respondents (pasted concepts, text attachments, files, links) are read as the material they react to, never as a source of facts; keywords (web search) require auto. Without relevant stored knowledge, subjective answers use the trained profile and factual answers state the evidence limitation.",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -6714,18 +6714,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.03f665bc7873.html",
+          "resourceUri": "ui://widget/response.5405509f5fcc.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.03f665bc7873.html",
+        "openai/outputTemplate": "ui://widget/response.5405509f5fcc.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.03f665bc7873.html"
+        "ui/resourceUri": "ui://widget/response.5405509f5fcc.html"
       }
     },
     {
