@@ -49,7 +49,189 @@
           "question": {
             "type": "string",
             "minLength": 1,
-            "description": "Exactly one respondent-visible standalone question for every Mind in the Audience. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the question and the instructions the Minds should receive. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution."
+            "description": "Exactly one respondent-visible standalone question for every Mind in the Audience. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the question and the instructions the Minds should receive. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here. Keep it as short as the ask allows: the question itself and only as much scenario context as the respondent needs to answer it. For a choice or numeric question, set answerContract: the answer type, the scale range and its labels, the choice options and any selection limit live there and are shown and enforced from there, so never restate them in this text (no option lists, no \"Answer on a scale from 0 to 10\", no \"Choose one\"). Only without answerContract does the research reader take the answer contract from this text; then state the options as the respondent would read them, with their complete labels, order and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution."
+          },
+          "answerContract": {
+            "description": "Optional answer contract for this one question: type (categorical for exactly one choice, multiselect for several with maxSelections, ranking to order every option, scale with an inclusive finite numeric scaleRange and, when its ends have wording, scaleAnchors (low, high, and mid for an exact middle value), qualitative for a genuinely open answer) plus categoricalOptions or scaleRange. When set, it is the question's executed answer format, used instead of reading the format from the question text, so the question text stays the short ask. Set it whenever the answer format is known; omit it only for a genuinely open question or when the format is not decided.",
+            "type": "object",
+            "properties": {
+              "scaleExceptions": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exclusiveOptions": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "optionSets": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "condition": {
+                      "type": "object",
+                      "properties": {
+                        "assignmentId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "levelIds": {
+                          "minItems": 1,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "assignmentId",
+                        "levelIds"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "options": {
+                      "minItems": 2,
+                      "maxItems": 100,
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "condition",
+                    "label",
+                    "options"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "qualitative",
+                  "categorical",
+                  "multiselect",
+                  "ranking",
+                  "scale"
+                ]
+              },
+              "unit": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "currency",
+                      "percentage",
+                      "duration",
+                      "length",
+                      "mass",
+                      "volume",
+                      "custom"
+                    ]
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                  }
+                },
+                "required": [
+                  "kind",
+                  "code"
+                ],
+                "additionalProperties": false
+              },
+              "scalePoints": {
+                "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
+                "minItems": 2,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "label",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "scaleRange": {
+                "description": "Inclusive finite numeric response bounds as [minimum, maximum], only when specified. Numeric responses may be unbounded. Fractional and wide ranges retain their authored values.",
+                "minItems": 2,
+                "maxItems": 2,
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "scaleAnchors": {
+                "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                "type": "object",
+                "properties": {
+                  "low": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "high": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "mid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "additionalProperties": false
+              },
+              "categoricalOptions": {
+                "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
+                "minItems": 2,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "maxSelections": {
+                "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
           },
           "name": {
             "description": "Optional name for the Study created to ask this question. Defaults to the Audience name.",
@@ -445,7 +627,7 @@
           "question": {
             "type": "string",
             "minLength": 1,
-            "description": "Exactly ONE respondent-visible standalone question or result-dependent adaptive follow-up for every selected Mind. Never concatenate, enumerate, or otherwise place a questionnaire, survey, battery, section, cohesive question set, or two or more known questions in this field. The system may classify or reformat it, but any text here can reach the Minds and influence their answers. Include only the single question and respondent-facing instructions. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in evidence.textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here, nor tool errors, status messages, Minds or other internal links, or your own process notes. If the question offers a fixed set of answer options, say so in the text as the respondent would read it. The research reader identifies the question and its answer contract together. Include the complete authored labels, ordering and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution."
+            "description": "Exactly ONE respondent-visible standalone question or result-dependent adaptive follow-up for every selected Mind. Never concatenate, enumerate, or otherwise place a questionnaire, survey, battery, section, cohesive question set, or two or more known questions in this field. The system may classify or reformat it, but any text here can reach the Minds and influence their answers. Include only the single question and respondent-facing instructions. Material the question is about (a pasted newsletter, email, ad copy or concept text) goes in evidence.textAttachments, verbatim, not here. Never place planner-only or MCP-client orchestration instructions here, nor tool errors, status messages, Minds or other internal links, or your own process notes. Keep it as short as the ask allows: the question itself and only as much scenario context as the respondent needs to answer it. For a choice or numeric question, set response.answerContract: the answer type, the scale range and its labels, the choice options and any selection limit live there and are shown and enforced from there, so never restate them in this text (no option lists, no \"Answer on a scale from 0 to 10\", no \"Choose one\"). Only without response.answerContract does the research reader take the answer contract from this text; then state the options as the respondent would read them, with their complete labels, order and selection instructions. Numbered answer options do not by themselves make a request a multi-question battery. An invalid or ambiguous reading stops for retry or planning before execution."
           },
           "audienceIds": {
             "description": "Optional subset of the Study's Audiences to ask; defaults to all Audiences.",
@@ -620,9 +802,191 @@
             }
           },
           "response": {
-            "description": "Shape of each answer, and whether earlier Study questions carry over.",
+            "description": "The answer contract (type, scale range, options) and shape of each answer, and whether earlier Study questions carry over.",
             "type": "object",
             "properties": {
+              "answerContract": {
+                "description": "Optional answer contract for this one question: type (categorical for exactly one choice, multiselect for several with maxSelections, ranking to order every option, scale with an inclusive finite numeric scaleRange and, when its ends have wording, scaleAnchors (low, high, and mid for an exact middle value), qualitative for a genuinely open answer) plus categoricalOptions or scaleRange. When set, it is the question's executed answer format, used instead of reading the format from the question text, so the question text stays the short ask. Set it whenever the answer format is known; omit it only for a genuinely open question or when the format is not decided.",
+                "type": "object",
+                "properties": {
+                  "scaleExceptions": {
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "exclusiveOptions": {
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "optionSets": {
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "condition": {
+                          "type": "object",
+                          "properties": {
+                            "assignmentId": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "levelIds": {
+                              "minItems": 1,
+                              "maxItems": 100,
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "assignmentId",
+                            "levelIds"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "options": {
+                          "minItems": 2,
+                          "maxItems": 100,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "condition",
+                        "label",
+                        "options"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "qualitative",
+                      "categorical",
+                      "multiselect",
+                      "ranking",
+                      "scale"
+                    ]
+                  },
+                  "unit": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "currency",
+                          "percentage",
+                          "duration",
+                          "length",
+                          "mass",
+                          "volume",
+                          "custom"
+                        ]
+                      },
+                      "code": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80,
+                        "description": "ISO 4217 currency code (EUR, USD); % for percentage; singular Intl unit identifier (hour, meter, kilogram, liter) for measurements; or a label of up to 80 characters for custom. Selecting a unit does not convert numbers or impose a range."
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "code"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "scalePoints": {
+                    "description": "Exhaustive allowed scale answers in authored order, each with its literal label and numeric value. Omit for an unenumerated range; never fill missing intermediate points.",
+                    "minItems": 2,
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "scaleRange": {
+                    "description": "Inclusive finite numeric response bounds as [minimum, maximum], only when specified. Numeric responses may be unbounded. Fractional and wide ranges retain their authored values.",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "scaleAnchors": {
+                    "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                    "type": "object",
+                    "properties": {
+                      "low": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "high": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "mid": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "categoricalOptions": {
+                    "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
+                    "minItems": 2,
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "maxSelections": {
+                    "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "additionalProperties": false
+              },
               "responseForm": {
                 "description": "How long and how shaped each qualitative answer should be: concise is one short message (5-20 words), standard is 1-3 sentences (25-90 words), expanded is 2-5 sentences (70-180 words). Omit to let the question itself decide. Set expanded when the researcher wants narrative depth (interviews, lived experience, reasoning) without editing the question wording, which a fixed instrument must keep exact. Ignored for scale, categorical and multiselect questions.",
                 "type": "string",
@@ -2302,6 +2666,28 @@
                             "type": "number"
                           }
                         },
+                        "scaleAnchors": {
+                          "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                          "type": "object",
+                          "properties": {
+                            "low": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "high": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "mid": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            }
+                          },
+                          "additionalProperties": false
+                        },
                         "categoricalOptions": {
                           "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
                           "minItems": 2,
@@ -2424,7 +2810,7 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 2000,
-                  "description": "Exact respondent-visible question text, including any anchors or labels. Stored as given. Answer options do NOT belong here: list them in response.categoricalOptions instead. A question whose text spells out its choices but is typed qualitative is answered as free text, every Mind converges on the same most likely wording, and the chart shows one option at 100%. State the options here only as a respondent would read them, and always carry the same options in response.categoricalOptions so the contract and the wording agree. Skip and filter instructions (\"No -> go to Q12\", \"only if Q3 = Yes\") do not belong in the text either: transcribe each as askIf. A jump from an answer of item G to item N gives every item between G and N answerNotIn [that answer]; a filter gives answerIn. Tell the person about any instruction you cannot map to exact items and options instead of guessing it."
+                  "description": "Respondent-visible question text, stored as given. Keep it the short ask with only the scenario context the respondent needs. The answer type, scale range and its end labels (response.scaleAnchors), choice options and selection limits live in response and are shown and enforced from there: never restate them here (no option lists, no \"Answer on a scale from 0 (not at all) to 10 (extremely)\", no \"Choose one\"). Answer options do not belong here: list them in response.categoricalOptions and type the item categorical, multiselect or ranking: a question whose choices exist only in its text and is typed qualitative is answered as free text, every Mind converges on the same most likely wording, and the chart shows one option at 100%. A questionnaire the user supplies verbatim keeps its own wording. Skip and filter instructions (\"No -> go to Q12\", \"only if Q3 = Yes\") do not belong in the text either: transcribe each as askIf. A jump from an answer of item G to item N gives every item between G and N answerNotIn [that answer]; a filter gives answerIn. Tell the person about any instruction you cannot map to exact items and options instead of guessing it."
                 },
                 "module": {
                   "description": "Optional module (battery) label. Consecutive questions with the same label form one module.",
@@ -2569,6 +2955,28 @@
                       "items": {
                         "type": "number"
                       }
+                    },
+                    "scaleAnchors": {
+                      "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                      "type": "object",
+                      "properties": {
+                        "low": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "high": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "mid": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      },
+                      "additionalProperties": false
                     },
                     "categoricalOptions": {
                       "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
@@ -6222,17 +6630,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.be62a5b39b68.html",
+          "resourceUri": "ui://widget/audience.a4d4ad8b22dd.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.be62a5b39b68.html",
+        "openai/outputTemplate": "ui://widget/audience.a4d4ad8b22dd.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.be62a5b39b68.html"
+        "ui/resourceUri": "ui://widget/audience.a4d4ad8b22dd.html"
       }
     },
     {
@@ -6317,17 +6725,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.4154aba22aca.html",
+          "resourceUri": "ui://widget/plan.0ba5842849e4.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.4154aba22aca.html",
+        "openai/outputTemplate": "ui://widget/plan.0ba5842849e4.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.4154aba22aca.html"
+        "ui/resourceUri": "ui://widget/plan.0ba5842849e4.html"
       }
     },
     {
@@ -6714,18 +7122,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.ff328172727d.html",
+          "resourceUri": "ui://widget/response.bc50b679944e.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.ff328172727d.html",
+        "openai/outputTemplate": "ui://widget/response.bc50b679944e.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.ff328172727d.html"
+        "ui/resourceUri": "ui://widget/response.bc50b679944e.html"
       }
     },
     {
@@ -7133,7 +7541,7 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 2000,
-                  "description": "Exact respondent-visible question text, including any anchors or labels. Stored as given. Answer options do NOT belong here: list them in response.categoricalOptions instead. A question whose text spells out its choices but is typed qualitative is answered as free text, every Mind converges on the same most likely wording, and the chart shows one option at 100%. State the options here only as a respondent would read them, and always carry the same options in response.categoricalOptions so the contract and the wording agree. Skip and filter instructions (\"No -> go to Q12\", \"only if Q3 = Yes\") do not belong in the text either: transcribe each as askIf. A jump from an answer of item G to item N gives every item between G and N answerNotIn [that answer]; a filter gives answerIn. Tell the person about any instruction you cannot map to exact items and options instead of guessing it."
+                  "description": "Respondent-visible question text, stored as given. Keep it the short ask with only the scenario context the respondent needs. The answer type, scale range and its end labels (response.scaleAnchors), choice options and selection limits live in response and are shown and enforced from there: never restate them here (no option lists, no \"Answer on a scale from 0 (not at all) to 10 (extremely)\", no \"Choose one\"). Answer options do not belong here: list them in response.categoricalOptions and type the item categorical, multiselect or ranking: a question whose choices exist only in its text and is typed qualitative is answered as free text, every Mind converges on the same most likely wording, and the chart shows one option at 100%. A questionnaire the user supplies verbatim keeps its own wording. Skip and filter instructions (\"No -> go to Q12\", \"only if Q3 = Yes\") do not belong in the text either: transcribe each as askIf. A jump from an answer of item G to item N gives every item between G and N answerNotIn [that answer]; a filter gives answerIn. Tell the person about any instruction you cannot map to exact items and options instead of guessing it."
                 },
                 "module": {
                   "description": "Optional module (battery) label. Consecutive questions with the same label form one module.",
@@ -7278,6 +7686,28 @@
                       "items": {
                         "type": "number"
                       }
+                    },
+                    "scaleAnchors": {
+                      "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                      "type": "object",
+                      "properties": {
+                        "low": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "high": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "mid": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      },
+                      "additionalProperties": false
                     },
                     "categoricalOptions": {
                       "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
@@ -7948,6 +8378,28 @@
                       "items": {
                         "type": "number"
                       }
+                    },
+                    "scaleAnchors": {
+                      "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                      "type": "object",
+                      "properties": {
+                        "low": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "high": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "mid": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      },
+                      "additionalProperties": false
                     },
                     "categoricalOptions": {
                       "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
@@ -10357,6 +10809,28 @@
                           "items": {
                             "type": "number"
                           }
+                        },
+                        "scaleAnchors": {
+                          "description": "Worded meanings of the scaleRange's ends, as the scale itself words them: low (the minimum), high (the maximum) and, only when the range has an exact middle value and the scale names it, mid. Works for any range: 1-5 satisfaction (\"Very dissatisfied\" / \"Very satisfied\"), 1-7 agreement (\"Strongly disagree\" / \"Neither agree nor disagree\" / \"Strongly agree\"), 0-10 likelihood, 0-100, frequency. Set them here, never in the question text; respondents and Minds read them from here. Labels never restrict the allowed values. Omit when the ends have no wording.",
+                          "type": "object",
+                          "properties": {
+                            "low": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "high": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "mid": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            }
+                          },
+                          "additionalProperties": false
                         },
                         "categoricalOptions": {
                           "description": "Predefined answer choices; only valid for categorical, multiselect or ranking responses. A ranking orders all of them.",
