@@ -226,6 +226,12 @@
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 100
+              },
+              "minSelections": {
+                "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
               }
             },
             "required": [
@@ -977,6 +983,12 @@
                   },
                   "maxSelections": {
                     "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "minSelections": {
+                    "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 100
@@ -2702,6 +2714,12 @@
                           "type": "integer",
                           "minimum": 1,
                           "maximum": 100
+                        },
+                        "minSelections": {
+                          "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 100
                         }
                       },
                       "required": [
@@ -2989,6 +3007,12 @@
                     },
                     "maxSelections": {
                       "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
+                    },
+                    "minSelections": {
+                      "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
                       "type": "integer",
                       "minimum": 1,
                       "maximum": 100
@@ -6630,17 +6654,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.a4d4ad8b22dd.html",
+          "resourceUri": "ui://widget/audience.477975149692.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.a4d4ad8b22dd.html",
+        "openai/outputTemplate": "ui://widget/audience.477975149692.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.a4d4ad8b22dd.html"
+        "ui/resourceUri": "ui://widget/audience.477975149692.html"
       }
     },
     {
@@ -6725,17 +6749,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.0ba5842849e4.html",
+          "resourceUri": "ui://widget/plan.a8c2b8c29900.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.0ba5842849e4.html",
+        "openai/outputTemplate": "ui://widget/plan.a8c2b8c29900.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.0ba5842849e4.html"
+        "ui/resourceUri": "ui://widget/plan.a8c2b8c29900.html"
       }
     },
     {
@@ -7122,18 +7146,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.bc50b679944e.html",
+          "resourceUri": "ui://widget/response.38ef24db088b.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.bc50b679944e.html",
+        "openai/outputTemplate": "ui://widget/response.38ef24db088b.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.bc50b679944e.html"
+        "ui/resourceUri": "ui://widget/response.38ef24db088b.html"
       }
     },
     {
@@ -7723,6 +7747,12 @@
                       "type": "integer",
                       "minimum": 1,
                       "maximum": 100
+                    },
+                    "minSelections": {
+                      "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
                     }
                   },
                   "required": [
@@ -8122,6 +8152,11 @@
                               "type": "integer",
                               "minimum": 1,
                               "maximum": 100
+                            },
+                            "minSelections": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 100
                             }
                           },
                           "required": [
@@ -8412,6 +8447,12 @@
                     },
                     "maxSelections": {
                       "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
+                    },
+                    "minSelections": {
+                      "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
                       "type": "integer",
                       "minimum": 1,
                       "maximum": 100
@@ -8771,9 +8812,7 @@
         "properties": {
           "name": {
             "description": "Sidebar name for the Study draft.",
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
+            "type": "string"
           },
           "audienceIds": {
             "description": "Existing Audience IDs selected for the Study. Preferred.",
@@ -8853,9 +8892,7 @@
               },
               "currentStep": {
                 "description": "Exact planner step to reopen, such as context, audiences, method, questions, or confirm. The legacy value groups remains accepted when reopening an older draft. When omitted on create, context applies; when omitted on a revision, the saved step is kept.",
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 100
+                "type": "string"
               }
             }
           },
@@ -10843,6 +10880,12 @@
                         },
                         "maxSelections": {
                           "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 100
+                        },
+                        "minSelections": {
+                          "description": "Minimum choices a respondent must select (an exact count sets it equal to maxSelections); only valid for multiselect responses.",
                           "type": "integer",
                           "minimum": 1,
                           "maximum": 100
