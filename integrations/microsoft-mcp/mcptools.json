@@ -1632,6 +1632,137 @@
       }
     },
     {
+      "name": "check_study_start_allowance",
+      "title": "Check Study Start Allowance",
+      "description": "Read-only: whether the account's plan can pay for a planned Study before it starts. Counts one synthetic response per intended Mind per question, the Free plan's Study answers and the started-Study cap, as a start does. Returns `fits`, `startRefused`, the shortfall and how many Minds or questions would fit. Nothing is created, reserved or charged.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "studyId": {
+            "description": "A saved Study draft's Study to check, by ID. Its attached Audiences count when audienceIds is omitted.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "audienceIds": {
+            "description": "Existing Audiences the Study will ask, by ID.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "segmentSelections": {
+            "description": "Optional list of {audienceId, segments}, where segments contains up to three {formationId, subgroupId} pairs from that Audience's segment catalogue (use list_formations to obtain their IDs). Choose at most one segment per dimension. Different dimensions intersect; only the matching Minds participate. The accepted participant set is retained for later questions and retries. Omit an Audience to use all its Minds.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "audienceId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "segments": {
+                  "maxItems": 3,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "formationId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "subgroupId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      }
+                    },
+                    "required": [
+                      "formationId",
+                      "subgroupId"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "audienceId",
+                "segments"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "plannedAudienceMinds": {
+            "description": "Sizes (Minds) of Audiences that will be created when the Study starts, one number per new Audience.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          "questions": {
+            "description": "How many questions every Mind will answer. Omit or 0 while the questions are not known yet: the check then covers one question.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "fits": {
+            "description": "True when every planned question runs for every intended Mind within the plan.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "startRefused": {
+            "description": "True when starting the Study as planned would be refused (not just run fewer questions).",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "responsesNeeded": {
+            "description": "Synthetic responses the start needs: one per intended Mind per question that runs."
+          },
+          "responses": {
+            "description": "The response allowance (`unlimited`, `limit`, `used`, `remaining`, `periodEnd`; -1 when unlimited)."
+          },
+          "planLimit": {
+            "description": "The plan-limit refusal the start would give (`statusMessage` and the PLAN_LIMIT envelope in `data`), or null when the Study fits."
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Check Study Start Allowance",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/visibility": "public",
+        "openai/scopes": [
+          "flows:read"
+        ]
+      }
+    },
+    {
       "name": "create_audience_from_brief",
       "title": "Create a Grounded Audience from a Brief",
       "description": "Builds grounded Audience/Mind profiles with exact segment allocation. Returns an asynchronous draft/operation for review; create only after the user accepts its roster/quota snapshot and checksum. Rework the same draft.id/sha256 in place, overwriting its saved request, roster and grounding; never start a new brief for that edit. Supports reviewed datasets and public research/files. Existing Audiences use recalibration. Private unless link sharing is enabled.",
@@ -6045,6 +6176,97 @@
       }
     },
     {
+      "name": "manage_study_draft",
+      "title": "Manage a Study Draft",
+      "description": "Delete, consume, or reread the original source of a durable Study draft. read-source takes the revision you hold, rereads the latest saved input with a model and keeps reviewed edits, including ones saved meanwhile; a long reading returns status processing and an operationId for the next read-source call. Check the returned review for unresolved settings. Consume only closes planning. No action starts research. Use list/save to read or checkpoint drafts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "delete",
+              "consume",
+              "read-source"
+            ],
+            "description": "read-source rereads the saved original input, preserving reviewed edits; it does not start research."
+          },
+          "draftId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "operationId": {
+            "description": "read-source only: the operationId a processing read-source returned; resumes that reading.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "studyId": {
+            "description": "Study ID to attach when consuming the draft. Preferred.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "panelId": {
+            "description": "Legacy alias for studyId. Accepted for compatibility.",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "action",
+          "draftId"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "The Study draft as saved after the action; null after delete."
+          },
+          "status": {
+            "description": "processing while a read-source reading continues; absent once the draft is returned.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operationId": {
+            "description": "The read-source operation to resume with the next read-source call.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "title": "Manage a Study Draft",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "_meta": {
+        "openai/scopes": [
+          "flows:write"
+        ]
+      }
+    },
+    {
       "name": "plan_study_questions",
       "title": "Plan a Multi-Question Block in a Study",
       "description": "Deprecated alias of create_study_plan and revise_study_plan; identical behaviour.",
@@ -6307,6 +6529,12 @@
                     }
                   }
                 }
+              },
+              "removeSourceUrl": {
+                "description": "Remove this one saved source from the Audience. Supply its grounding URL (link.originalUrl when present) as the sole change. Earlier Study snapshots retain their evidence.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16384
               },
               "query": {
                 "description": "Replaces the research topic entirely, only when the user wants to steer away from the original brief. When omitted, the original brief and attachments are replayed.",
@@ -6654,17 +6882,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.477975149692.html",
+          "resourceUri": "ui://widget/audience.4e981f3548a7.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.477975149692.html",
+        "openai/outputTemplate": "ui://widget/audience.4e981f3548a7.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.477975149692.html"
+        "ui/resourceUri": "ui://widget/audience.4e981f3548a7.html"
       }
     },
     {
@@ -6749,17 +6977,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.a8c2b8c29900.html",
+          "resourceUri": "ui://widget/plan.4ec28f537431.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.a8c2b8c29900.html",
+        "openai/outputTemplate": "ui://widget/plan.4ec28f537431.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.a8c2b8c29900.html"
+        "ui/resourceUri": "ui://widget/plan.4ec28f537431.html"
       }
     },
     {
@@ -7146,18 +7374,18 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.38ef24db088b.html",
+          "resourceUri": "ui://widget/response.e1d4b7ddd4f7.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.38ef24db088b.html",
+        "openai/outputTemplate": "ui://widget/response.e1d4b7ddd4f7.html",
         "openai/scopes": [
           "flows:read",
           "flows:write"
         ],
-        "ui/resourceUri": "ui://widget/response.38ef24db088b.html"
+        "ui/resourceUri": "ui://widget/response.e1d4b7ddd4f7.html"
       }
     },
     {

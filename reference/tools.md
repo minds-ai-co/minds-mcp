@@ -6,8 +6,8 @@ The remote server is the source of truth for current schemas. This page is
 regenerated from the live server card; let the connected client inspect the
 live tool definition before constructing a call.
 
-The server advertises **52 tools** through ordinary `tools/list` discovery.
-There are **77 canonical callable tools**, excluding aliases.
+The server advertises **54 tools** through ordinary `tools/list` discovery.
+There are **78 canonical callable tools**, excluding aliases.
 Access reflects the server annotations; destructive operations may delete or
 replace stored data. Inspect the schema and confirmation requirements before calling.
 
@@ -22,6 +22,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `get_audience_creation_progress` | Audience creation progress | Read-only; never starts or retries work. | read-only | sparks:read |
 | `render_audience_review` | Show Audience Creation | Shows source research, distributions, proposed Minds, the draft and training for one or more Audience operations, display only: the user confirms or asks for changes in chat. | read-only | sparks:read |
 | `get_audience_limits` | Get Audience Limits | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. | read-only | sparks:read |
+| `check_study_start_allowance` | Check Study Start Allowance | Read-only: whether the account's plan can pay for a planned Study before it starts. | read-only | flows:read |
 | `ask_audience` | Ask One Standalone Audience Question | Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. | destructive | flows:write |
 | `export_audience` | Export Audience Brief | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
@@ -59,6 +60,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `enterprise_use_cases` | Enterprise use cases | Read paged team business use cases and role-scoped counts of attributed drafts, Studies and completed runs. | read-only | flows:read |
 | `save_enterprise_use_case` | Save enterprise use case | Save a revision-checked team business use case with objectives, template revisions, planned targets and lifecycle state. | destructive | flows:write |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |
+| `manage_study_draft` | Manage a Study Draft | Delete, consume, or reread the original source of a durable Study draft. | destructive | flows:write |
 | `save_study_template` | Save Study Template | Creates a private Custom template with its questions, response settings, attachments and method. | writes | flows:write |
 | `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |
 | `use_study_template` | Create Draft From Study Template | Creates an independent editable Study draft from a readable template at use.expectedRevision. | writes | flows:write |
@@ -150,7 +152,6 @@ discovery response. Registry listings must not describe them as discovered.
 | `manage_mind` | Read, update, delete, retrain, or regenerate an existing Mind through the canonical v1 API. |
 | `manage_mind_knowledge` | List, add links, files, or keywords, update, delete, enrich, and inspect a Mind’s knowledge through /api/v1/ endpoints. |
 | `manage_study` | Read, delete, enable or disable link sharing, share with or unshare from the owner's team (set_team_sharing; no invitation is sent), invite collaborators to, list (list_collaborators) or remove (remove_collaborator with userId; revokes their invitations and their read access to the Study's Audiences and Minds, without email) collaborators of, add Audiences to (add_audiences) or remove an Audience from (remove_audience) an existing Study through the v1 API. |
-| `manage_study_draft` | Delete, consume, or reread the original source of a durable Study draft through /api/v1/. |
 | `manage_study_template` | Saves a Custom Study template, updates one the user owns, or turns one into an independent editable Study draft in the Minds web app. |
 | `preview_audience_dataset_segmentation` | Enterprise review step for spreadsheet-grounded Audiences. |
 | `run_study_heatmap` | Read or start saved analysis of an assigned image, video, website or supported original file on a Study question. |
