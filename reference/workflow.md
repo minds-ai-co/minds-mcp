@@ -109,6 +109,20 @@ Returns the authenticated account's current plan (`planName`, as the app names i
 | --- | --- | --- | --- |
 | `mode` | No | "balanced", "segment_coverage", "benchmark_depth" | Report only this creation mode. Omit to see every mode. |
 
+## Check Study Start Allowance
+
+Tool: `check_study_start_allowance`
+
+Read-only: whether the account's plan can pay for a planned Study before it starts. Counts one synthetic response per intended Mind per question, the Free plan's Study answers and the started-Study cap, as a start does. Returns `fits`, `startRefused`, the shortfall and how many Minds or questions would fit. Nothing is created, reserved or charged.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `studyId` | No | string | A saved Study draft's Study to check, by ID. Its attached Audiences count when audienceIds is omitted. |
+| `audienceIds` | No | array | Existing Audiences the Study will ask, by ID. |
+| `segmentSelections` | No | array | Optional list of {audienceId, segments}, where segments contains up to three {formationId, subgroupId} pairs from that Audience's segment catalogue (use list_formations to obtain their IDs). Choose at most one segment per dimension. Different dimensions intersect; only the matching Minds participate. The accepted participant set is retained for later questions and retries. Omit an Audience to use all its Minds. |
+| `plannedAudienceMinds` | No | array | Sizes (Minds) of Audiences that will be created when the Study starts, one number per new Audience. |
+| `questions` | No | integer | How many questions every Mind will answer. Omit or 0 while the questions are not known yet: the check then covers one question. |
+
 ## Ask One Standalone Audience Question
 
 Tool: `ask_audience`
@@ -640,6 +654,21 @@ Creates or checkpoints an unfinished Quick or Custom Study draft without startin
 | `planner` | No | object | Planner state to restore when the draft is reopened. |
 | `context` | No | object | Research context captured so far: only the user's brief and material relevant to the research question, never tool errors, status messages, internal links or process notes. |
 | `conversationFiles` | No | array | Study context files for the draft: images, video and audio are stimulus respondents see, documents are background. They are kept on later saves of the same draft. Files shared in this conversation: uploaded or generated images, PDFs, documents. Each is copied into Minds storage on receipt; its file_id is its attachment id. |
+
+## Manage a Study Draft
+
+Tool: `manage_study_draft`
+
+Delete, consume, or reread the original source of a durable Study draft. read-source takes the revision you hold, rereads the latest saved input with a model and keeps reviewed edits, including ones saved meanwhile; a long reading returns status processing and an operationId for the next read-source call. Check the returned review for unresolved settings. Consume only closes planning. No action starts research. Use list/save to read or checkpoint drafts.
+
+| Input | Required | Type / allowed values | Guidance |
+| --- | --- | --- | --- |
+| `action` | Yes | "delete", "consume", "read-source" | read-source rereads the saved original input, preserving reviewed edits; it does not start research. |
+| `draftId` | Yes | string |  |
+| `expectedRevision` | No | integer |  |
+| `operationId` | No | string | read-source only: the operationId a processing read-source returned; resumes that reading. |
+| `studyId` | No | string | Study ID to attach when consuming the draft. Preferred. |
+| `panelId` | No | string | Legacy alias for studyId. Accepted for compatibility. |
 
 ## Save Study Template
 
