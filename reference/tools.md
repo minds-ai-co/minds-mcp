@@ -24,7 +24,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `get_audience_limits` | Get Audience Limits | Returns the authenticated account's current plan (`planName`, as the app names it), its Audience size allowance (per-Audience cap including any team or contract allowance, `customSizeMax`, per-mode ceilings) and the synthetic responses left, read live; it supersedes limits stated elsewhere. | read-only | sparks:read |
 | `check_study_start_allowance` | Check Study Start Allowance | Read-only: whether the account's plan can pay for a planned Study before it starts. | read-only | flows:read |
 | `ask_audience` | Ask One Standalone Audience Question | Accepts one standalone question request for an Audience, restricted to supplied segments, and creates a private Study. | destructive | flows:write |
-| `export_audience` | Export Audience Brief | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
+| `export_audience` | Export Audience Brief | Exports an Audience brief or kind validation_report (scores, KPIs, answer shares, provenance) as Markdown/PDF/DOCX/PPTX. | destructive | sparks:read |
 | `duplicate_audience` | Duplicate Audience | Adds an independent copy of an Audience, its Minds and retained knowledge. | writes | sparks:write |
 | `recalibrate_audience` | Change an Existing Audience | Changes an existing Audience in place: it keeps its id, its Minds keep theirs (except copies below), and no Mind is deleted. | destructive | sparks:write |
 | `manage_audience_support` | Manage Audience Support Access | Manage owner-issued, expiring staff access to one Audience’s composition and receipts. | destructive | sparks:write |
@@ -36,13 +36,13 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `get_study_status` | Get Study Status | Read Study progress, saved replies, uncalibrated forecasts and exports without generating replies. | read-only | flows:read |
 | `request_study_answers` | Request Study Replies | Request actual replies (default 8; all=true for all). | destructive | flows:write |
 | `cancel_study_run` | Cancel Study Run | Stop pending Study work; keep saved replies. | destructive | flows:write |
-| `render_study_results` | Show Study Results | Completed Study results or labeled experimental, uncalibrated forecasts. | destructive | flows:read, flows:write |
-| `export_study` | Export Study Results | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. | destructive | flows:read, flows:write |
+| `render_study_results` | Show Study Results | Completed Study results or labeled experimental, uncalibrated forecasts. | read-only | flows:read |
+| `export_study` | Export Study Results | Queues Study results export: executive/full reports in PDF/DOCX/PPTX/Markdown; raw CSV/XLS/SPSS SAV. | destructive | flows:read |
 | `duplicate_study` | Duplicate Study | Permanently copy a Study with its questions and results over the same Audiences. | writes | flows:write |
-| `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. | destructive | flows:read, flows:write |
+| `export_heatmap` | Export Website Heatmap | Exports a completed website heatmap by Study/message ID as a ZIP of stored screenshots and overlays. | destructive | flows:read |
 | `get_study_heatmap` | Read Study Asset Heatmap | Read saved attention by assetKey and, for monadic Studies, variantId. | read-only | flows:read |
 | `start_study_heatmap` | Start Study Asset Heatmap | Start or retry analysis of an assigned original file, image, video or public website, including a monadic variantId. | destructive | flows:write |
-| `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read, sparks:write |
+| `export_mind` | Export Mind Persona Profile | Exports an existing Mind by ID/name: inline Markdown by default, or PDF/DOCX/PPTX. | destructive | sparks:read |
 | `get_shared_mind_knowledge` | Read Shared Mind Sources | Returns stored public Mind sources/assessments by share ID, including shares outside the private workspace. | read-only | sparks:read |
 | `create_study_plan` | Draft Research in an Existing Study | Saves a non-executing research draft in an existing Study, including a multi-question concept test or survey. | destructive | flows:write |
 | `revise_study_plan` | Revise Study Plan | Revises the saved draft at current draft.id and draft.revision without starting research. | destructive | flows:write |
@@ -56,7 +56,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `set_sharing` | Change Study or Audience Sharing | Turns a Study's or Audience's public link or team sharing on or off. | destructive | flows:write, sparks:write |
 | `list_research_methods` | List Research Methods | Lists the research-method catalog without changing or running methods. | read-only | flows:read |
 | `list_study_drafts` | List Study Drafts | Lists a page of unfinished Study draft summaries, newest first, or returns the complete saved planning state for one exact draft ID. | read-only | flows:read |
-| `list_study_templates` | List Study Templates | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. | destructive | flows:read, flows:write |
+| `list_study_templates` | List Study Templates | Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. | read-only | flows:read |
 | `enterprise_use_cases` | Enterprise use cases | Read paged team business use cases and role-scoped counts of attributed drafts, Studies and completed runs. | read-only | flows:read |
 | `save_enterprise_use_case` | Save enterprise use case | Save a revision-checked team business use case with objectives, template revisions, planned targets and lifecycle state. | destructive | flows:write |
 | `save_study_draft` | Save Study Draft | Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. | destructive | flows:write |
@@ -65,7 +65,7 @@ replace stored data. Inspect the schema and confirmation requirements before cal
 | `update_study_template` | Update Study Template | Updates one owned Custom template at update.expectedRevision. | destructive | flows:write |
 | `use_study_template` | Create Draft From Study Template | Creates an independent editable Study draft from a readable template at use.expectedRevision. | writes | flows:write |
 | `delete_study_template` | Delete Study Template | Only for saved Study templates; it cannot delete Studies, Audiences, Minds or answers. | destructive | flows:write |
-| `read_study_summary` | Read Study Summary | Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. | destructive | flows:read, flows:write |
+| `read_study_summary` | Read Study Summary | Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. | read-only | flows:read |
 | `refresh_study_summary` | Refresh Study Summary | Queues a whole-Study summary refresh after explicit approval. | destructive | flows:write |
 | `plan_study_questions` | Plan a Multi-Question Block in a Study | Deprecated alias of create_study_plan and revise_study_plan; identical behaviour. | destructive | flows:write |
 | `run_study_questions` | Run a Confirmed Multi-Question Block | Deprecated alias of start_study_run; identical behaviour. | destructive | flows:write |

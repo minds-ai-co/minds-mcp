@@ -323,7 +323,7 @@ Stop pending Study work; keep saved replies. Returns run/collection status.
 
 Tool: `render_study_results`
 
-Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. May recover and replace derived results from accepted answers without rerunning Minds.
+Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. Write grants also recover stale derived results; never reruns Minds.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -602,7 +602,7 @@ Lists a page of unfinished Study draft summaries, newest first, or returns the c
 
 Tool: `list_study_templates`
 
-Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Listing provisions starters or overwrites eligible untouched older starters. Exact-template reads skip provisioning.
+Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Write-grant listing provisions or refreshes untouched starters; exact reads skip it.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |
@@ -718,7 +718,7 @@ Only for saved Study templates; it cannot delete Studies, Audiences, Minds or an
 
 Tool: `read_study_summary`
 
-Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. May recover/replace stale or missing summaries; never reruns respondents.
+Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. Write grants also recover stale summaries; never reruns respondents.
 
 | Input | Required | Type / allowed values | Guidance |
 | --- | --- | --- | --- |

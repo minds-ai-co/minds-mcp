@@ -3870,8 +3870,7 @@
         "openai/toolInvocation/invoking": "Exporting Audience brief...",
         "openai/toolInvocation/invoked": "Audience brief ready!",
         "openai/scopes": [
-          "sparks:read",
-          "sparks:write"
+          "sparks:read"
         ]
       }
     },
@@ -3958,8 +3957,7 @@
         "openai/toolInvocation/invoking": "Exporting website heatmap...",
         "openai/toolInvocation/invoked": "Heatmap archive ready!",
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ]
       }
     },
@@ -4068,8 +4066,7 @@
         "openai/toolInvocation/invoking": "Exporting Mind profile...",
         "openai/toolInvocation/invoked": "Profile ready!",
         "openai/scopes": [
-          "sparks:read",
-          "sparks:write"
+          "sparks:read"
         ]
       }
     },
@@ -4194,8 +4191,7 @@
         "openai/toolInvocation/invoking": "Exporting Study results...",
         "openai/toolInvocation/invoked": "Export request processed",
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ]
       }
     },
@@ -5982,7 +5978,7 @@
     {
       "name": "list_study_templates",
       "title": "List Study Templates",
-      "description": "Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Listing provisions starters or overwrites eligible untouched older starters. Exact-template reads skip provisioning.",
+      "description": "Lists owned/team-shared template summaries, most used first; templateId returns full configuration, revision, questions, response settings and attachments. configuration.questions is the fixed instrument; configuration.methodId the research method it runs with. Write-grant listing provisions or refreshes untouched starters; exact reads skip it.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6067,8 +6063,8 @@
       },
       "annotations": {
         "title": "List Study Templates",
-        "readOnlyHint": false,
-        "destructiveHint": true,
+        "readOnlyHint": true,
+        "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -6077,8 +6073,7 @@
       },
       "_meta": {
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ]
       }
     },
@@ -6374,7 +6369,7 @@
     {
       "name": "read_study_summary",
       "title": "Read Study Summary",
-      "description": "Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. May recover/replace stale or missing summaries; never reruns respondents.",
+      "description": "Reads saved whole-Study Markdown, evidence, generation state and your refresh receipt. Pending retains prior content. Write grants also recover stale summaries; never reruns respondents.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -6424,8 +6419,8 @@
       },
       "annotations": {
         "title": "Read Study Summary",
-        "readOnlyHint": false,
-        "destructiveHint": true,
+        "readOnlyHint": true,
+        "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -6434,8 +6429,7 @@
       },
       "_meta": {
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ]
       }
     },
@@ -6882,17 +6876,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.4e981f3548a7.html",
+          "resourceUri": "ui://widget/audience.27180ecdf2e5.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.4e981f3548a7.html",
+        "openai/outputTemplate": "ui://widget/audience.27180ecdf2e5.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.4e981f3548a7.html"
+        "ui/resourceUri": "ui://widget/audience.27180ecdf2e5.html"
       }
     },
     {
@@ -6977,23 +6971,23 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.4ec28f537431.html",
+          "resourceUri": "ui://widget/plan.87e02c5a2ae5.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.4ec28f537431.html",
+        "openai/outputTemplate": "ui://widget/plan.87e02c5a2ae5.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.4ec28f537431.html"
+        "ui/resourceUri": "ui://widget/plan.87e02c5a2ae5.html"
       }
     },
     {
       "name": "render_study_results",
       "title": "Show Study Results",
-      "description": "Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. May recover and replace derived results from accepted answers without rerunning Minds.",
+      "description": "Completed Study results or labeled experimental, uncalibrated forecasts. Exactly one runId/questionId. Replies load on request. Write grants also recover stale derived results; never reruns Minds.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -7364,8 +7358,8 @@
       },
       "annotations": {
         "title": "Show Study Results",
-        "readOnlyHint": false,
-        "destructiveHint": true,
+        "readOnlyHint": true,
+        "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
       },
@@ -7374,18 +7368,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.e1d4b7ddd4f7.html",
+          "resourceUri": "ui://widget/response.1f238cc3b1ba.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.e1d4b7ddd4f7.html",
+        "openai/outputTemplate": "ui://widget/response.1f238cc3b1ba.html",
         "openai/scopes": [
-          "flows:read",
-          "flows:write"
+          "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.e1d4b7ddd4f7.html"
+        "ui/resourceUri": "ui://widget/response.1f238cc3b1ba.html"
       }
     },
     {
