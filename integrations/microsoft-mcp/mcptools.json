@@ -3408,7 +3408,8 @@
                   "ja",
                   "ko",
                   "it",
-                  "nl"
+                  "nl",
+                  "pt"
                 ]
               }
             },
@@ -6876,17 +6877,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/audience.27180ecdf2e5.html",
+          "resourceUri": "ui://widget/audience.bac945122f5a.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/audience.27180ecdf2e5.html",
+        "openai/outputTemplate": "ui://widget/audience.bac945122f5a.html",
         "openai/scopes": [
           "sparks:read"
         ],
-        "ui/resourceUri": "ui://widget/audience.27180ecdf2e5.html"
+        "ui/resourceUri": "ui://widget/audience.bac945122f5a.html"
       }
     },
     {
@@ -6971,17 +6972,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/plan.87e02c5a2ae5.html",
+          "resourceUri": "ui://widget/plan.948e5fc5d7d4.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/plan.87e02c5a2ae5.html",
+        "openai/outputTemplate": "ui://widget/plan.948e5fc5d7d4.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/plan.87e02c5a2ae5.html"
+        "ui/resourceUri": "ui://widget/plan.948e5fc5d7d4.html"
       }
     },
     {
@@ -7368,17 +7369,17 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://widget/response.1f238cc3b1ba.html",
+          "resourceUri": "ui://widget/response.e3ed2e07e2ce.html",
           "visibility": [
             "model",
             "app"
           ]
         },
-        "openai/outputTemplate": "ui://widget/response.1f238cc3b1ba.html",
+        "openai/outputTemplate": "ui://widget/response.e3ed2e07e2ce.html",
         "openai/scopes": [
           "flows:read"
         ],
-        "ui/resourceUri": "ui://widget/response.1f238cc3b1ba.html"
+        "ui/resourceUri": "ui://widget/response.e3ed2e07e2ce.html"
       }
     },
     {
@@ -8235,7 +8236,8 @@
                   "ja",
                   "ko",
                   "it",
-                  "nl"
+                  "nl",
+                  "pt"
                 ]
               }
             },
@@ -9260,7 +9262,8 @@
                       "ja",
                       "ko",
                       "it",
-                      "nl"
+                      "nl",
+                      "pt"
                     ]
                   },
                   "questions": {
@@ -10316,7 +10319,8 @@
                       "ja",
                       "ko",
                       "it",
-                      "nl"
+                      "nl",
+                      "pt"
                     ]
                   },
                   "questions": {
